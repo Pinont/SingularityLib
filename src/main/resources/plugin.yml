@@ -1,0 +1,4 @@
+name: SingularityLib
+version: '1.0-SNAPSHOT'
+main: com.pinont.lib.SingularityLib
+api-version: '1.21'
