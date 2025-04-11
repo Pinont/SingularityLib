@@ -1,4 +1,4 @@
-package com.pinont.lib.api.enums;
+package com.pinont.lib.enums;
 
 import org.bukkit.attribute.Attribute;
 

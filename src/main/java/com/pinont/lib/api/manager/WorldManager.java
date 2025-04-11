@@ -15,6 +15,7 @@ public class WorldManager {
     private static final ConfigManager worldConfigManager = new ConfigManager("worlds.yml");
     private static final FileConfiguration worldConfig = worldConfigManager.getConfig();
 
+    @Deprecated (forRemoval = true)
     public WorldManager(String worldName) {
         this.worldName = worldName;
     }
