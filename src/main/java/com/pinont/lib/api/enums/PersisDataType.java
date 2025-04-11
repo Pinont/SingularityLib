@@ -1,4 +1,4 @@
-package com.pinont.lib.api.utils.enums;
+package com.pinont.lib.api.enums;
 
 public enum PersisDataType {
     STRING,
