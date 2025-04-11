@@ -15,6 +15,10 @@ public abstract class CorePlugin extends JavaPlugin implements PluginBootstrap {
 
     private static CorePlugin instance;
 
+    public static void sendConsoleMessage(String message) {
+        Bukkit.getConsoleSender().sendMessage(message);
+    }
+
     public static CorePlugin getInstance() {
         if (instance == null) {
             try {
@@ -22,7 +26,7 @@ public abstract class CorePlugin extends JavaPlugin implements PluginBootstrap {
 
             } catch (final IllegalStateException ex) {
                 if (Bukkit.getPluginManager().getPlugin("PlugManX") != null)
-                    Bukkit.getLogger().severe("Failed to get instance of the plugin, if you reloaded using PlugManX you need to do a clean restart instead.");
+                    sendConsoleMessage("Failed to get instance of the plugin, if you reloaded using PlugManX you need to do a clean restart instead.");
                 throw ex;
             }
             Objects.requireNonNull(instance, "Cannot get a new instance! Have you reloaded?");
@@ -35,7 +39,7 @@ public abstract class CorePlugin extends JavaPlugin implements PluginBootstrap {
     public final void onEnable() {
         plugin = this;
         onPluginStart();
-        Bukkit.getLogger().info(this.getName() + " has been enabled!");
+        sendConsoleMessage(this.getName() + " has been enabled!");
     }
 
     @Override
@@ -61,7 +65,7 @@ public abstract class CorePlugin extends JavaPlugin implements PluginBootstrap {
     @Override
     public final void onDisable() {
         onPluginStop();
-        getLogger().info(this.getName() + " has been disabled!");
+        sendConsoleMessage(this.getName() + " has been disabled!");
     }
 
     public abstract void onPluginStart();
