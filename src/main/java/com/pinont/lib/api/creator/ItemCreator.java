@@ -1,5 +1,6 @@
 package com.pinont.lib.api.creator;
 
+import com.pinont.lib.SingularityLib;
 import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.api.utils.enums.AttributeType;
 import com.pinont.lib.api.utils.enums.PersisDataType;
@@ -33,7 +34,7 @@ public class ItemCreator {
     private final ArrayList<String> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
-    private Plugin plugin = CorePlugin.getPlugin();
+    private final Plugin plugin = SingularityLib.getInstance();
 
     public ItemCreator(@NotNull ItemStack item) {
         this.item = item;
@@ -109,10 +110,10 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator addAttribute(AttributeType attributeType, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
-        meta.addAttributeModifier(attributeType.getAttribute(), new AttributeModifier(UUID.randomUUID(), attributeType.name(), amount, operation, slot).getAttributeModifier());
-        return this;
-    }
+//    public ItemCreator addAttribute(AttributeType attributeType, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
+//        meta.addAttributeModifier(attributeType.getAttribute(), new AttributeModifier(UUID.randomUUID(), attributeType.name(), amount, operation, slot).getAttributeModifier());
+//        return this;
+//    }
 
     public ItemCreator setCustomModelData(int data) {
         meta.setCustomModelData(data);

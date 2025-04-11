@@ -1,7 +1,6 @@
 package com.pinont.lib.api.manager;
 
-import com.pinont.lib.SingularityLib;
-import com.pinont.lib.api.utils.ConfigBuilder;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,8 +11,9 @@ public class WorldManager {
 
     private final String worldName;
 
-    public static final ConfigBuilder worldConfigBuilder = new ConfigBuilder("worlds.yml", SingularityLib.getInstance());
-    public static final FileConfiguration worldConfig = worldConfigBuilder.getConfig();
+    @Getter
+    private static final ConfigManager worldConfigManager = new ConfigManager("worlds.yml");
+    private static final FileConfiguration worldConfig = worldConfigManager.getConfig();
 
     public WorldManager(String worldName) {
         this.worldName = worldName;
@@ -54,7 +54,7 @@ public class WorldManager {
         worldConfig.set(worldName + ".seed", world.getSeed());
         worldConfig.set(worldName + ".borderSize", world.getWorldBorder().getSize());
         worldConfig.set(worldName + ".worldType", Objects.requireNonNull(world.getWorldType()).getName());
-        worldConfig.set(worldName + ".spawnLocation.world", world.getSpawnLocation().getWorld().getName());
+        worldConfig.set(worldName + ".spawnLocation.world", Objects.requireNonNull(world.getSpawnLocation().getWorld()).getName());
         worldConfig.set(worldName + ".spawnLocation.x", world.getSpawnLocation().getX());
         worldConfig.set(worldName + ".spawnLocation.y", world.getSpawnLocation().getY());
         worldConfig.set(worldName + ".spawnLocation.z", world.getSpawnLocation().getZ());
@@ -67,7 +67,7 @@ public class WorldManager {
                 worldConfig.set(worldName + ".gameRule." + key, value);
             }
         }
-        worldConfigBuilder.saveConfig();
+        worldConfigManager.saveConfig();
     }
 
     public static void load(String worldName) {
@@ -94,7 +94,7 @@ public class WorldManager {
             return false;
         }
         worldConfig.set(worldName, null);
-        worldConfigBuilder.saveConfig();
+        worldConfigManager.saveConfig();
         return true;
     }
 

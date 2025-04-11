@@ -26,7 +26,7 @@ public class Common {
         return Arrays.asList(getAllItemsMaterials()).contains(material);
     }
 
-    public static Plugin plugin = SingularityLib.getPlugin();
+    public static Plugin plugin = SingularityLib.getInstance();
 
     public static Set<String> getCommands() {
         return plugin.getDescription().getCommands().keySet();
