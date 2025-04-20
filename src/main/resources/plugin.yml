@@ -1,4 +1,6 @@
 name: SingularityLib
 version: '1.0-SNAPSHOT'
 main: com.pinont.lib.SingularityLib
-api-version: '1.21'
+description: Library for Singularity Plugins
+api-version: '1.21.5'
+bootstrapper: com.pinont.lib.bootstrap.CorePluginBootstrap

@@ -1,18 +1,16 @@
-package com.pinont.lib.api.creator;
+package com.pinont.lib.api.creator.items;
 
 import com.pinont.lib.SingularityLib;
+import com.pinont.lib.api.ui.Interaction;
 import com.pinont.lib.api.utils.Common;
-import com.pinont.lib.api.utils.enums.AttributeType;
-import com.pinont.lib.api.utils.enums.PersisDataType;
-import com.pinont.lib.boostrap.AttributeModifier;
-import com.pinont.lib.plugin.CorePlugin;
-import lombok.Getter;
+import com.pinont.lib.enums.AttributeType;
+import com.pinont.lib.enums.PersisDataType;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -29,12 +27,16 @@ public class ItemCreator {
     private final ItemStack item;
     private ItemMeta meta;
     private short durability = 0;
-    @Getter
     private final PersistentDataContainer data;
     private final ArrayList<String> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
     private final Plugin plugin = SingularityLib.getInstance();
+    private static final ArrayList<Interaction> interactions = new ArrayList<>();
+
+    public static ArrayList<Interaction> getInteractions() {
+        return interactions;
+    }
 
     public ItemCreator(@NotNull ItemStack item) {
         this.item = item;
@@ -63,6 +65,11 @@ public class ItemCreator {
         return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
     }
 
+    public ItemCreator addLore(String lore) {
+        this.lore.add(Common.colorize(lore));
+        return this;
+    }
+
     public ItemCreator setItemMeta(ItemMeta meta) {
         this.meta = meta;
         return this;
@@ -70,13 +77,6 @@ public class ItemCreator {
 
     public ItemCreator setType(Material type) {
         this.type = type;
-        return this;
-    }
-
-    public ItemCreator addChargedProjectile(ItemStack arrow) {
-        CrossbowMeta crossbowMeta = (CrossbowMeta) meta;
-        crossbowMeta.addChargedProjectile(arrow);
-        meta = crossbowMeta;
         return this;
     }
 
@@ -110,10 +110,10 @@ public class ItemCreator {
         return this;
     }
 
-//    public ItemCreator addAttribute(AttributeType attributeType, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
-//        meta.addAttributeModifier(attributeType.getAttribute(), new AttributeModifier(UUID.randomUUID(), attributeType.name(), amount, operation, slot).getAttributeModifier());
-//        return this;
-//    }
+    public ItemCreator addAttribute(AttributeType attributeType, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
+        meta.addAttributeModifier(attributeType.getAttribute(), new AttributeModifier(UUID.randomUUID(), attributeType.name(), amount, operation, slot));
+        return this;
+    }
 
     public ItemCreator setCustomModelData(int data) {
         meta.setCustomModelData(data);
@@ -179,7 +179,43 @@ public class ItemCreator {
         return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
     }
 
-    public Object getPersistentDataContainer(String key, PersistentDataType type) {
-        return data.get(new NamespacedKey(plugin, key), type);
+    public static Object getItemPersistData(ItemStack item, String key, PersistentDataType type) {
+        if (isItemHasPersistData(item, key, type)) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                return meta.getPersistentDataContainer().get(new NamespacedKey(SingularityLib.getInstance(), key), type);
+            }
+        }
+        return null;
+    }
+
+    public ItemCreator addInteraction(Interaction interaction) {
+        interactions.add(interaction);
+        this.setPersisDataContainer("interaction", interaction.getName(), PersisDataType.STRING);
+        return this;
+    }
+
+    private static String getItemInteractionName(ItemStack item) {
+        if (isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(SingularityLib.getInstance(), "interaction"), PersistentDataType.STRING));
+            }
+        }
+        return null;
+    }
+
+    public static Interaction getInteraction(ItemStack item) {
+        String id = getItemInteractionName(item);
+        for (Interaction interaction : interactions) {
+            if (interaction.getName().equals(id)) {
+                return interaction;
+            }
+        }
+        return null;
+    }
+
+    public static Boolean isItemHasPersistData(ItemStack item, String key, PersistentDataType type) {
+        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(SingularityLib.getInstance(), key), type);
     }
 }

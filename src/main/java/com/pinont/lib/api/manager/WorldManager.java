@@ -1,6 +1,5 @@
 package com.pinont.lib.api.manager;
 
-import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,7 +10,6 @@ public class WorldManager {
 
     private final String worldName;
 
-    @Getter
     private static final ConfigManager worldConfigManager = new ConfigManager("worlds.yml");
     private static final FileConfiguration worldConfig = worldConfigManager.getConfig();
 

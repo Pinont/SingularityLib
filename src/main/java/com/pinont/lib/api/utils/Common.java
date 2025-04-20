@@ -1,7 +1,6 @@
 package com.pinont.lib.api.utils;
 
 import com.pinont.lib.SingularityLib;
-import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -32,7 +31,6 @@ public class Common {
         return plugin.getDescription().getCommands().keySet();
     }
 
-    @SneakyThrows
     public static void checkBoolean(final boolean expression, final String falseMessage, final Object... replacements) {
         if (!expression) {
             String message = falseMessage;
@@ -64,5 +62,9 @@ public class Common {
             players.add(player.getName());
         }
         return players;
+    }
+
+    public static Boolean isMainHandEmpty(Player player) {
+        return (player.getInventory().getItemInMainHand().getType() == Material.AIR) || (player.getInventory().getItemInMainHand() == null);
     }
 }
