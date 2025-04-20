@@ -20,7 +20,7 @@
         <repository>
             <id>github</id>
             <name>PinozenTH</name>
-            <url>https://maven.pkg.github.com/PinozenTH/SingualarityLib</url>
+            <url>https://maven.pkg.github.com/PinozenTH/SingularityLib</url>
         </repository>
     </distributionManagement>
 
