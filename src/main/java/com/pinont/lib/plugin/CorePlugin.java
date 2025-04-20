@@ -1,8 +1,14 @@
 package com.pinont.lib.plugin;
 
 import com.pinont.lib.plugin.events.PlayerListener;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -38,6 +44,16 @@ public abstract class CorePlugin extends JavaPlugin {
     public final void onEnable() {
         plugin = this;
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();
+        lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
+            // Handler for the event
+            event.registrar().register("ench", new BasicCommand() {
+                @Override
+                public void execute(CommandSourceStack commandSourceStack, String[] strings) {
+                    commandSourceStack.getSender().sendMessage("Hello world!");
+                }
+            });
+        });
         onPluginStart();
         sendConsoleMessage(this.getName() + " has been enabled!");
     }

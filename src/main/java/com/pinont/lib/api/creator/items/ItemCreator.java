@@ -105,7 +105,7 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setLore(String... lore) {
+    public ItemCreator addLore(String... lore) {
         this.lore.addAll(Arrays.asList(lore));
         return this;
     }

@@ -1,7 +1,6 @@
 package com.pinont.lib.bootstrap;
 
 import com.pinont.lib.SingularityLib;
-import com.pinont.lib.plugin.CorePlugin;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext;
