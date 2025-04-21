@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Objects;
 
-public class WorldManager {
+public final class WorldManager {
 
     private final String worldName;
 

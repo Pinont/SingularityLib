@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
@@ -59,26 +60,26 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
+    public void inventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", SingularityLib.getInstance());
-        }
+        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
     }
 
     @EventHandler
-    public void onPlayerLeave(PlayerQuitEvent event) {
-        final Player player = event.getPlayer();
-        if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", SingularityLib.getInstance());
-        }
+    public void playerLeave(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void playerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", SingularityLib.getInstance());
+        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
+    }
+
+    private void removePlayerMetadata(Player player, String key, Plugin plugin) {
+        if (player.hasMetadata(key)) {
+            player.removeMetadata(key, plugin);
         }
     }
 

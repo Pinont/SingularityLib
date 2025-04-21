@@ -1,5 +1,6 @@
 package com.pinont.lib.api.creator.items;
 
+import com.google.common.collect.Sets;
 import com.pinont.lib.SingularityLib;
 import com.pinont.lib.api.ui.Interaction;
 import com.pinont.lib.api.utils.Common;
@@ -17,10 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class ItemCreator {
 
@@ -32,9 +30,9 @@ public class ItemCreator {
     private int amount = 1;
     private Material type;
     private final Plugin plugin = SingularityLib.getInstance();
-    private static final ArrayList<Interaction> interactions = new ArrayList<>();
+    private static final Set<Interaction> interactions = Sets.newHashSet();
 
-    public static ArrayList<Interaction> getInteractions() {
+    public static Set<Interaction> getInteractions() {
         return interactions;
     }
 
@@ -87,6 +85,11 @@ public class ItemCreator {
 
     public ItemCreator setAmount(int amount) {
         this.amount = Math.max(amount, 1);
+        return this;
+    }
+
+    public ItemCreator setLore(List<String> lore) {
+        this.lore.addAll(lore);
         return this;
     }
 

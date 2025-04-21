@@ -2,6 +2,9 @@ package com.pinont.lib.api.creator;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attributable;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -9,6 +12,8 @@ import org.bukkit.util.Vector;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class EntityCreator {
 
@@ -30,6 +35,7 @@ public class EntityCreator {
     private boolean visualFire;
     private boolean visibleByDefault;
     private int ticksLived;
+    private double maxHealth;
 
     public EntityCreator(EntityType entityType) {
         this.entityType = entityType;
@@ -42,6 +48,11 @@ public class EntityCreator {
 
     public EntityCreator addScoreboardTag(String... ScoreboardTag) {
         Collections.addAll(this.ScoreboardTag, ScoreboardTag);
+        return this;
+    }
+
+    public EntityCreator setMaxHealth(double maxHealth) {
+        this.maxHealth = maxHealth;
         return this;
     }
 
@@ -122,7 +133,15 @@ public class EntityCreator {
 
     public Entity spawn(Location location) {
         Entity entity = Objects.requireNonNull(location.getWorld()).spawnEntity(location, entityType);
-
+        Attributable attribute = (Attributable) entity;
+        if (Objects.requireNonNull(attribute.getAttribute(Attribute.MAX_HEALTH)).getValue() != this.maxHealth) {
+            AttributeInstance healthAttributeInstance = attribute.getAttribute(Attribute.MAX_HEALTH);
+            try {
+                Objects.requireNonNull(healthAttributeInstance).setBaseValue(this.maxHealth);
+            } catch (Exception e) {
+                sendConsoleMessage("Could not set max health of " + this.entityType + " to " + this.maxHealth);
+            }
+        }
         if (passenger != null) entity.addPassenger(passenger);
         if (ScoreboardTag != null) {
             for (String tag : ScoreboardTag) {
