@@ -17,12 +17,12 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>PinozenTH</name>
-            <url>https://maven.pkg.github.com/PinozenTH/SingularityLib</url>
-        </repository>
-    </distributionManagement>
+     <repository>
+       <id>github</id>
+       <name>GitHub Packages</name>
+       <url>https://maven.pkg.github.com/PinozenTH/SingularityLib</url>
+     </repository>
+   </distributionManagement>
 
     <build>
         <plugins>
