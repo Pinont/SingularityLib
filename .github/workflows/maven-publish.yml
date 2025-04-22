@@ -23,8 +23,8 @@ jobs:
       - name: Publish to the Maven Central Repository
         run: mvn --batch-mode deploy
         env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Java for publishing to GitHub Packages
         uses: actions/setup-java@v4
         with:
