@@ -1,6 +1,5 @@
 package com.pinont.lib.bootstrap;
 
-import com.pinont.lib.Singularity;
 import com.pinont.lib.api.creator.EnchantmentCreator;
 import com.pinont.lib.plugin.CorePlugin;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;

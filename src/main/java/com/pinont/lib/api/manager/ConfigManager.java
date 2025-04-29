@@ -1,6 +1,5 @@
 package com.pinont.lib.api.manager;
 
-import com.pinont.lib.Singularity;
 import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,9 +14,10 @@ public class ConfigManager {
     private final File configFile;
     private final FileConfiguration config;
     private final String fileName;
-    public boolean isFirstLoad;
+    private final Plugin plugin = CorePlugin.getInstance();
+    private boolean isFirstLoad;
 
-    public ConfigManager(Plugin plugin, String fileName) {
+    public ConfigManager(String fileName) {
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder(), fileName);
         if (!configFile.exists()) {
@@ -34,7 +34,7 @@ public class ConfigManager {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
-    public ConfigManager(Plugin plugin, String subFolder, String fileName) {
+    public ConfigManager(String subFolder, String fileName) {
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);
         if (!configFile.exists()) {

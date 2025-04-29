@@ -1,6 +1,6 @@
 package com.pinont.lib.api.ui;
 
-import com.pinont.lib.Singularity;
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -77,7 +77,7 @@ public class Menu_old {
             return;
         }
         // Set metadata to prevent multiple instances
-        player.setMetadata("Menu", new FixedMetadataValue(Singularity.getInstance(), this));
+        player.setMetadata("Menu", new FixedMetadataValue(CorePlugin.getInstance(), this));
         player.openInventory(inventory);
     }
 

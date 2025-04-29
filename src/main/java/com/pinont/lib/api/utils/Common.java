@@ -1,6 +1,5 @@
 package com.pinont.lib.api.utils;
 
-import com.pinont.lib.Singularity;
 import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

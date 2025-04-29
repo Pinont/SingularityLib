@@ -1,11 +1,7 @@
 package com.pinont.lib.plugin;
 
-import com.pinont.lib.Singularity;
 import com.pinont.lib.api.manager.ConfigManager;
-import com.pinont.lib.api.ui.Button;
 import com.pinont.lib.plugin.events.PlayerListener;
-import io.papermc.paper.command.brigadier.BasicCommand;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -17,20 +13,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class CorePlugin extends JavaPlugin {
-    private static JavaPlugin plugin;
     private static CorePlugin instance;
 
-    private static List<String> blockedCommands = new ArrayList<>();
-    private static Boolean obfuscatedCommand = false;
+    private static ConfigManager configManager;
+
+    public static ConfigManager getConfigManager() {
+        return configManager;
+    }
 
     public static void sendConsoleMessage(String message) {
         Bukkit.getConsoleSender().sendMessage(message);
     }
+
+    private final List<SimpleCommand> simpleCommands = new ArrayList<>();
 
     public static JavaPlugin getInstance() {
         if (instance == null) {
@@ -49,13 +48,31 @@ public abstract class CorePlugin extends JavaPlugin {
 
     @Override
     public final void onEnable() {
-        plugin = this;
-        onPluginStart();
-        if (this.getName().equalsIgnoreCase("SingularityLib")) {
-            sendConsoleMessage(ChatColor.LIGHT_PURPLE + "" + ChatColor.ITALIC + "SingularityAPI" + ChatColor.WHITE + ChatColor.ITALIC + " has been loaded!");
-        } else {
-            sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "Singularity!");
+        instance = this;
+        configManager = new ConfigManager("config.yml");
+        FileConfiguration config = getConfigManager().getConfig();
+        registerEvents(this, new PlayerListener());
+        ConfigManager configManager = getConfigManager();
+        if (configManager.isFirstLoad()) {
+            config.set("debug", false);
+            config.set("dev-tool", false);
+            configManager.saveConfig();
+            config.options().copyDefaults(true);
+            return;
         }
+        config.options().copyDefaults(true);
+        sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
+        onPluginStart();
+        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();
+        lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
+            for (SimpleCommand simpleCommand : simpleCommands) {
+                event.registrar().register(simpleCommand.getName(), simpleCommand);
+            }
+            if (config.getBoolean("dev-tool")) {
+                DevTool devTool = new DevTool();
+                event.registrar().register(devTool.getName(), devTool);
+            }
+        });
     }
 
     @Override
@@ -69,8 +86,12 @@ public abstract class CorePlugin extends JavaPlugin {
         }
     }
 
+    public void registerCommand(SimpleCommand simpleCommand) {
+        simpleCommands.add(simpleCommand);
+    }
+
     public static void sendDebugMessage(String message) {
-        if (Singularity.getConfigManager().getConfig().getBoolean("debug")) {
+        if (getConfigManager().getConfig().getBoolean("debug")) {
             sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.YELLOW + "SingularDebugger: [DEV] " + message);
         }
     }

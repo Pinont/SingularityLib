@@ -14,7 +14,7 @@ public final class WorldManager {
     private static final FileConfiguration worldConfig = getWorldConfigManager().getConfig();
 
     private static ConfigManager getWorldConfigManager() {
-        return new ConfigManager(plugin, "worlds.yml");
+        return new ConfigManager("worlds.yml");
     }
 
     @Deprecated (forRemoval = true)

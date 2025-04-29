@@ -1,6 +1,6 @@
 package com.pinont.lib.api.custom.item;
 
-import com.pinont.lib.api.ui.Interaction;
+import com.pinont.lib.api.ui.ItemInteraction;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -15,6 +15,6 @@ public interface CustomItem {
 
     int getModelData();
 
-    Interaction onUse();
+    ItemInteraction onUse();
 
 }

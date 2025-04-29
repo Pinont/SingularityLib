@@ -5,14 +5,22 @@ import com.pinont.lib.api.creator.items.ItemCreator;
 import com.pinont.lib.api.ui.Button;
 import com.pinont.lib.api.ui.Layout;
 import com.pinont.lib.api.ui.Menu;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
-public class DevTool {
+import java.util.Collection;
+import java.util.Collections;
+
+public class DevTool implements SimpleCommand {
     // pattern
     /*
     ===========
@@ -25,7 +33,7 @@ public class DevTool {
     // World Creator
     // playerList [kick, de-op]
 
-    public DevTool(Player player) {
+    public void openDevTool(Player player) {
         Menu devMenu = new Menu("Dev Tool", 9*5);
         devMenu.setLayout("=========", "====i====", "=========", "==w=p=o==", "=========");
         devMenu.setKey(
@@ -202,5 +210,42 @@ public class DevTool {
             });
         }
         playerManager.show(p);
+    }
+
+    @Override
+    public void execute(@NotNull CommandSourceStack commandSourceStack, String @NotNull [] strings) {
+        if (commandSourceStack.getSender() instanceof Player player) {
+            this.openDevTool(player);
+            return;
+        }
+        commandSourceStack.getSender().sendMessage("This command can only be executed by a player!");
+    }
+
+    @Override
+    public @NotNull Collection<String> suggest(@NotNull CommandSourceStack commandSourceStack, String @NotNull [] args) {
+        return switch (args.length) {
+//            case 0 -> Collections.singletonList("temp");
+            default -> Collections.emptyList();
+        };
+    }
+
+
+    @Override
+    public boolean canUse(@NotNull CommandSender sender) {
+        if (sender instanceof Player) {
+            return sender.hasPermission("pinont.devtool");
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "devTool";
+    }
+
+    @Override
+    public String description() {
+        return "SingularityLib Developer Tools";
     }
 }

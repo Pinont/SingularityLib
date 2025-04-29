@@ -2,7 +2,6 @@ package com.pinont.lib.api.creator;
 
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
-import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.tag.TagKey;
 import net.kyori.adventure.text.Component;

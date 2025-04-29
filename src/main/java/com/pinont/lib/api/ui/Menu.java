@@ -1,6 +1,5 @@
 package com.pinont.lib.api.ui;
 
-import com.pinont.lib.Singularity;
 import com.pinont.lib.api.creator.items.ItemCreator;
 import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
@@ -72,7 +71,7 @@ public class Menu {
     public void show(Player player) {
         Inventory inventory = Bukkit.createInventory(player, size, title);
 
-        player.removeMetadata("Menu", Singularity.getInstance());
+        player.removeMetadata("Menu", CorePlugin.getInstance());
         if (!patternLayout.isEmpty()) {
             for (int i = 0; i < patternLayout.size(); i++) {
                 String c = patternLayout.get(i);
@@ -128,7 +127,7 @@ public class Menu {
             }
         }
         if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", Singularity.getInstance());
+            player.removeMetadata("Menu", CorePlugin.getInstance());
             player.closeInventory();
         }
         // Set metadata to prevent multiple instances
