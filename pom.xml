@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.pinozenth</groupId>
+    <groupId>com.github.PinozenTH</groupId>
     <artifactId>SingularityLib</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>TEST</version>
     <packaging>jar</packaging>
 
     <name>SingularityLib</name>
@@ -49,7 +49,7 @@
                         <configuration>
                             <target>
                                 <copy file="${project.build.directory}/${project.build.finalName}.jar"
-                                      tofile="./run/plugins/${project.build.finalName}.jar" />
+                                      tofile="${user.home}/.m2/repository/${project.groupId.replace('.', '/')}/${project.artifactId}/${project.version}/${project.build.finalName}.jar" />
                             </target>
                         </configuration>
                         <goals>

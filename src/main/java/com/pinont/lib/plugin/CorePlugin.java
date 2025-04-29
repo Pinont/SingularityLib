@@ -92,7 +92,7 @@ public abstract class CorePlugin extends JavaPlugin {
 
     public static void sendDebugMessage(String message) {
         if (getConfigManager().getConfig().getBoolean("debug")) {
-            sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.YELLOW + "SingularDebugger: [DEV] " + message);
+            sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + "Singularity Debugger:" + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
         }
     }
 

@@ -5,9 +5,10 @@ import com.pinont.lib.api.ui.ItemInteraction;
 import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.enums.AttributeType;
 import com.pinont.lib.enums.PersisDataType;
-import com.pinont.lib.enums.WorldEnvironment;
 import com.pinont.lib.plugin.CorePlugin;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -15,7 +16,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
@@ -39,6 +39,10 @@ public class ItemCreator {
 
     public static Set<ItemInteraction> getInteractions() {
         return ITEM_INTERACTIONS;
+    }
+
+    public ItemCreator(Material type) {
+        this(new ItemStack(type));
     }
 
     public ItemCreator(@NotNull ItemStack item) {
@@ -215,27 +219,6 @@ public class ItemCreator {
 
     public ItemCreator addInteraction(ItemInteraction itemInteraction) {
         ITEM_INTERACTIONS.add(itemInteraction);
-        List<World> allowedWorlds = new ArrayList<>();
-        if (itemInteraction.getExecuteInWorlds().contains("*")) {
-            allowedWorlds = Bukkit.getWorlds();
-        } else {
-            for (String worldName : itemInteraction.getExecuteInWorlds()) {
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    allowedWorlds.add(world);
-                    continue;
-                }
-                sendConsoleMessage("World " + worldName + " not found, please check if the world is loaded or exist.");
-            }
-        }
-        allowedWorlds = allowedWorlds.stream()
-                .filter(world -> itemInteraction.getExecuteWorldEnvironment().stream()
-                .anyMatch(env -> env.getWorldEnvironment().contains(world.getEnvironment()))).toList();
-        for (World world : allowedWorlds) {
-            if (itemInteraction.getExecuteWorldEnvironment().contains(WorldEnvironment.fromWorldEnvironment(world.getEnvironment()))) {
-                world.setMetadata("interaction_" + itemInteraction.getName(), new FixedMetadataValue(plugin, itemInteraction));
-            }
-        }
         this.setPersisDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
         return this;
     }
@@ -252,9 +235,15 @@ public class ItemCreator {
 
     public static ItemInteraction getInteraction(Player holder, ItemStack item) {
         String id = getItemInteractionName(item);
-        World playerWorld = holder.getWorld();
-        if (playerWorld.hasMetadata("interaction_" + id)) {
-            return (ItemInteraction) playerWorld.getMetadata("interaction_" + id);
+        if (id == null) {
+            sendConsoleMessage("Item interaction not found for " + holder.getName() + " with item " + item.getType());
+            return null;
+        }
+        ItemInteraction interaction = ITEM_INTERACTIONS.stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
+        if (interaction != null) {
+            return interaction;
+        } else {
+            sendConsoleMessage("Item interaction not found for " + holder.getName() + " with item " + item.getType());
         }
         return null;
     }

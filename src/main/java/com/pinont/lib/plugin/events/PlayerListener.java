@@ -14,18 +14,25 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+
+import java.util.HashMap;
 
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class PlayerListener implements Listener {
 
+    HashMap<Player, ItemStack> interactionLock = new HashMap<>();
+
     @EventHandler
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
-            event.setCancelled(true);
+//            if (interactionLock.containsKey(player)) return;
+//            interactionLock.put(player, event.getItem());
+//            interactionLock.remove(player);
             ItemInteraction itemInteraction;
             try {
                 itemInteraction = ItemCreator.getInteraction(player, player.getInventory().getItemInMainHand());
@@ -39,6 +46,7 @@ public class PlayerListener implements Listener {
             }
             if (itemInteraction.getAction().contains(event.getAction())) {
                 itemInteraction.execute(player);
+                event.setCancelled(true);
             }
         }
     }

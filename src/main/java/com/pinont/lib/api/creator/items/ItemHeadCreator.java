@@ -6,11 +6,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-public class HeadItemCreator extends ItemCreator {
+public class ItemHeadCreator extends ItemCreator {
 
     private final SkullMeta skullMeta;
 
-    public HeadItemCreator(@NotNull ItemStack item) {
+    public ItemHeadCreator(@NotNull ItemStack item) {
         super(item);
         skullMeta = (SkullMeta) item.getItemMeta();
     }
@@ -23,7 +23,7 @@ public class HeadItemCreator extends ItemCreator {
         return this;
     }
 
-    public HeadItemCreator setOwner(@NotNull String owner) {
+    public ItemHeadCreator setOwner(@NotNull String owner) {
         skullMeta.setOwner(owner);
         return this;
     }

@@ -102,7 +102,7 @@ public class Menu {
                         }
                     });
                     continue;
-                }
+                } else if (layout.getButton().getItem() == null || layout.getButton().getItem().getType().equals(Material.AIR)) {continue;}
                 addButton(new Button() {
                     @Override
                     public int getSlot() {
