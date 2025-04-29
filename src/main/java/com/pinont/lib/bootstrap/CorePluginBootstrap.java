@@ -1,7 +1,8 @@
 package com.pinont.lib.bootstrap;
 
-import com.pinont.lib.SingularityLib;
+import com.pinont.lib.Singularity;
 import com.pinont.lib.api.creator.EnchantmentCreator;
+import com.pinont.lib.plugin.CorePlugin;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.bootstrap.PluginProviderContext;
@@ -42,6 +43,12 @@ public class CorePluginBootstrap implements PluginBootstrap {
 
     @Override
     public @NotNull JavaPlugin createPlugin(PluginProviderContext context) {
-        return new SingularityLib();
+        return new CorePlugin() {
+            @Override
+            public void onPluginStart() {}
+
+            @Override
+            public void onPluginStop() {}
+        };
     }
 }

@@ -1,6 +1,7 @@
 package com.pinont.lib.api.utils;
 
-import com.pinont.lib.SingularityLib;
+import com.pinont.lib.Singularity;
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,7 +26,7 @@ public class Common {
         return Arrays.asList(getAllItemsMaterials()).contains(material);
     }
 
-    public static Plugin plugin = SingularityLib.getInstance();
+    public static Plugin plugin = CorePlugin.getInstance();
 
     public static Set<String> getCommands() {
         return plugin.getDescription().getCommands().keySet();

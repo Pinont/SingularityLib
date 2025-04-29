@@ -1,6 +1,7 @@
 package com.pinont.lib.api.manager;
 
-import com.pinont.lib.SingularityLib;
+import com.pinont.lib.Singularity;
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -14,12 +15,10 @@ public class ConfigManager {
     private final File configFile;
     private final FileConfiguration config;
     private final String fileName;
-    private final Plugin plugin = SingularityLib.getInstance();
     public boolean isFirstLoad;
 
-    public ConfigManager(String fileName) {
+    public ConfigManager(Plugin plugin, String fileName) {
         this.fileName = fileName;
-        Plugin plugin = SingularityLib.getInstance();
         configFile = new File(plugin.getDataFolder(), fileName);
         if (!configFile.exists()) {
             try {
@@ -35,7 +34,7 @@ public class ConfigManager {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
-    public ConfigManager(String subFolder, String fileName) {
+    public ConfigManager(Plugin plugin, String subFolder, String fileName) {
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);
         if (!configFile.exists()) {

@@ -1,11 +1,12 @@
 package com.pinont.lib.plugin.events;
 
-import com.pinont.lib.SingularityLib;
+import com.pinont.lib.Singularity;
 import com.pinont.lib.api.creator.items.ItemCreator;
 import com.pinont.lib.api.ui.Button;
 import com.pinont.lib.api.ui.Interaction;
 import com.pinont.lib.api.ui.Menu;
 import com.pinont.lib.api.utils.Common;
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,9 +26,10 @@ public class PlayerListener implements Listener {
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
+            event.setCancelled(true);
             Interaction interaction;
             try {
-                interaction = ItemCreator.getInteraction(player.getInventory().getItemInMainHand());
+                interaction = ItemCreator.getInteraction(player, player.getInventory().getItemInMainHand());
             } catch (IllegalArgumentException e) {
                 sendInteractionError(player);
                 return;
@@ -50,6 +52,7 @@ public class PlayerListener implements Listener {
         if (player.hasMetadata("Menu")) {
             final Menu menu = (Menu) player.getMetadata("Menu").getFirst().value();
             if (menu == null) return;
+            CorePlugin.sendDebugMessage("Player " + player.getName() + " clicked on " + menu.getTitle());
             for (final Button button : menu.getButtons()) {
                 if (button.getSlot() == event.getSlot()) {
                     button.onClick(player);
@@ -62,24 +65,24 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void inventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
+        removePlayerMenuMetadata(player, Singularity.getInstance());
     }
 
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
+        removePlayerMenuMetadata(player, Singularity.getInstance());
     }
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        removePlayerMetadata(player, "Menu", SingularityLib.getInstance());
+        removePlayerMenuMetadata(player, Singularity.getInstance());
     }
 
-    private void removePlayerMetadata(Player player, String key, Plugin plugin) {
-        if (player.hasMetadata(key)) {
-            player.removeMetadata(key, plugin);
+    private void removePlayerMenuMetadata(Player player, Plugin plugin) {
+        if (player.hasMetadata("Menu")) {
+            player.removeMetadata("Menu", plugin);
         }
     }
 

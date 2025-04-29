@@ -3,18 +3,23 @@ package com.pinont.lib.api.manager;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Objects;
 
 public final class WorldManager {
 
     private final String worldName;
+    private static Plugin plugin;
+    private static final FileConfiguration worldConfig = getWorldConfigManager().getConfig();
 
-    private static final ConfigManager worldConfigManager = new ConfigManager("worlds.yml");
-    private static final FileConfiguration worldConfig = worldConfigManager.getConfig();
+    private static ConfigManager getWorldConfigManager() {
+        return new ConfigManager(plugin, "worlds.yml");
+    }
 
     @Deprecated (forRemoval = true)
-    public WorldManager(String worldName) {
+    public WorldManager(Plugin plugin, String worldName) {
+        WorldManager.plugin = plugin;
         this.worldName = worldName;
     }
 
@@ -66,7 +71,7 @@ public final class WorldManager {
                 worldConfig.set(worldName + ".gameRule." + key, value);
             }
         }
-        worldConfigManager.saveConfig();
+        getWorldConfigManager().saveConfig();
     }
 
     public static void load(String worldName) {
@@ -93,7 +98,7 @@ public final class WorldManager {
             return false;
         }
         worldConfig.set(worldName, null);
-        worldConfigManager.saveConfig();
+        getWorldConfigManager().saveConfig();
         return true;
     }
 

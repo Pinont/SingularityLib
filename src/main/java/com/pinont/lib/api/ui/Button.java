@@ -5,7 +5,9 @@ import org.bukkit.inventory.ItemStack;
 
 public interface Button {
 
-    int getSlot();
+    default int getSlot() {
+        return 0;
+    }
 
     ItemStack getItem();
 

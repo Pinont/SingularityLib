@@ -1,24 +1,33 @@
 package com.pinont.lib.api.creator.items;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import com.pinont.lib.SingularityLib;
+import com.pinont.lib.Singularity;
 import com.pinont.lib.api.ui.Interaction;
 import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.enums.AttributeType;
 import com.pinont.lib.enums.PersisDataType;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import com.pinont.lib.enums.WorldEnvironment;
+import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Stream;
+
+import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class ItemCreator {
 
@@ -29,7 +38,7 @@ public class ItemCreator {
     private final ArrayList<String> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
-    private final Plugin plugin = SingularityLib.getInstance();
+    private final Plugin plugin = Singularity.getInstance();
     private static final Set<Interaction> interactions = Sets.newHashSet();
 
     public static Set<Interaction> getInteractions() {
@@ -64,7 +73,7 @@ public class ItemCreator {
     }
 
     public ItemCreator addLore(String lore) {
-        this.lore.add(Common.colorize(lore));
+        this.lore.add(ChatColor.RESET + Common.colorize(lore));
         return this;
     }
 
@@ -73,13 +82,27 @@ public class ItemCreator {
         return this;
     }
 
+    public ItemCreator setCannotMove(boolean b) {
+        if (b) {
+            this.setPersisDataContainer("cannot_move", "true", PersisDataType.STRING);
+        }
+        return this;
+    }
+
     public ItemCreator setType(Material type) {
         this.type = type;
         return this;
     }
 
+    public ItemCreator addItemFlag(ItemFlag... flags) {
+        for (ItemFlag flag : flags) {
+            meta.addItemFlags(flag);
+        }
+        return this;
+    }
+
     public ItemCreator setDisplayName(String name) {
-        meta.setDisplayName(Common.colorize(name));
+        meta.setDisplayName(ChatColor.RESET + Common.colorize(name));
         return this;
     }
 
@@ -89,7 +112,9 @@ public class ItemCreator {
     }
 
     public ItemCreator setLore(List<String> lore) {
-        this.lore.addAll(lore);
+        for (String s : lore) {
+            this.lore.add(ChatColor.RESET + Common.colorize(s));
+        }
         return this;
     }
 
@@ -186,7 +211,7 @@ public class ItemCreator {
         if (isItemHasPersistData(item, key, type)) {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                return meta.getPersistentDataContainer().get(new NamespacedKey(SingularityLib.getInstance(), key), type);
+                return meta.getPersistentDataContainer().get(new NamespacedKey(Singularity.getInstance(), key), type);
             }
         }
         return null;
@@ -194,6 +219,27 @@ public class ItemCreator {
 
     public ItemCreator addInteraction(Interaction interaction) {
         interactions.add(interaction);
+        List<World> allowedWorlds = new ArrayList<>();
+        if (interaction.getExecuteInWorlds().contains("*")) {
+            allowedWorlds = Bukkit.getWorlds();
+        } else {
+            for (String worldName : interaction.getExecuteInWorlds()) {
+                World world = Bukkit.getWorld(worldName);
+                if (world != null) {
+                    allowedWorlds.add(world);
+                    continue;
+                }
+                sendConsoleMessage("World " + worldName + " not found, please check if the world is loaded or exist.");
+            }
+        }
+        allowedWorlds = allowedWorlds.stream()
+                .filter(world -> interaction.getExecuteWorldEnvironment().stream()
+                .anyMatch(env -> env.getWorldEnvironment().contains(world.getEnvironment()))).toList();
+        for (World world : allowedWorlds) {
+            if (interaction.getExecuteWorldEnvironment().contains(WorldEnvironment.fromWorldEnvironment(world.getEnvironment()))) {
+                world.setMetadata("interaction_" + interaction.getName(), new FixedMetadataValue(plugin, interaction));
+            }
+        }
         this.setPersisDataContainer("interaction", interaction.getName(), PersisDataType.STRING);
         return this;
     }
@@ -202,23 +248,22 @@ public class ItemCreator {
         if (isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(SingularityLib.getInstance(), "interaction"), PersistentDataType.STRING));
+                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(Singularity.getInstance(), "interaction"), PersistentDataType.STRING));
             }
         }
         return null;
     }
 
-    public static Interaction getInteraction(ItemStack item) {
+    public static Interaction getInteraction(Player holder, ItemStack item) {
         String id = getItemInteractionName(item);
-        for (Interaction interaction : interactions) {
-            if (interaction.getName().equals(id)) {
-                return interaction;
-            }
+        World playerWorld = holder.getWorld();
+        if (playerWorld.hasMetadata("interaction_" + id)) {
+            return (Interaction) playerWorld.getMetadata("interaction_" + id);
         }
         return null;
     }
 
     public static Boolean isItemHasPersistData(ItemStack item, String key, PersistentDataType type) {
-        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(SingularityLib.getInstance(), key), type);
+        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(Singularity.getInstance(), key), type);
     }
 }
