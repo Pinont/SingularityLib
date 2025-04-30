@@ -41,6 +41,7 @@ public final class WorldManager {
         world.setGameRuleValue("doMobSpawning", "false");
         WorldBorder border = world.getWorldBorder();
         border.setSize(borderSize);
+        world.setMetadata("loader", new FixedMetadataValue(CorePlugin.getInstance(), CorePlugin.getInstance().getName()));
         setWorldConfig();
     }
 
@@ -67,6 +68,10 @@ public final class WorldManager {
         worldConfig.saveConfig();
     }
 
+    public void saveWorld() {
+        setWorldConfig();
+    }
+
     public static void load(String worldName) {
         Bukkit.createWorld(WorldCreator.name(worldName));
     }
@@ -85,6 +90,7 @@ public final class WorldManager {
                 world = Bukkit.createWorld(WorldCreator.name(worldName));
             }
             assert world != null;
+            world.removeMetadata("loader", CorePlugin.getInstance());
             world.getWorldFolder().deleteOnExit();
             Bukkit.unloadWorld(world, false);
         } else {

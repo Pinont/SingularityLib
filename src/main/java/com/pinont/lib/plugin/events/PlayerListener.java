@@ -28,6 +28,7 @@ public class PlayerListener implements Listener {
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
+            event.setCancelled(true);
             ItemInteraction itemInteraction;
             try {
                 itemInteraction = ItemCreator.getInteraction(player, player.getInventory().getItemInMainHand());
@@ -41,7 +42,6 @@ public class PlayerListener implements Listener {
             }
             if (itemInteraction.getAction().contains(event.getAction())) {
                 itemInteraction.execute(player);
-                event.setCancelled(true);
             }
         }
     }
@@ -66,11 +66,13 @@ public class PlayerListener implements Listener {
                         int borderSize = Integer.parseInt(event.getMessage());
                         if (borderSize <= 0) {
                             player.sendMessage(ChatColor.RED + "World border size must be greater than 0");
+                            new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
                             return;
                         }
                         new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), borderSize, worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
                     } catch (NumberFormatException e) {
                         player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
                     }
                     break;
                 }
@@ -80,6 +82,7 @@ public class PlayerListener implements Listener {
                         new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), seed);
                     } catch (NumberFormatException e) {
                         player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
                     }
                     break;
                 }
@@ -94,13 +97,13 @@ public class PlayerListener implements Listener {
         if (!player.hasMetadata("Menu")) return;
         if (event.getCurrentItem() == null || event.getCurrentItem().getType().isAir()) return;
         if (player.hasMetadata("Menu")) {
+            event.setCancelled(true);
             final Menu menu = (Menu) player.getMetadata("Menu").getFirst().value();
             if (menu == null) return;
             CorePlugin.sendDebugMessage("Player " + player.getName() + " clicked on " + menu.getTitle());
             for (final Button button : menu.getButtons()) {
                 if (button.getSlot() == event.getSlot()) {
                     button.onClick(player);
-                    event.setCancelled(true);
                 }
             }
         }

@@ -22,6 +22,23 @@ public class DevTool implements SimpleCommand {
 
     private final String version = CorePlugin.getInstance().getDescription().getVersion();
 
+    public ItemInteraction devToolItemInteraction = new ItemInteraction() {
+        @Override
+        public String getName() {
+            return "DevTool";
+        }
+
+        @Override
+        public Set<Action> getAction() {
+            return Set.of(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
+        }
+
+        @Override
+        public void execute(Player player) {
+            openDevTool(player);
+        }
+    };
+
     public void openDevTool(Player player) {
         Menu devMenu = new Menu(ChatColor.DARK_RED + "Developer Tools " + ChatColor.GRAY + "(" + version + ")", 9*5);
         devMenu.setLayout("=========", "====i====", "=========", "==w=p=t==", "=========");
@@ -593,96 +610,8 @@ public class DevTool implements SimpleCommand {
     }
 
     private void showSingleWorldManager(World world, Player player) {
-        Menu worldManagerMenu = new Menu("World Manager", 9 * 5);
+        Menu worldManagerMenu = new Menu(world.getName() + ": World Manager");
         worldManagerMenu.setLayout("=========", "====w====", "=========", "==t=d=r==", "=========");
-        if (world.hasMetadata("loader")) {
-            worldManagerMenu.setKey(
-                    blank(),
-                    new Layout() {
-
-                        @Override
-                        public char getKey() {
-                            return 'w';
-                        }
-
-                        @Override
-                        public Button getButton() {
-                            return new Button() { // world info
-
-                                @Override
-                                public ItemStack getItem() {
-
-                                    return new ItemCreator(getWorldEnvironmentBlock(world)).setDisplayName(ChatColor.GREEN + "World Info").addLore(ChatColor.GRAY + "Name: " + ChatColor.YELLOW + properWorldName(world), ChatColor.GRAY + "Difficulty: " + ChatColor.YELLOW + world.getDifficulty(), ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + world.getEnvironment()).create();
-                                }
-
-                                @Override
-                                public void onClick(Player player) {
-
-                                }
-                            };
-                        }
-                    },
-                    new Layout() {
-                        @Override
-                        public char getKey() {
-                            return 't'; // teleport
-                        }
-
-                        @Override
-                        public Button getButton() {
-                            return new Button() {
-                                @Override
-                                public ItemStack getItem() {
-                                    return new ItemCreator(new ItemStack(Material.BEACON)).setDisplayName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
-                                }
-
-                                @Override
-                                public void onClick(Player player) {
-                                    if (player.getWorld() != world) {
-                                        player.sendMessage(ChatColor.GRAY + "Teleporting to " + properWorldName(world) + "...");
-                                        player.teleport(world.getSpawnLocation());
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "You are already in this world!");
-                                    }
-                                }
-                            };
-                        }
-                    },
-                    new Layout() {
-                        @Override
-                        public char getKey() {
-                            return 'r'; // gamerules
-                        }
-
-                        @Override
-                        public Button getButton() {
-                            return null;
-                        }
-                    },
-                    new Layout() {
-                        @Override
-                        public char getKey() {
-                            return 'd';
-                        }
-
-                        @Override
-                        public Button getButton() {
-                            return new Button() {
-                                @Override
-                                public ItemStack getItem() {
-                                    return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED +"Delete").addLore(ChatColor.RED + "Click here to delete this world").create();
-                                }
-
-                                @Override
-                                public void onClick(Player player) {
-                                    showDeleteWorldApproval(player, world);
-                                }
-                            };
-                        }
-                    }
-            ).show(player);
-            return;
-        }
         worldManagerMenu.setKey(
                 blank(),
                 new Layout() {
@@ -745,8 +674,56 @@ public class DevTool implements SimpleCommand {
                     public Button getButton() {
                         return null;
                     }
-                }
+                },
+                worldDeleteButton(world)
         ).show(player);
+    }
+
+    private Layout worldDeleteButton(World world) {
+        if (world.hasMetadata("loader")) {
+            return new Layout() {
+                @Override
+                public char getKey() {
+                    return 'd';
+                }
+
+                @Override
+                public Button getButton() {
+                    return new Button() {
+                        @Override
+                        public ItemStack getItem() {
+                            return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED +"Delete").addLore(ChatColor.RED + "Click here to delete this world").create();
+                        }
+
+                        @Override
+                        public void onClick(Player player) {
+                            showDeleteWorldApproval(player, world);
+                        }
+                    };
+                }
+            };
+        }
+        return new Layout() {
+            @Override
+            public char getKey() {
+                return 'd';
+            }
+
+            @Override
+            public Button getButton() {
+                return new Button() {
+                    @Override
+                    public ItemStack getItem() {
+                        return new ItemCreator(Material.AIR).create();
+                    }
+
+                    @Override
+                    public void onClick(Player player) {
+
+                    }
+                };
+            }
+        };
     }
 
     private void showDeleteWorldApproval(Player player, World targetWorld) {
@@ -1172,28 +1149,29 @@ public class DevTool implements SimpleCommand {
             switch (strings.length) {
                 case 0: {
                     this.openDevTool(player);
+                    break;
                 }
                 case 1: {
                     ItemStack devToolItem = new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
-                            new ItemInteraction() {
-                                @Override
-                                public String getName() {
-                                    return "DevTool";
-                                }
-
-                                @Override
-                                public Set<Action> getAction() {
-                                    return Set.of(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
-                                }
-
-                                @Override
-                                public void execute(Player player) {
-                                    openDevTool(player);
-                                }
-                            }
+                        devToolItemInteraction
                     ).create();
                     if (strings[0].equalsIgnoreCase("get") || strings[0].equalsIgnoreCase("getItem")) {
                         player.getInventory().addItem(devToolItem);
+                    }
+                    break;
+                }
+                case 3: {
+                    if (strings[0].equalsIgnoreCase("world")) {
+                        if (strings[1].equalsIgnoreCase("teleport")) {
+                            World world = Bukkit.getWorld(strings[2]);
+                            if (world != null) {
+                                player.teleport(world.getSpawnLocation());
+                                player.sendMessage(ChatColor.GRAY + "Teleporting to " + world.getName() + "...");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "World not found!");
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -1204,14 +1182,24 @@ public class DevTool implements SimpleCommand {
 
     @Override
     public @NotNull Collection<String> suggest(@NotNull CommandSourceStack commandSourceStack, String @NotNull [] args) {
-        return switch (args.length) {
-            case 0: {
-                yield List.of("get", "getItem");
+        switch (args.length) {
+            case 0, 1: {
+                return List.of("get", "getItem", "world");
             }
-            default: {
-                yield Collections.emptyList();
+            case 2: {
+                if (args[0].equalsIgnoreCase("world")) {
+                    return List.of("teleport");
+                }
+                break;
             }
-        };
+            case 3: {
+                if (args[0].equalsIgnoreCase("world") && args[1].equalsIgnoreCase("teleport")) {
+                    return List.of(Bukkit.getWorlds().stream().map(World::getName).toArray(String[]::new));
+                }
+                break;
+            }
+        }
+        return List.of();
     }
 
 

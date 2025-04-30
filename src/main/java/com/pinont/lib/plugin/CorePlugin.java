@@ -1,5 +1,6 @@
 package com.pinont.lib.plugin;
 
+import com.pinont.lib.api.creator.items.ItemCreator;
 import com.pinont.lib.api.manager.ConfigManager;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.plugin.events.PlayerListener;
@@ -7,6 +8,8 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -75,10 +78,16 @@ public abstract class CorePlugin extends JavaPlugin {
                 event.registrar().register(devTool.getName(), devTool);
             }
         });
+        new ItemCreator(Material.STICK).addInteraction(new DevTool().devToolItemInteraction).create(); // register devTool interaction with dummy item
     }
 
     @Override
     public final void onDisable() {
+        for (World world : Bukkit.getWorlds()) {
+            if (world.hasMetadata("loader")) {
+                new WorldManager(world.getName()).saveWorld();
+            }
+        }
         onPluginStop();
     }
 
