@@ -27,7 +27,7 @@ public class Menu {
     }
 
     public Menu(String title) {
-        this(title, 9);
+        this(title, -1);
     }
 
     public Menu(String title, int size) {
@@ -69,7 +69,14 @@ public class Menu {
     }
 
     public void show(Player player) {
-        Inventory inventory = Bukkit.createInventory(player, size, title);
+        Inventory inventory;
+        if (size == -1 && patternLayout.isEmpty()) {
+            inventory = Bukkit.createInventory(player, 9, title);
+        } else if (size == -1 && patternLayout.size() >= 9) {
+            inventory = Bukkit.createInventory(player, patternLayout.size(), title); // auto layout
+        } else {
+            inventory = Bukkit.createInventory(player, size, title);
+        }
 
         player.removeMetadata("Menu", CorePlugin.getInstance());
         if (!patternLayout.isEmpty()) {

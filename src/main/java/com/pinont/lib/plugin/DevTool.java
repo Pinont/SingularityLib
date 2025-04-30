@@ -2,27 +2,25 @@ package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.creator.items.ItemHeadCreator;
 import com.pinont.lib.api.creator.items.ItemCreator;
+import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.api.ui.Button;
+import com.pinont.lib.api.ui.ItemInteraction;
 import com.pinont.lib.api.ui.Layout;
 import com.pinont.lib.api.ui.Menu;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class DevTool implements SimpleCommand {
 
-    String version = CorePlugin.getInstance().getDescription().getVersion();
+    private final String version = CorePlugin.getInstance().getDescription().getVersion();
 
     public void openDevTool(Player player) {
         Menu devMenu = new Menu(ChatColor.DARK_RED + "Developer Tools " + ChatColor.GRAY + "(" + version + ")", 9*5);
@@ -120,7 +118,7 @@ public class DevTool implements SimpleCommand {
     }
 
     private void showOtherTools(Player player) {
-        new Menu("Heldable Tool").setLayout("=========", "==m=w=o==", "=========").setKey(
+        new Menu("Heldable Tool", 9 * 3).setLayout("=========", "==m=w=o==", "=========").setKey(
                 blank(),
                 new Layout() {
                     @Override
@@ -160,7 +158,11 @@ public class DevTool implements SimpleCommand {
     }
 
     private ItemStack getWorldEnvironmentBlock(World world) {
-        return switch (world.getEnvironment()) {
+        return getWorldEnvironmentBlock(world.getEnvironment());
+    }
+
+    private ItemStack getWorldEnvironmentBlock(World.Environment worldEnv) {
+        return switch (worldEnv) {
             case NORMAL -> new ItemStack(Material.GRASS_BLOCK);
             case NETHER -> new ItemStack(Material.NETHERRACK);
             case THE_END -> new ItemStack(Material.END_STONE);
@@ -205,15 +207,482 @@ public class DevTool implements SimpleCommand {
 
             @Override
             public void onClick(Player player) {
-
+                showWorldCreator(player);
             }
         });
         worldManagerMenu.show(p);
     }
 
+    private void showWorldCreator(Player player) {
+        getWorldCreatorMenu(null, World.Environment.NORMAL, WorldType.NORMAL, true, 1000, Difficulty.EASY, new Random().nextLong(System.currentTimeMillis())).show(player);
+    }
+
+    public void showWorldCreator(Player player, String world_name, World.Environment environment, WorldType worldType, boolean generate_structure, int borderSize, Difficulty difficulty, long seed) {
+        getWorldCreatorMenu(world_name, environment, worldType, generate_structure, borderSize, difficulty, seed).show(player);
+    }
+
+    public interface WorldCreatorContent {
+        String getInputContent();
+        String getWorldName();
+        World.Environment getEnvironment();
+        WorldType getWorldType();
+        boolean getGenerateStructure();
+        int getBorderSize();
+        Difficulty getDifficulty();
+        Long getSeed();
+    }
+
+    private Menu getWorldCreatorMenu(String name, World.Environment environment, WorldType worldType, boolean generate_structure, int borderSize, Difficulty difficulty, Long seed) {
+        Menu worldCreatorMenu = new Menu("World Creator").setLayout("----w----", "-=n=e=t=-", "-=g=b=s=-", "----c----");
+        return worldCreatorMenu.setKey(
+                blank(),
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return '-';
+                    } // border
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(" ").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'w';
+                    } // world creator icon
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(new ItemStack(Material.GOLD_BLOCK)).setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "World Creator").addLore(
+                                        ChatColor.GRAY + "Name: " + ChatColor.YELLOW + (name == null ? ChatColor.RED + "Not Set" : name),
+                                        ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + (environment == null ? ChatColor.RED + "Not Set" : environment),
+                                        ChatColor.GRAY + "World Type: " + ChatColor.YELLOW + (worldType == null ? ChatColor.RED + "Not Set" : worldType),
+                                        ChatColor.GRAY + "Difficulty: " + ChatColor.YELLOW + difficulty,
+                                        ChatColor.GRAY + "Generate Structure: " + ChatColor.YELLOW + (generate_structure ? "True" : "False"),
+                                        ChatColor.GRAY + "Border Size: " + ChatColor.YELLOW + borderSize,
+                                        ChatColor.GRAY + "Seed: " + ChatColor.YELLOW + (seed == null ? ChatColor.RED + "RANDOM" : seed)
+                                ).create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                player.closeInventory();
+                                player.sendMessage(ChatColor.YELLOW + "World '" + name + "' is Creating...");
+                                createWorld(name, environment, worldType, generate_structure, borderSize, difficulty, seed);
+                                player.sendMessage(ChatColor.GREEN + "World '" + name + "' has been created!");
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'n';
+                    } // set world name
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                if (name == null) {
+                                    return new ItemCreator(Material.OAK_SIGN).setDisplayName("Set World Name").addLore(ChatColor.YELLOW + "Click to set world name.").create();
+                                }
+                                return new ItemCreator(Material.BIRCH_SIGN).setDisplayName(name).addLore(ChatColor.YELLOW + "Click to change world name.").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                player.sendMessage(ChatColor.GRAY + "Please send a world name into chat.");
+                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                    @Override
+                                    public String getInputContent() {
+                                        return "worldName";
+                                    }
+
+                                    @Override
+                                    public String getWorldName() {
+                                        return name;
+                                    }
+
+                                    @Override
+                                    public World.Environment getEnvironment() {
+                                        return environment;
+                                    }
+
+                                    @Override
+                                    public WorldType getWorldType() {
+                                        return worldType;
+                                    }
+
+                                    @Override
+                                    public boolean getGenerateStructure() {
+                                        return generate_structure;
+                                    }
+
+                                    @Override
+                                    public int getBorderSize() {
+                                        return borderSize;
+                                    }
+
+                                    @Override
+                                    public Difficulty getDifficulty() {
+                                        return difficulty;
+                                    }
+
+                                    @Override
+                                    public Long getSeed() {
+                                        return seed;
+                                    }
+                                }));
+                                player.closeInventory();
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'e'; // environment
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                if (environment == null) {
+                                    return new ItemCreator(Material.COMMAND_BLOCK).setDisplayName("Set World Environment").addLore(ChatColor.YELLOW + "Click to change world environment.").create();
+                                }
+                                return new ItemCreator(getWorldEnvironmentBlock(environment)).setDisplayName(environment.name()).addLore(ChatColor.YELLOW + "Click to change world environment.").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                World.Environment[] environments = World.Environment.values();
+                                int currentIndex = environment == null ? -1 : java.util.Arrays.asList(environments).indexOf(environment);
+                                int nextIndex = (currentIndex + 1) % environments.length;
+                                showWorldCreator(player, name, environments[nextIndex], worldType, generate_structure, borderSize, difficulty, seed);
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 't'; // world type
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                if (worldType == null) {
+                                    return new ItemCreator(Material.OAK_SAPLING).setDisplayName("Set World Type").addLore(ChatColor.YELLOW + "Click to change world type.").create();
+                                }
+                                return new ItemCreator(Material.CHERRY_SAPLING).setDisplayName(worldType.getName()).addLore(ChatColor.YELLOW + "Click to change world type").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                WorldType[] worldTypes = WorldType.values();
+                                int currentTypeIndex = worldType == null ? -1 : java.util.Arrays.asList(worldTypes).indexOf(worldType);
+                                int nextTypeIndex = (currentTypeIndex + 1) % worldTypes.length;
+
+                                showWorldCreator(player, name, environment, worldTypes[nextTypeIndex], generate_structure, borderSize, difficulty, seed);
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'g'; // generate structure? def = true
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                if (generate_structure) return new ItemCreator(Material.BIRCH_STAIRS).setDisplayName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "True").create();
+                                return new ItemCreator(Material.ACACIA_STAIRS).setDisplayName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "False").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                showWorldCreator(player, name, environment, worldType, !generate_structure, borderSize, difficulty, seed);
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'b'; // border size? def = default
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(Material.STRUCTURE_VOID).setDisplayName(ChatColor.GRAY + "World Border Size: " + ChatColor.YELLOW + borderSize).create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                player.sendMessage(ChatColor.GRAY + "Please send a world border size into chat.");
+                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                    @Override
+                                    public String getInputContent() {
+                                        return "worldBorder";
+                                    }
+
+                                    @Override
+                                    public String getWorldName() {
+                                        return name;
+                                    }
+
+                                    @Override
+                                    public World.Environment getEnvironment() {
+                                        return environment;
+                                    }
+
+                                    @Override
+                                    public WorldType getWorldType() {
+                                        return worldType;
+                                    }
+
+                                    @Override
+                                    public boolean getGenerateStructure() {
+                                        return generate_structure;
+                                    }
+
+                                    @Override
+                                    public int getBorderSize() {
+                                        return borderSize;
+                                    }
+
+                                    @Override
+                                    public Difficulty getDifficulty() {
+                                        return difficulty;
+                                    }
+
+                                    @Override
+                                    public Long getSeed() {
+                                        return seed;
+                                    }
+                                }));
+                                player.closeInventory();
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 's'; // seed? def = default
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(Material.WHEAT_SEEDS).setDisplayName(ChatColor.GRAY + "Seed: " + ChatColor.YELLOW + seed).create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                player.sendMessage(ChatColor.GRAY + "Please send a seed number into chat.");
+                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                    @Override
+                                    public String getInputContent() {
+                                        return "worldSeed";
+                                    }
+
+                                    @Override
+                                    public String getWorldName() {
+                                        return name;
+                                    }
+
+                                    @Override
+                                    public World.Environment getEnvironment() {
+                                        return environment;
+                                    }
+
+                                    @Override
+                                    public WorldType getWorldType() {
+                                        return worldType;
+                                    }
+
+                                    @Override
+                                    public boolean getGenerateStructure() {
+                                        return generate_structure;
+                                    }
+
+                                    @Override
+                                    public int getBorderSize() {
+                                        return borderSize;
+                                    }
+
+                                    @Override
+                                    public Difficulty getDifficulty() {
+                                        return difficulty;
+                                    }
+
+                                    @Override
+                                    public Long getSeed() {
+                                        return seed;
+                                    }
+                                }));
+                                player.closeInventory();
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() {
+                        return 'c'; // create button
+                    }
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.WHITE + "Create World").addLore(ChatColor.YELLOW + "Click to create world.").create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                player.closeInventory();
+                                player.sendMessage(ChatColor.YELLOW + "World '" + name + "' is Creating...");
+                                createWorld(name, environment, worldType, generate_structure, borderSize, difficulty, seed);
+                                player.sendMessage(ChatColor.GREEN + "World '" + name + "' has been created!");
+                            }
+                        };
+                    }
+                }
+        );
+    }
+
+    private void createWorld(String name, World.Environment environment, WorldType worldType, boolean generate_structure, int borderSize, Difficulty difficulty, Long seed) {
+        if (name == null) {
+            name = "custom_world_" + environment.name() + "_" + worldType.getName() + "_" + System.currentTimeMillis();
+        }
+        new WorldManager(name).create(worldType, environment, generate_structure, borderSize, difficulty, seed);
+    }
+
     private void showSingleWorldManager(World world, Player player) {
         Menu worldManagerMenu = new Menu("World Manager", 9 * 5);
-        worldManagerMenu.setLayout("=========", "====w====", "=========", "==t===r==", "=========");
+        worldManagerMenu.setLayout("=========", "====w====", "=========", "==t=d=r==", "=========");
+        if (world.hasMetadata("loader")) {
+            worldManagerMenu.setKey(
+                    blank(),
+                    new Layout() {
+
+                        @Override
+                        public char getKey() {
+                            return 'w';
+                        }
+
+                        @Override
+                        public Button getButton() {
+                            return new Button() { // world info
+
+                                @Override
+                                public ItemStack getItem() {
+
+                                    return new ItemCreator(getWorldEnvironmentBlock(world)).setDisplayName(ChatColor.GREEN + "World Info").addLore(ChatColor.GRAY + "Name: " + ChatColor.YELLOW + properWorldName(world), ChatColor.GRAY + "Difficulty: " + ChatColor.YELLOW + world.getDifficulty(), ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + world.getEnvironment()).create();
+                                }
+
+                                @Override
+                                public void onClick(Player player) {
+
+                                }
+                            };
+                        }
+                    },
+                    new Layout() {
+                        @Override
+                        public char getKey() {
+                            return 't'; // teleport
+                        }
+
+                        @Override
+                        public Button getButton() {
+                            return new Button() {
+                                @Override
+                                public ItemStack getItem() {
+                                    return new ItemCreator(new ItemStack(Material.BEACON)).setDisplayName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
+                                }
+
+                                @Override
+                                public void onClick(Player player) {
+                                    if (player.getWorld() != world) {
+                                        player.sendMessage(ChatColor.GRAY + "Teleporting to " + properWorldName(world) + "...");
+                                        player.teleport(world.getSpawnLocation());
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "You are already in this world!");
+                                    }
+                                }
+                            };
+                        }
+                    },
+                    new Layout() {
+                        @Override
+                        public char getKey() {
+                            return 'r'; // gamerules
+                        }
+
+                        @Override
+                        public Button getButton() {
+                            return null;
+                        }
+                    },
+                    new Layout() {
+                        @Override
+                        public char getKey() {
+                            return 'd';
+                        }
+
+                        @Override
+                        public Button getButton() {
+                            return new Button() {
+                                @Override
+                                public ItemStack getItem() {
+                                    return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED +"Delete").addLore(ChatColor.RED + "Click here to delete this world").create();
+                                }
+
+                                @Override
+                                public void onClick(Player player) {
+                                    showDeleteWorldApproval(player, world);
+                                }
+                            };
+                        }
+                    }
+            ).show(player);
+            return;
+        }
         worldManagerMenu.setKey(
                 blank(),
                 new Layout() {
@@ -256,9 +725,10 @@ public class DevTool implements SimpleCommand {
 
                             @Override
                             public void onClick(Player player) {
-                                if (player.getWorld() != world)
+                                if (player.getWorld() != world) {
+                                    player.sendMessage(ChatColor.GRAY + "Teleporting to " + properWorldName(world) + "...");
                                     player.teleport(world.getSpawnLocation());
-                                else {
+                                } else {
                                     player.sendMessage(ChatColor.RED + "You are already in this world!");
                                 }
                             }
@@ -277,6 +747,78 @@ public class DevTool implements SimpleCommand {
                     }
                 }
         ).show(player);
+    }
+
+    private void showDeleteWorldApproval(Player player, World targetWorld) {
+        new Menu(ChatColor.RED + "Are you sure to delete " + targetWorld.getName() + "?")
+                .setLayout("=========", "====w====", "=========", "==a===d==", "=========")
+                .setKey(blank(),
+                        new Layout() {
+                            @Override
+                            public char getKey() {
+                                return 'w';
+                            }
+
+                            @Override
+                            public Button getButton() {
+                                return new Button() {
+                                    @Override
+                                    public ItemStack getItem() {
+                                        return new ItemCreator(new ItemStack(getWorldEnvironmentBlock(targetWorld))).setDisplayName(ChatColor.RED + "Are you sure to delete " + targetWorld.getName() + "?").create();
+                                    }
+
+                                    @Override
+                                    public void onClick(Player player) {
+
+                                    }
+                                };
+                            }
+                        },
+                        new Layout() {
+                            @Override
+                            public char getKey() {
+                                return 'a';
+                            }
+
+                            @Override
+                            public Button getButton() {
+                                return new Button() {
+                                    @Override
+                                    public ItemStack getItem() {
+                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setDisplayName(ChatColor.GREEN + "ACCEPT").create();
+                                    }
+
+                                    @Override
+                                    public void onClick(Player player) {
+                                        WorldManager.delete(targetWorld.getName());
+                                        player.sendMessage(ChatColor.RED + targetWorld.getName() + " is now mark for removal!");
+                                        showServerWorldManger(player);
+                                    }
+                                };
+                            }
+                        },
+                        new Layout() {
+                            @Override
+                            public char getKey() {
+                                return 'd';
+                            }
+
+                            @Override
+                            public Button getButton() {
+                                return new Button() {
+                                    @Override
+                                    public ItemStack getItem() {
+                                        return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED + "DENY").create();
+                                    }
+
+                                    @Override
+                                    public void onClick(Player player) {
+                                        showSingleWorldManager(targetWorld, player);
+                                    }
+                                };
+                            }
+                        }
+                ).show(player);
     }
 
     private String properWorldName(World world) {
@@ -311,7 +853,6 @@ public class DevTool implements SimpleCommand {
                 return new Button() {
                     @Override
                     public ItemStack getItem() {
-//                        return new ItemCreator(new ItemStack(Material.WHITE_STAINED_GLASS_PANE)).setDisplayName(" ").create();
                         return new ItemStack(Material.AIR);
                     }
 
@@ -398,6 +939,7 @@ public class DevTool implements SimpleCommand {
                             @Override
                             public void onClick(Player player) {
                                 player.teleport(target.getLocation());
+                                player.closeInventory();
                             }
                         };
                     }
@@ -522,6 +1064,7 @@ public class DevTool implements SimpleCommand {
                                     @Override
                                     public void onClick(Player player) {
                                         target.ban("You have been banned from this server.", (Date) null, player.getName(), true);
+                                        showServerPlayerManager(origin);
                                     }
                                 };
                             }
@@ -592,6 +1135,7 @@ public class DevTool implements SimpleCommand {
                                     @Override
                                     public void onClick(Player player) {
                                         target.kick();
+                                        showServerPlayerManager(origin);
                                     }
                                 };
                             }
@@ -625,7 +1169,34 @@ public class DevTool implements SimpleCommand {
     @Override
     public void execute(@NotNull CommandSourceStack commandSourceStack, String @NotNull [] strings) {
         if (commandSourceStack.getSender() instanceof Player player) {
-            this.openDevTool(player);
+            switch (strings.length) {
+                case 0: {
+                    this.openDevTool(player);
+                }
+                case 1: {
+                    ItemStack devToolItem = new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
+                            new ItemInteraction() {
+                                @Override
+                                public String getName() {
+                                    return "DevTool";
+                                }
+
+                                @Override
+                                public Set<Action> getAction() {
+                                    return Set.of(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
+                                }
+
+                                @Override
+                                public void execute(Player player) {
+                                    openDevTool(player);
+                                }
+                            }
+                    ).create();
+                    if (strings[0].equalsIgnoreCase("get") || strings[0].equalsIgnoreCase("getItem")) {
+                        player.getInventory().addItem(devToolItem);
+                    }
+                }
+            }
             return;
         }
         commandSourceStack.getSender().sendMessage("This command can only be executed by a player!");
@@ -634,9 +1205,9 @@ public class DevTool implements SimpleCommand {
     @Override
     public @NotNull Collection<String> suggest(@NotNull CommandSourceStack commandSourceStack, String @NotNull [] args) {
         return switch (args.length) {
-//            case 0: {
-//                yield Collections.singletonList("tool");
-//            }
+            case 0: {
+                yield List.of("get", "getItem");
+            }
             default: {
                 yield Collections.emptyList();
             }

@@ -6,33 +6,28 @@ import com.pinont.lib.api.ui.ItemInteraction;
 import com.pinont.lib.api.ui.Menu;
 import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.plugin.CorePlugin;
+import com.pinont.lib.plugin.DevTool;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-
-import java.util.HashMap;
 
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class PlayerListener implements Listener {
 
-    HashMap<Player, ItemStack> interactionLock = new HashMap<>();
-
     @EventHandler
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
-//            if (interactionLock.containsKey(player)) return;
-//            interactionLock.put(player, event.getItem());
-//            interactionLock.remove(player);
             ItemInteraction itemInteraction;
             try {
                 itemInteraction = ItemCreator.getInteraction(player, player.getInventory().getItemInMainHand());
@@ -48,6 +43,48 @@ public class PlayerListener implements Listener {
                 itemInteraction.execute(player);
                 event.setCancelled(true);
             }
+        }
+    }
+
+    @EventHandler
+    public void sendChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasMetadata("devTool")) {
+            DevTool.WorldCreatorContent worldCreatorContent = (DevTool.WorldCreatorContent) player.getMetadata("devTool").getFirst().value();
+            if (worldCreatorContent.getInputContent() == null) {
+                player.sendMessage(ChatColor.RED + "Seem like devTool World creator has occur an error.");
+                return;
+            }
+            event.setCancelled(true);
+            switch (worldCreatorContent.getInputContent()) {
+                case "worldName" : {
+                    new DevTool().showWorldCreator(player, event.getMessage(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    break;
+                }
+                case "worldBorder" : {
+                    try {
+                        int borderSize = Integer.parseInt(event.getMessage());
+                        if (borderSize <= 0) {
+                            player.sendMessage(ChatColor.RED + "World border size must be greater than 0");
+                            return;
+                        }
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), borderSize, worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                    }
+                    break;
+                }
+                case "worldSeed" : {
+                    try {
+                        long seed = Long.parseLong(event.getMessage());
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), seed);
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                    }
+                    break;
+                }
+            }
+            removePlayerMetadata(player, CorePlugin.getInstance(), "devTool");
         }
     }
 
@@ -72,24 +109,26 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void inventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        removePlayerMenuMetadata(player, CorePlugin.getInstance());
+        removePlayerMetadata(player, CorePlugin.getInstance(), "Menu");
     }
 
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        removePlayerMenuMetadata(player, CorePlugin.getInstance());
+        removePlayerMetadata(player, CorePlugin.getInstance(), "Menu", "DevTool");
     }
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        removePlayerMenuMetadata(player, CorePlugin.getInstance());
+        removePlayerMetadata(player, CorePlugin.getInstance(), "Menu", "DevTool");
     }
 
-    private void removePlayerMenuMetadata(Player player, Plugin plugin) {
-        if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", plugin);
+    private void removePlayerMetadata(Player player, Plugin plugin, String... keys) {
+        for (String metaKey : keys) {
+            if (player.hasMetadata(metaKey)) {
+                player.removeMetadata(metaKey, plugin);
+            }
         }
     }
 

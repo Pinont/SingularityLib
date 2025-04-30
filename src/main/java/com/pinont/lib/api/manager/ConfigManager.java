@@ -34,6 +34,10 @@ public class ConfigManager {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
+    public static boolean isExists(String subFolder, String fileName) {
+        return new File(CorePlugin.getInstance().getDataFolder() + "/" + subFolder, fileName).exists();
+    }
+
     public ConfigManager(String subFolder, String fileName) {
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);

@@ -1,6 +1,7 @@
 package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.manager.ConfigManager;
+import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.plugin.events.PlayerListener;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -61,6 +62,7 @@ public abstract class CorePlugin extends JavaPlugin {
             return;
         }
         config.options().copyDefaults(true);
+        WorldManager.autoLoadWorlds();
         sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
         onPluginStart();
         final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();

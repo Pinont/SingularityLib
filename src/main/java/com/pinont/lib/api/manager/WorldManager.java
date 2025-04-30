@@ -1,29 +1,23 @@
 package com.pinont.lib.api.manager;
 
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 
 public final class WorldManager {
 
     private final String worldName;
-    private static Plugin plugin;
-    private static final FileConfiguration worldConfig = getWorldConfigManager().getConfig();
 
-    private static ConfigManager getWorldConfigManager() {
-        return new ConfigManager("worlds.yml");
-    }
+    private static final ConfigManager worldConfig = new ConfigManager("devTools", "worlds.yml");
 
-    @Deprecated (forRemoval = true)
-    public WorldManager(Plugin plugin, String worldName) {
-        WorldManager.plugin = plugin;
+    public WorldManager(String worldName) {
         this.worldName = worldName;
     }
 
-    public void create(WorldType worldType, int borderSize, boolean generateStructures, World.Environment environment, Difficulty difficulty) {
+    public void create(WorldType worldType, World.Environment environment, boolean generateStructures, int borderSize, Difficulty difficulty) {
         WorldCreator worldCreator = new WorldCreator(worldName);
         worldCreator.type(worldType);
         worldCreator.generateStructures(generateStructures);
@@ -31,7 +25,7 @@ public final class WorldManager {
         createWorld(borderSize, difficulty, worldCreator);
     }
 
-    public void create(WorldType worldType, long seed, int borderSize, boolean generateStructures, World.Environment environment, Difficulty difficulty) {
+    public void create(WorldType worldType, World.Environment environment, boolean generateStructures, int borderSize, Difficulty difficulty, long seed) {
         WorldCreator worldCreator = new WorldCreator(worldName);
         worldCreator.type(worldType);
         worldCreator.generateStructures(generateStructures);
@@ -48,7 +42,6 @@ public final class WorldManager {
         WorldBorder border = world.getWorldBorder();
         border.setSize(borderSize);
         setWorldConfig();
-        Bukkit.unloadWorld(world, true);
     }
 
     public void setWorldConfig() {
@@ -71,7 +64,7 @@ public final class WorldManager {
                 worldConfig.set(worldName + ".gameRule." + key, value);
             }
         }
-        getWorldConfigManager().saveConfig();
+        worldConfig.saveConfig();
     }
 
     public static void load(String worldName) {
@@ -98,7 +91,7 @@ public final class WorldManager {
             return false;
         }
         worldConfig.set(worldName, null);
-        getWorldConfigManager().saveConfig();
+        worldConfig.saveConfig();
         return true;
     }
 
@@ -110,30 +103,31 @@ public final class WorldManager {
     }
 
     public static void autoLoadWorlds() {
-        for (String worldName : worldConfig.getKeys(false)) {
-            if (worldConfig.get(worldName + ".autoLoad") == null) {return;}
-            if (worldConfig.getBoolean(worldName + ".autoLoad")) {
+        if (ConfigManager.isExists("devTools", "worlds.yml"))
+            for (String worldName : worldConfig.getConfig().getKeys(false)) {
                 load(worldName);
+                World world = Bukkit.getWorld(worldName);
+                assert world != null;
+                world.setMetadata("loader", new FixedMetadataValue(CorePlugin.getInstance(), CorePlugin.getInstance().getName()));
             }
-        }
     }
 
-    public static void reloadWorlds() {
-        World[] worlds = Bukkit.getWorlds().toArray(World[]::new);
-        for (World world : worlds) {
-            assert world != null;
-            setWorldFromConfig(world);
-        }
-    }
+//    public static void reloadWorlds() {
+//        World[] worlds = Bukkit.getWorlds().toArray(World[]::new);
+//        for (World world : worlds) {
+//            assert world != null;
+//            setWorldFromConfig(world);
+//        }
+//    }
 
-    public static void importWorld(String name) {
-        Bukkit.getLogger().info("Importing world " + name);
-        World world = Bukkit.createWorld(WorldCreator.name(name));
-    }
+//    public static void importWorld(String name) {
+//        Bukkit.getLogger().info("Importing world " + name);
+//        World world = Bukkit.createWorld(WorldCreator.name(name));
+//    }
 
     public static void setWorldFromConfig(World world) {
         String worldName = world.getName();
-        ConfigurationSection section = worldConfig.getConfigurationSection(worldName);
+        ConfigurationSection section = worldConfig.getConfig().getConfigurationSection(worldName);
         assert section != null;
         ConfigurationSection gameruleSection = section.getConfigurationSection("gameRule");
         world.getWorldBorder().setSize(section.getDouble("borderSize"));

@@ -111,10 +111,8 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setLore(List<String> lore) {
-        for (String s : lore) {
-            this.lore.add(ChatColor.RESET + Common.colorize(s));
-        }
+    public ItemCreator setUnstackable(boolean bool) {
+        setPersisDataContainer("unstackable", (short) new Random().nextInt(), PersisDataType.SHORT);
         return this;
     }
 
