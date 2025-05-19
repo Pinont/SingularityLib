@@ -3,6 +3,7 @@ package com.pinont.lib.api.utils;
 import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -64,7 +65,86 @@ public class Common {
         return players;
     }
 
+    public static String normalizeStringName(String string) {
+        String[] words = string.replace("_", " ").split(" ");
+        StringBuilder properName = new StringBuilder();
+        for (String word : words) {
+            if (word.length() > 0) {
+                properName.append(word.substring(0, 1).toUpperCase());
+                properName.append(word.substring(1).toLowerCase());
+                properName.append(" ");
+            }
+        }
+        return properName.toString().trim();
+    }
+
     public static Boolean isMainHandEmpty(Player player) {
         return (player.getInventory().getItemInMainHand().getType() == Material.AIR) || (player.getInventory().getItemInMainHand() == null);
+    }
+
+    public static String IntegerToRomanNumeral(int input) {
+        if (input < 1 || input > 3999)
+            return "Invalid Roman Number Value";
+        String s = "";
+        while (input >= 1000) {
+            s += "M";
+            input -= 1000;        }
+        while (input >= 900) {
+            s += "CM";
+            input -= 900;
+        }
+        while (input >= 500) {
+            s += "D";
+            input -= 500;
+        }
+        while (input >= 400) {
+            s += "CD";
+            input -= 400;
+        }
+        while (input >= 100) {
+            s += "C";
+            input -= 100;
+        }
+        while (input >= 90) {
+            s += "XC";
+            input -= 90;
+        }
+        while (input >= 50) {
+            s += "L";
+            input -= 50;
+        }
+        while (input >= 40) {
+            s += "XL";
+            input -= 40;
+        }
+        while (input >= 10) {
+            s += "X";
+            input -= 10;
+        }
+        while (input >= 9) {
+            s += "IX";
+            input -= 9;
+        }
+        while (input >= 5) {
+            s += "V";
+            input -= 5;
+        }
+        while (input >= 4) {
+            s += "IV";
+            input -= 4;
+        }
+        while (input >= 1) {
+            s += "I";
+            input -= 1;
+        }
+        return s;
+    }
+
+    public static Player getNearestPlayer(Location location, int radius) {
+        return location.getNearbyPlayers(radius).stream().findFirst().orElse(null);
+    }
+
+    public static String resetStringColor(String name) {
+        return name.replaceAll("§[0-9a-fk-or]", "");
     }
 }

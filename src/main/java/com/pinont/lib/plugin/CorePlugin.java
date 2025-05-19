@@ -1,9 +1,14 @@
 package com.pinont.lib.plugin;
 
+import com.pinont.lib.api.creator.EnchantmentCreator;
 import com.pinont.lib.api.creator.items.ItemCreator;
+import com.pinont.lib.api.custom.CustomItem;
+import com.pinont.lib.api.custom.CustomItemManager;
 import com.pinont.lib.api.manager.ConfigManager;
+import com.pinont.lib.api.manager.FileManager;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.plugin.events.PlayerListener;
+import com.pinont.lib.plugin.events.ServerListPingListener;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -16,6 +21,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,10 +33,14 @@ import java.util.Objects;
 public abstract class CorePlugin extends JavaPlugin {
     private static CorePlugin instance;
 
-    private static ConfigManager configManager;
+    private boolean custom_enchants = false;
 
-    public static ConfigManager getConfigManager() {
-        return configManager;
+    public @NotNull FileConfiguration getConfig() {
+        return new ConfigManager("config.yml").getConfig();
+    }
+
+    public @NotNull ConfigManager getConfigManager() {
+        return new ConfigManager("config.yml");
     }
 
     public static void sendConsoleMessage(String message) {
@@ -34,6 +48,31 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     private final List<SimpleCommand> simpleCommands = new ArrayList<>();
+
+    private final List<EnchantmentCreator.Enchant> enchantments = new ArrayList<>();
+
+    private final List<Listener> listeners = new ArrayList<>();
+
+    private boolean custom_items = false;
+
+    private boolean custom_motd;
+
+    private final List<CustomItem> customItems = new ArrayList<>();
+
+    private boolean getMotdEnable() {
+        if (getConfig().contains("custom_motd")) {
+            return getConfig().getBoolean("custom_motd");
+        } else {
+            return false;
+        }
+    }
+
+    private final List<String> motds = List.of(new String[]{
+            "SingularityAPI for all!\nThank you for using SingularityAPI!",
+            "Welcome to the server!\nMinimessage will be supported soon! <player>",
+            "Enjoy your stay!\n<player>",
+            "Have fun playing!\n<player>",
+    });
 
     public static JavaPlugin getInstance() {
         if (instance == null) {
@@ -50,34 +89,32 @@ public abstract class CorePlugin extends JavaPlugin {
         return instance;
     }
 
+    private void reload() {
+        configureServerMotd();
+        onReload();
+    }
+
     @Override
     public final void onEnable() {
         instance = this;
-        configManager = new ConfigManager("config.yml");
-        FileConfiguration config = getConfigManager().getConfig();
-        registerEvents(this, new PlayerListener());
-        ConfigManager configManager = getConfigManager();
-        if (configManager.isFirstLoad()) {
-            config.set("debug", false);
-            config.set("dev-tool", false);
-            configManager.saveConfig();
-            config.options().copyDefaults(true);
-            return;
+        ConfigManager pluginConfig = new ConfigManager("config.yml");
+        registerEvents(new PlayerListener());
+        if (pluginConfig.isFirstLoad()) {
+            pluginConfig.set("debug", false);
+            pluginConfig.set("dev-tool", false);
+            pluginConfig.saveConfig();
         }
-        config.options().copyDefaults(true);
+        pluginConfig.getConfig().options().copyDefaults(true);
+        custom_motd = getMotdEnable();
         WorldManager.autoLoadWorlds();
         sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
         onPluginStart();
-        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();
-        lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
-            for (SimpleCommand simpleCommand : simpleCommands) {
-                event.registrar().register(simpleCommand.getName(), simpleCommand);
-            }
-            if (config.getBoolean("dev-tool")) {
-                DevTool devTool = new DevTool();
-                event.registrar().register(devTool.getName(), devTool);
-            }
-        });
+        registerCommand();
+        reload();
+        if (custom_motd) {
+            registerEvents(new ServerListPingListener());
+        }
+        registerEvents(this);
         new ItemCreator(Material.STICK).addInteraction(new DevTool().devToolItemInteraction).create(); // register devTool interaction with dummy item
     }
 
@@ -91,21 +128,107 @@ public abstract class CorePlugin extends JavaPlugin {
         onPluginStop();
     }
 
-    public void registerEvents(Plugin plugin, Listener... listener) {
-        for (Listener l : listener) {
+    private void registerEvents(Plugin plugin) {
+        for (Listener l : this.listeners) {
             Bukkit.getPluginManager().registerEvents(l, plugin);
+        }
+        this.listeners.clear();
+    }
+
+    public void registerEvents(Listener... listener) {
+        this.listeners.addAll(List.of(listener));
+    }
+
+    private void registerCommand() {
+        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();
+        lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
+            if (getConfig().getBoolean("dev-tool")) registerCommand(new DevTool());
+            if (custom_enchants) registerCommand(new EnchantmentCreator());
+            if (custom_items) registerCommand(new CustomItemManager().register(customItems));
+            for (SimpleCommand simpleCommand : simpleCommands) {
+                event.registrar().register(simpleCommand.getName(), simpleCommand);
+            }
+        });
+        this.simpleCommands.clear();
+    }
+
+    public void registerCustomItem(CustomItem... customItem) {
+        custom_items = true;
+        customItems.addAll(List.of(customItem));
+        for (CustomItem item : customItems) {
+            if (item.getItem() != null) {
+                item.register();
+            }
         }
     }
 
-    public void registerCommand(SimpleCommand simpleCommand) {
-        simpleCommands.add(simpleCommand);
+    public void registerCommand(SimpleCommand... simpleCommand) {
+        simpleCommands.addAll(List.of(simpleCommand));
+    }
+
+    private void configureServerMotd() {
+        ConfigManager motdConfig = getConfigManager();
+//        if (!motdConfig.getConfig().contains("custom-motd")) {
+//            URL defaultImageURL = getClass().getResource("/SingularityAPI.png");
+//            Image defaultImage = new ImageIcon(defaultImageURL != null ? defaultImageURL : null).getImage();
+//            BufferedImage bufferedImage = defaultImage;
+//            motdConfig.set("custom_motd", true);
+//        }
+        if (!motdConfig.getConfig().contains("motds")) {
+            motdConfig.set("motds", motds);
+        }
+        motdConfig.saveConfig();
+        motdConfig.getConfig().options().copyDefaults(true);
+    }
+
+    public void customMotd(boolean enable) {
+        custom_motd = enable;
+        getConfig().set("custom_motd", enable);
+        if (!getConfig().contains("motds")) {
+            getConfig().set("motds", motds);
+        }
+        getConfigManager().saveConfig();
+    }
+
+    private void registerEnchantment(EnchantmentCreator.Enchant... enchant) {
+        custom_enchants = true;
+        enchantments.addAll(List.of(enchant));
+        new EnchantmentCreator().getEnchants().addAll(enchantments);
     }
 
     public static void sendDebugMessage(String message) {
-        if (getConfigManager().getConfig().getBoolean("debug")) {
+        if (CorePlugin.getInstance().getConfig().getBoolean("debug")) {
             sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + "Singularity Debugger:" + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
         }
     }
+
+    // this method is not working for me, will use it later when it is fixed
+//    @Override
+//    public void bootstrap(@NotNull BootstrapContext context) {
+//        sendConsoleMessage(ChatColor.WHITE + "----------------Bootstrap started----------------");
+//        // Register a new handler for the freeze lifecycle event on the enchantment registry
+//        if (custom_enchants)
+//            context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.freeze().newHandler(event -> {
+//                    for (EnchantmentCreator.Enchant enchantment : enchantments) {
+//                        event.registry().register(
+//                                // The key of the registry
+//                                // Plugins should use their own namespace instead of minecraft or papermc
+//                                EnchantmentKeys.create(Key.key(enchantment.getNamespace() + ":" + enchantment.getName())),
+//                                b -> b.description(Component.text(enchantment.getDescription()))
+//                                        .supportedItems(event.getOrCreateTag(enchantment.getSupportItem()))
+//                                        .anvilCost(enchantment.getAnvilCost())
+//                                        .maxLevel(enchantment.getMaxLevel())
+//                                        .weight(enchantment.getFoundRate())
+//                                        .minimumCost(enchantment.getMinimumCost())
+//                                        .maximumCost(enchantment.getMaximumCost())
+//                                        .activeSlots(enchantment.getActiveSlotGroup())
+//                        );
+//                        sendDebugMessage("Registered enchantment " + enchantment.getName() + " with key " + enchantment.getNamespace() + ":" + enchantment.getName());
+//                    }
+//            }));
+//    }
+
+    public abstract void onReload();
 
     public abstract void onPluginStart();
 
