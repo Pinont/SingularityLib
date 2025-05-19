@@ -8,17 +8,23 @@ import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.plugin.CorePlugin;
 import com.pinont.lib.plugin.DevTool;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Objects;
 
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
@@ -29,6 +35,7 @@ public class PlayerListener implements Listener {
         Player player = event.getPlayer();
         if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
             event.setCancelled(true);
+            if (event.getPlayer().getCooldown(player.getInventory().getItemInMainHand()) > 0) return;
             ItemInteraction itemInteraction;
             try {
                 itemInteraction = ItemCreator.getInteraction(player, player.getInventory().getItemInMainHand());
@@ -41,6 +48,7 @@ public class PlayerListener implements Listener {
                 return;
             }
             if (itemInteraction.getAction().contains(event.getAction())) {
+                CorePlugin.sendDebugMessage("Executing interaction: " + itemInteraction.getName());
                 itemInteraction.execute(player);
             }
         }
@@ -112,7 +120,10 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void inventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
-        removePlayerMetadata(player, CorePlugin.getInstance(), "Menu");
+        if (player.hasMetadata("god")) {
+            player.setGameMode((GameMode) Objects.requireNonNull(player.getMetadata("god").getFirst().value()));
+        }
+        removePlayerMetadata(player, CorePlugin.getInstance(), "Menu", "god");
     }
 
     @EventHandler
@@ -125,6 +136,29 @@ public class PlayerListener implements Listener {
     public void playerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         removePlayerMetadata(player, CorePlugin.getInstance(), "Menu", "DevTool");
+    }
+
+    @EventHandler
+    public void openInventory(InventoryOpenEvent event) {
+        if (event.getPlayer() instanceof Player player) {
+            if (player.isInvulnerable()) {
+                player.setMetadata("god", new FixedMetadataValue(CorePlugin.getInstance(), player.getGameMode()));
+                player.setGameMode(GameMode.CREATIVE);
+                CorePlugin.sendDebugMessage("Player " + player.getName() + " opened inventory... " + player.getGameMode());
+            }
+        }
+    }
+
+    @EventHandler
+    public void hungerChange(FoodLevelChangeEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            if (player.isInvulnerable()) {
+                event.setCancelled(true);
+                if (player.getFoodLevel() < 20) {
+                    event.setFoodLevel(player.getFoodLevel());
+                }
+            }
+        }
     }
 
     private void removePlayerMetadata(Player player, Plugin plugin, String... keys) {

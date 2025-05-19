@@ -870,7 +870,7 @@ public class DevTool implements SimpleCommand {
 
     private void showSpecificPlayerManager(Player origin, Player target) {
         Menu playerManager = new Menu("Player Manager", 9 * 5);
-        playerManager.setLayout("====p====", "=========", "==t=i=o==", "==b=k=n==");
+        playerManager.setLayout("====p====", "=========", "==t=i=o==", "==b=k=n==", "====v====", "=========");
         playerManager.setKey(
                 blank(),
                 new Layout() {
@@ -978,7 +978,7 @@ public class DevTool implements SimpleCommand {
                     @Override
                     public char getKey() {
                         return 'o';
-                    }
+                    } // op Player
 
                     @Override
                     public Button getButton() {
@@ -989,6 +989,33 @@ public class DevTool implements SimpleCommand {
                     @Override
                     public char getKey() {
                         return 'n';
+                    } // invincibility
+
+                    @Override
+                    public Button getButton() {
+                        return new Button() {
+                            @Override
+                            public ItemStack getItem() {
+                                return new ItemCreator(Material.TOTEM_OF_UNDYING).setDisplayName("God: " + target.isInvulnerable()).create();
+                            }
+
+                            @Override
+                            public void onClick(Player player) {
+                                target.setInvulnerable(!target.isInvulnerable());
+                                if (Bukkit.getServer().getAllowFlight()) {
+                                    target.setAllowFlight(target.isInvulnerable());
+                                }
+                                else
+                                    player.sendMessage(ChatColor.RED + "You need to enable flight to use flying feature.");
+                                showSpecificPlayerManager(player, target);
+                            }
+                        };
+                    }
+                },
+                new Layout() {
+                    @Override
+                    public char getKey() { // vanish
+                        return 'v';
                     }
 
                     @Override

@@ -1,5 +1,6 @@
 package com.pinont.lib.api.creator;
 
+import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
@@ -133,36 +134,37 @@ public class EntityCreator {
 
     public Entity spawn(Location location) {
         Entity entity = Objects.requireNonNull(location.getWorld()).spawnEntity(location, entityType);
-        Attributable attribute = (Attributable) entity;
-        if (Objects.requireNonNull(attribute.getAttribute(Attribute.MAX_HEALTH)).getValue() != this.maxHealth) {
-            AttributeInstance healthAttributeInstance = attribute.getAttribute(Attribute.MAX_HEALTH);
-            try {
-                Objects.requireNonNull(healthAttributeInstance).setBaseValue(this.maxHealth);
-            } catch (Exception e) {
-                sendConsoleMessage("Could not set max health of " + this.entityType + " to " + this.maxHealth);
-            }
-        }
+        CorePlugin.sendDebugMessage("Spawned " + entityType + " at " + location);
+//        Attributable attribute = (Attributable) entity;
+//        if (Objects.requireNonNull(attribute.getAttribute(Attribute.MAX_HEALTH)).getValue() != this.maxHealth) {
+//            AttributeInstance healthAttributeInstance = attribute.getAttribute(Attribute.MAX_HEALTH);
+//            try {
+//                Objects.requireNonNull(healthAttributeInstance).setBaseValue(this.maxHealth);
+//            } catch (Exception e) {
+//                sendConsoleMessage("Could not set max health of " + this.entityType + " to " + this.maxHealth);
+//            }
+//        }
         if (passenger != null) entity.addPassenger(passenger);
         if (ScoreboardTag != null) {
             for (String tag : ScoreboardTag) {
                 entity.addScoreboardTag(tag);
             }
         }
-        if (entity.getFireTicks() != fireTicks) entity.setFireTicks(fireTicks);
-        if (entity.isGlowing() != glowing) entity.setGlowing(glowing);
+//        if (entity.getFireTicks() != fireTicks) entity.setFireTicks(fireTicks);
+//        if (entity.isGlowing() != glowing) entity.setGlowing(glowing);
         if (entity.isInvulnerable() != invulnerable) entity.setInvulnerable(invulnerable);
-        if (entity.isSilent() != silent) entity.setSilent(silent);
-        if (entity.hasGravity() != gravity) entity.setGravity(gravity);
+//        if (entity.isSilent() != silent) entity.setSilent(silent);
+//        if (entity.hasGravity() != gravity) entity.setGravity(gravity);
         if (vector != null) entity.setVelocity(vector);
-        if (entity.isPersistent() != persistent) entity.setPersistent(persistent);
-        if (entity.getFreezeTicks() != freezeTicks) entity.setFreezeTicks(freezeTicks);
-        if (entity.isCustomNameVisible() != customNameVisible) entity.setCustomNameVisible(customNameVisible);
-        if (entity.getPortalCooldown() != portalCooldown) entity.setPortalCooldown(portalCooldown);
-        if (entity.getFallDistance() != fallingDistance) entity.setFallDistance(fallingDistance);
+//        if (entity.isPersistent() != persistent) entity.setPersistent(persistent);
+//        if (entity.getFreezeTicks() != freezeTicks) entity.setFreezeTicks(freezeTicks);
+//        if (entity.isCustomNameVisible() != customNameVisible) entity.setCustomNameVisible(customNameVisible);
+//        if (entity.getPortalCooldown() != portalCooldown) entity.setPortalCooldown(portalCooldown);
+//        if (entity.getFallDistance() != fallingDistance) entity.setFallDistance(fallingDistance);
         if (rotation != null) entity.setRotation(rotation[0], rotation[1]);
-        if (entity.getTicksLived() != ticksLived) entity.setTicksLived(ticksLived);
-        if (entity.isVisibleByDefault() != visibleByDefault) entity.setVisibleByDefault(visibleByDefault);
-        if (entity.isVisualFire() != visualFire) entity.setVisualFire(visualFire);
+//        if (entity.getTicksLived() != ticksLived) entity.setTicksLived(ticksLived);
+//        if (entity.isVisibleByDefault() != visibleByDefault) entity.setVisibleByDefault(visibleByDefault);
+//        if (entity.isVisualFire() != visualFire) entity.setVisualFire(visualFire);
 
         return entity;
     }

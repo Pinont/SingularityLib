@@ -103,6 +103,7 @@ public class ItemCreator {
 
     public ItemCreator setDisplayName(String name) {
         meta.setDisplayName(ChatColor.RESET + Common.colorize(name));
+        meta.setItemName(ChatColor.RESET + Common.colorize(name));
         return this;
     }
 
