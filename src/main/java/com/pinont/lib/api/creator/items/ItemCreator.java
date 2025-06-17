@@ -1,11 +1,11 @@
 package com.pinont.lib.api.creator.items;
 
 import com.google.common.collect.Sets;
-import com.pinont.lib.api.ui.ItemInteraction;
 import com.pinont.lib.api.utils.Common;
 import com.pinont.lib.enums.AttributeType;
 import com.pinont.lib.enums.PersisDataType;
 import com.pinont.lib.plugin.CorePlugin;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -27,11 +27,13 @@ import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class ItemCreator {
 
+    private final Common common = new Common();
+
     private final ItemStack item;
     private ItemMeta meta;
     private short durability = 0;
     private final PersistentDataContainer data;
-    private final ArrayList<String> lore = new ArrayList<>();
+    private final ArrayList<Component> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
     private final Plugin plugin = CorePlugin.getInstance();
@@ -56,7 +58,7 @@ public class ItemCreator {
         item.setType(type);
         if (meta == null) {meta = item.getItemMeta();}
         if (meta != null) {
-            meta.setLore(lore);
+            meta.lore(lore);
         }
         item.setItemMeta(meta);
         item.setDurability(durability);
@@ -73,7 +75,7 @@ public class ItemCreator {
     }
 
     public ItemCreator addLore(String lore) {
-        this.lore.add(ChatColor.RESET + Common.colorize(lore));
+        this.lore.add(common.colorize(lore));
         return this;
     }
 
@@ -102,8 +104,8 @@ public class ItemCreator {
     }
 
     public ItemCreator setDisplayName(String name) {
-        meta.setDisplayName(ChatColor.RESET + Common.colorize(name));
-        meta.setItemName(ChatColor.RESET + Common.colorize(name));
+        meta.displayName(common.colorize(name));
+        meta.itemName(common.colorize(name));
         return this;
     }
 
@@ -133,7 +135,7 @@ public class ItemCreator {
     }
 
     public ItemCreator addLore(String... lore) {
-        this.lore.addAll(Arrays.asList(lore));
+        this.lore.add(common.colorize(Arrays.toString(lore)));
         return this;
     }
 

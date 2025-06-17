@@ -2,9 +2,10 @@ package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.creator.items.ItemHeadCreator;
 import com.pinont.lib.api.creator.items.ItemCreator;
+import com.pinont.lib.api.custom.CustomItem;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.api.ui.Button;
-import com.pinont.lib.api.ui.ItemInteraction;
+import com.pinont.lib.api.creator.items.ItemInteraction;
 import com.pinont.lib.api.ui.Layout;
 import com.pinont.lib.api.ui.Menu;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -18,26 +19,31 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class DevTool implements SimpleCommand {
+public class DevTool implements SimpleCommand, CustomItem {
 
     private final String version = CorePlugin.getInstance().getDescription().getVersion();
 
-    public ItemInteraction devToolItemInteraction = new ItemInteraction() {
-        @Override
-        public String getName() {
-            return "DevTool";
-        }
+    @Override
+    public ItemCreator register() {
+        return new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
+                new ItemInteraction() {
+                    @Override
+                    public String getName() {
+                        return "DevTool";
+                    }
 
-        @Override
-        public Set<Action> getAction() {
-            return Set.of(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
-        }
+                    @Override
+                    public Set<Action> getAction() {
+                        return Set.of(Action.LEFT_CLICK_AIR, Action.LEFT_CLICK_BLOCK, Action.RIGHT_CLICK_AIR, Action.RIGHT_CLICK_BLOCK);
+                    }
 
-        @Override
-        public void execute(Player player) {
-            openDevTool(player);
-        }
-    };
+                    @Override
+                    public void execute(Player player) {
+                        openDevTool(player);
+                    }
+                }
+        );
+    }
 
     public void openDevTool(Player player) {
         Menu devMenu = new Menu(ChatColor.DARK_RED + "Developer Tools " + ChatColor.GRAY + "(" + version + ")", 9*5);
@@ -1179,9 +1185,7 @@ public class DevTool implements SimpleCommand {
                     break;
                 }
                 case 1: {
-                    ItemStack devToolItem = new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
-                        devToolItemInteraction
-                    ).create();
+                    ItemStack devToolItem = this.getItem();
                     if (strings[0].equalsIgnoreCase("get") || strings[0].equalsIgnoreCase("getItem")) {
                         player.getInventory().addItem(devToolItem);
                     }

@@ -1,4 +1,4 @@
-package com.pinont.lib.api.ui;
+package com.pinont.lib.api.creator.items;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -12,5 +12,9 @@ public interface ItemInteraction {
     Set<Action> getAction();
 
     void execute(Player player);
+
+    default boolean cancelEvent() {
+        return true;
+    }
 
 }

@@ -114,7 +114,7 @@ public class CustomItemManager implements SimpleCommand {
                         .toList());
                 if (!args[1].isEmpty()) {
                     yield items.stream()
-                            .filter(item -> item.toLowerCase().startsWith(args[1].toLowerCase()))
+                            .filter(item -> item.split(":")[1].toLowerCase().startsWith(args[1].toLowerCase()))
                             .toList();
                 }
                 yield items;

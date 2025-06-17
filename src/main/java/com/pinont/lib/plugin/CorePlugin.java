@@ -5,14 +5,15 @@ import com.pinont.lib.api.creator.items.ItemCreator;
 import com.pinont.lib.api.custom.CustomItem;
 import com.pinont.lib.api.custom.CustomItemManager;
 import com.pinont.lib.api.manager.ConfigManager;
-import com.pinont.lib.api.manager.FileManager;
 import com.pinont.lib.api.manager.WorldManager;
+import com.pinont.lib.plugin.essentialCommand.FlySpeed;
 import com.pinont.lib.plugin.events.PlayerListener;
 import com.pinont.lib.plugin.events.ServerListPingListener;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,10 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,6 +58,8 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private final List<CustomItem> customItems = new ArrayList<>();
 
+    private ConfigManager pluginConfig;
+
     private boolean getMotdEnable() {
         if (getConfig().contains("custom_motd")) {
             return getConfig().getBoolean("custom_motd");
@@ -90,6 +91,13 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     private void reload() {
+        registerEvents(new PlayerListener());
+        if (pluginConfig.isFirstLoad()) {
+            pluginConfig.set("debug", false);
+            pluginConfig.set("dev-tool", false);
+            pluginConfig.saveConfig();
+        }
+        pluginConfig.getConfig().options().copyDefaults(true);
         configureServerMotd();
         onReload();
     }
@@ -97,7 +105,7 @@ public abstract class CorePlugin extends JavaPlugin {
     @Override
     public final void onEnable() {
         instance = this;
-        ConfigManager pluginConfig = new ConfigManager("config.yml");
+        pluginConfig = new ConfigManager("config.yml");
         registerEvents(new PlayerListener());
         if (pluginConfig.isFirstLoad()) {
             pluginConfig.set("debug", false);
@@ -108,14 +116,14 @@ public abstract class CorePlugin extends JavaPlugin {
         custom_motd = getMotdEnable();
         WorldManager.autoLoadWorlds();
         sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
+//        registerCustomItem(new DevTool());
         onPluginStart();
-        registerCommand();
         reload();
         if (custom_motd) {
             registerEvents(new ServerListPingListener());
         }
+        registerCommand(this);
         registerEvents(this);
-        new ItemCreator(Material.STICK).addInteraction(new DevTool().devToolItemInteraction).create(); // register devTool interaction with dummy item
     }
 
     @Override
@@ -139,14 +147,22 @@ public abstract class CorePlugin extends JavaPlugin {
         this.listeners.addAll(List.of(listener));
     }
 
-    private void registerCommand() {
-        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = this.getLifecycleManager();
+    private void registerCommand(Plugin plugin) {
+        final LifecycleEventManager<@NotNull Plugin> lifecycleManager = plugin.getLifecycleManager();
+        if (custom_enchants) registerCommand(new EnchantmentCreator());
+        if (custom_items) registerCommand(new CustomItemManager().register(customItems));
+        sendConsoleMessage(Color.WHITE + "Registering Commands: " + Arrays.toString(simpleCommands.stream().map(SimpleCommand::getName).toArray()));
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
-            if (getConfig().getBoolean("dev-tool")) registerCommand(new DevTool());
-            if (custom_enchants) registerCommand(new EnchantmentCreator());
-            if (custom_items) registerCommand(new CustomItemManager().register(customItems));
             for (SimpleCommand simpleCommand : simpleCommands) {
-                event.registrar().register(simpleCommand.getName(), simpleCommand);
+                sendConsoleMessage(Color.WHITE + "Registered command + " + simpleCommand.getName());
+                String[] aliases = simpleCommand.getName().split(":");
+                if (aliases.length > 1) {
+                    for (String alias : aliases) {
+                        event.registrar().register(alias, simpleCommand);
+                    }
+                } else {
+                    event.registrar().register(simpleCommand.getName(), simpleCommand);
+                }
             }
         });
         this.simpleCommands.clear();
@@ -163,7 +179,7 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     public void registerCommand(SimpleCommand... simpleCommand) {
-        simpleCommands.addAll(List.of(simpleCommand));
+        this.simpleCommands.addAll(List.of(simpleCommand));
     }
 
     private void configureServerMotd() {

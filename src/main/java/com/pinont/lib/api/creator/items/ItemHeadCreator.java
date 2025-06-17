@@ -18,7 +18,7 @@ public class ItemHeadCreator extends ItemCreator {
     @Override
     public ItemCreator setDisplayName(String displayName) {
         if (skullMeta != null) {
-            skullMeta.setDisplayName(ChatColor.RESET + Common.colorize(displayName));
+            skullMeta.displayName(new Common().colorize(displayName));
         }
         return this;
     }

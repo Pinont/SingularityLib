@@ -1,19 +1,23 @@
 package com.pinont.lib.api.utils;
 
 import com.pinont.lib.plugin.CorePlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class Common {
-    public static String colorize(String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
+
+    public @NotNull Component colorize(String message) {
+        MiniMessage miniMessage = MiniMessage.miniMessage();
+        return miniMessage.deserialize(message);
     }
 
     public static Material[] getAllItemsMaterials() {
@@ -144,7 +148,12 @@ public class Common {
         return location.getNearbyPlayers(radius).stream().findFirst().orElse(null);
     }
 
+    @Deprecated
     public static String resetStringColor(String name) {
         return name.replaceAll("§[0-9a-fk-or]", "");
+    }
+
+    public static String resetStringColor(Component component) {
+        return MiniMessage.miniMessage().serialize(component);
     }
 }
