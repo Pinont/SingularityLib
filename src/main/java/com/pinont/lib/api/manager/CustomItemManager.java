@@ -1,8 +1,8 @@
-package com.pinont.lib.api.custom;
+package com.pinont.lib.api.manager;
 
+import com.pinont.lib.api.command.SimpleCommand;
+import com.pinont.lib.api.items.CustomItem;
 import com.pinont.lib.api.utils.Common;
-import com.pinont.lib.plugin.CorePlugin;
-import com.pinont.lib.plugin.SimpleCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static com.pinont.lib.api.utils.Common.resetStringColor;
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
 public class CustomItemManager implements SimpleCommand {
 
@@ -50,8 +50,8 @@ public class CustomItemManager implements SimpleCommand {
         if (itemName.startsWith("minecraft:")) {
             itemName = itemName.replace("minecraft:", "");
             item = new ItemStack(Objects.requireNonNull(Material.getMaterial(itemName.toUpperCase())), count);
-        } else if (itemName.startsWith(CorePlugin.getInstance().getName().toLowerCase() + ":")) {
-            String finalItemName = itemName.replace(CorePlugin.getInstance().getName().toLowerCase() + ":", "");
+        } else if (itemName.startsWith(getInstance().getName().toLowerCase() + ":")) {
+            String finalItemName = itemName.replace(getInstance().getName().toLowerCase() + ":", "");
             item = customItems.stream()
                     .filter(customItem -> customItem.getName().equalsIgnoreCase(finalItemName))
                     .findFirst()
@@ -110,7 +110,7 @@ public class CustomItemManager implements SimpleCommand {
                         .map(material -> "minecraft:" + material.name().toLowerCase())
                         .toList());
                 items.addAll(customItems.stream()
-                        .map(item -> CorePlugin.getInstance().getName().toLowerCase() + ":" + item.getName())
+                        .map(item -> getInstance().getName().toLowerCase() + ":" + item.getName())
                         .toList());
                 if (!args[1].isEmpty()) {
                     yield items.stream()

@@ -1,11 +1,12 @@
 package com.pinont.lib.api.manager;
 
-import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
+
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
 public final class WorldManager {
 
@@ -41,7 +42,7 @@ public final class WorldManager {
         world.setGameRuleValue("doMobSpawning", "false");
         WorldBorder border = world.getWorldBorder();
         border.setSize(borderSize);
-        world.setMetadata("loader", new FixedMetadataValue(CorePlugin.getInstance(), CorePlugin.getInstance().getName()));
+        world.setMetadata("loader", new FixedMetadataValue(getInstance(), getInstance().getName()));
         setWorldConfig();
     }
 
@@ -90,7 +91,7 @@ public final class WorldManager {
                 world = Bukkit.createWorld(WorldCreator.name(worldName));
             }
             assert world != null;
-            world.removeMetadata("loader", CorePlugin.getInstance());
+            world.removeMetadata("loader", getInstance());
             world.getWorldFolder().deleteOnExit();
             Bukkit.unloadWorld(world, false);
         } else {
@@ -114,7 +115,7 @@ public final class WorldManager {
                 load(worldName);
                 World world = Bukkit.getWorld(worldName);
                 assert world != null;
-                world.setMetadata("loader", new FixedMetadataValue(CorePlugin.getInstance(), CorePlugin.getInstance().getName()));
+                world.setMetadata("loader", new FixedMetadataValue(getInstance(), getInstance().getName()));
             }
     }
 

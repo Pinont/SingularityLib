@@ -1,17 +1,14 @@
-package com.pinont.lib.api.creator.items;
+package com.pinont.lib.api.items;
 
 import com.google.common.collect.Sets;
+import com.pinont.lib.api.enums.AttributeType;
+import com.pinont.lib.api.enums.PersisDataType;
 import com.pinont.lib.api.utils.Common;
-import com.pinont.lib.enums.AttributeType;
-import com.pinont.lib.enums.PersisDataType;
-import com.pinont.lib.plugin.CorePlugin;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class ItemCreator {
@@ -36,7 +34,7 @@ public class ItemCreator {
     private final ArrayList<Component> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
-    private final Plugin plugin = CorePlugin.getInstance();
+    private final Plugin plugin = getInstance();
     private static final Set<ItemInteraction> ITEM_INTERACTIONS = Sets.newHashSet();
 
     public static Set<ItemInteraction> getInteractions() {
@@ -84,11 +82,19 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setCannotMove(boolean b) {
-        if (b) {
-            this.setPersisDataContainer("cannot_move", "true", PersisDataType.STRING);
+    public static ItemInteraction getInteraction(ItemStack item) {
+        String id = getItemInteractionName(item);
+        if (id == null) {
+            sendConsoleMessage("Item interaction not found for item " + item.getType());
+            return null;
         }
-        return this;
+        ItemInteraction interaction = ITEM_INTERACTIONS.stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
+        if (interaction != null) {
+            return interaction;
+        } else {
+            sendConsoleMessage("Item interaction not found for  item " + item.getType());
+        }
+        return null;
     }
 
     public ItemCreator setType(Material type) {
@@ -103,9 +109,10 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setDisplayName(String name) {
-        meta.displayName(common.colorize(name));
-        meta.itemName(common.colorize(name));
+    public ItemCreator setCannotMove(boolean b) {
+        if (b) {
+            this.setDataContainer("cannot_move", "true", PersisDataType.STRING);
+        }
         return this;
     }
 
@@ -114,8 +121,9 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setUnstackable(boolean bool) {
-        setPersisDataContainer("unstackable", (short) new Random().nextInt(), PersisDataType.SHORT);
+    public ItemCreator setName(String name) {
+        meta.displayName(common.colorize(name));
+        meta.itemName(common.colorize(name));
         return this;
     }
 
@@ -144,22 +152,46 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setCustomModelData(int data) {
+    public ItemCreator setUnstackable(boolean bool) {
+        setDataContainer("unstackable", (short) new Random().nextInt(), PersisDataType.SHORT);
+        return this;
+    }
+
+    public ItemCreator setModelData(int data) {
         meta.setCustomModelData(data);
         return this;
     }
 
-    public ItemCreator setCustomTag(String tag) {
+    public ItemCreator setTag(String tag) {
         data.set(new NamespacedKey(plugin, tag), PersistentDataType.STRING, tag);
         return this;
     }
 
-    public ItemCreator setCustomTag(String key, String value) {
+    public ItemCreator setTag(String key, String value) {
         data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, value);
         return this;
     }
 
-    public ItemCreator setPersisDataContainer(String key, Object value, PersisDataType type) {
+    public ItemCreator setDurability(int durability) {
+        this.durability = durability < 0 ? 0 : (short) durability;
+        return this;
+    }
+
+    public ItemMeta getMeta() {
+        return Objects.requireNonNull(item).getItemMeta();
+    }
+
+    public static Object getItemPersistData(ItemStack item, String key, PersistentDataType type) {
+        if (isItemHasPersistData(item, key, type)) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                return meta.getPersistentDataContainer().get(new NamespacedKey(getInstance(), key), type);
+            }
+        }
+        return null;
+    }
+
+    public ItemCreator setDataContainer(String key, Object value, PersisDataType type) {
         switch (type) {
             case STRING:
                 data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, value.toString());
@@ -195,24 +227,11 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setDurability(int durability) {
-        this.durability = durability < 0 ? 0 : (short) durability;
-        return this;
-    }
-
-    public ItemMeta getMeta() {
-        return Objects.requireNonNull(item).getItemMeta();
-    }
-
-    public String getCustomTag(String key) {
-        return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
-    }
-
-    public static Object getItemPersistData(ItemStack item, String key, PersistentDataType type) {
-        if (isItemHasPersistData(item, key, type)) {
+    private static String getItemInteractionName(ItemStack item) {
+        if (isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                return meta.getPersistentDataContainer().get(new NamespacedKey(CorePlugin.getInstance(), key), type);
+                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(getInstance(), "interaction"), PersistentDataType.STRING));
             }
         }
         return null;
@@ -220,36 +239,11 @@ public class ItemCreator {
 
     public ItemCreator addInteraction(ItemInteraction itemInteraction) {
         ITEM_INTERACTIONS.add(itemInteraction);
-        this.setPersisDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
+        this.setDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
         return this;
     }
 
-    private static String getItemInteractionName(ItemStack item) {
-        if (isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(CorePlugin.getInstance(), "interaction"), PersistentDataType.STRING));
-            }
-        }
-        return null;
-    }
-
-    public static ItemInteraction getInteraction(Player holder, ItemStack item) {
-        String id = getItemInteractionName(item);
-        if (id == null) {
-            sendConsoleMessage("Item interaction not found for " + holder.getName() + " with item " + item.getType());
-            return null;
-        }
-        ItemInteraction interaction = ITEM_INTERACTIONS.stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
-        if (interaction != null) {
-            return interaction;
-        } else {
-            sendConsoleMessage("Item interaction not found for " + holder.getName() + " with item " + item.getType());
-        }
-        return null;
-    }
-
     public static Boolean isItemHasPersistData(ItemStack item, String key, PersistentDataType type) {
-        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(CorePlugin.getInstance(), key), type);
+        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(getInstance(), key), type);
     }
 }

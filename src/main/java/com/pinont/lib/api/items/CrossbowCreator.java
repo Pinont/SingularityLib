@@ -1,4 +1,4 @@
-package com.pinont.lib.api.creator.items;
+package com.pinont.lib.api.items;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;

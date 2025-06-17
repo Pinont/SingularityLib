@@ -1,11 +1,11 @@
 package com.pinont.lib.plugin;
 
-import com.pinont.lib.api.creator.items.ItemHeadCreator;
-import com.pinont.lib.api.creator.items.ItemCreator;
+import com.pinont.lib.api.items.ItemHeadCreator;
+import com.pinont.lib.api.items.ItemCreator;
 import com.pinont.lib.api.custom.CustomItem;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.api.ui.Button;
-import com.pinont.lib.api.creator.items.ItemInteraction;
+import com.pinont.lib.api.items.ItemInteraction;
 import com.pinont.lib.api.ui.Layout;
 import com.pinont.lib.api.ui.Menu;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -25,7 +25,7 @@ public class DevTool implements SimpleCommand, CustomItem {
 
     @Override
     public ItemCreator register() {
-        return new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
+        return new ItemCreator(Material.DIAMOND).setName(ChatColor.DARK_RED + "Developer Tool").setUnstackable(true).addInteraction(
                 new ItemInteraction() {
                     @Override
                     public String getName() {
@@ -63,7 +63,7 @@ public class DevTool implements SimpleCommand, CustomItem {
 
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(new ItemStack(Material.GRASS_BLOCK)).setDisplayName(ChatColor.GREEN + "Server Info").addLore(ChatColor.GRAY + "Server: " + ChatColor.YELLOW + Bukkit.getServer().getName(), ChatColor.GRAY + "Version: " + ChatColor.YELLOW + Bukkit.getServer().getVersion(), ChatColor.GRAY + "Plugins (" + ChatColor.YELLOW + Bukkit.getServer().getPluginManager().getPlugins().length + ChatColor.GRAY + ")").create();
+                                return new ItemCreator(new ItemStack(Material.GRASS_BLOCK)).setName(ChatColor.GREEN + "Server Info").addLore(ChatColor.GRAY + "Server: " + ChatColor.YELLOW + Bukkit.getServer().getName(), ChatColor.GRAY + "Version: " + ChatColor.YELLOW + Bukkit.getServer().getVersion(), ChatColor.GRAY + "Plugins (" + ChatColor.YELLOW + Bukkit.getServer().getPluginManager().getPlugins().length + ChatColor.GRAY + ")").create();
                             }
 
                             @Override
@@ -84,7 +84,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(player.getName()).setDisplayName("Player List").create();
+                                return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(player.getName()).setName("Player List").create();
                             }
 
                             @Override
@@ -105,7 +105,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(new ItemStack(Material.COARSE_DIRT)).setDisplayName("Worlds").create();
+                                return new ItemCreator(new ItemStack(Material.COARSE_DIRT)).setName("Worlds").create();
                             }
 
                             @Override
@@ -126,7 +126,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.STICK).setDisplayName("Tools").addLore("More Tools").create();
+                                return new ItemCreator(Material.STICK).setName("Tools").addLore("More Tools").create();
                             }
 
                             @Override
@@ -206,7 +206,7 @@ public class DevTool implements SimpleCommand, CustomItem {
 
                 @Override
                 public ItemStack getItem() {
-                    return new ItemCreator(getWorldEnvironmentBlock(world)).setDisplayName(properWorldName(world)).addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to edit").create();
+                    return new ItemCreator(getWorldEnvironmentBlock(world)).setName(properWorldName(world)).addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to edit").create();
                 }
 
                 @Override
@@ -225,7 +225,7 @@ public class DevTool implements SimpleCommand, CustomItem {
 
             @Override
             public ItemStack getItem() {
-                return new ItemCreator(new ItemStack(Material.BEDROCK)).setDisplayName(ChatColor.YELLOW + "Click to create new world").create();
+                return new ItemCreator(new ItemStack(Material.BEDROCK)).setName(ChatColor.YELLOW + "Click to create new world").create();
             }
 
             @Override
@@ -270,7 +270,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.YELLOW_STAINED_GLASS_PANE).setDisplayName(" ").create();
+                                return new ItemCreator(Material.YELLOW_STAINED_GLASS_PANE).setName(" ").create();
                             }
 
                             @Override
@@ -291,7 +291,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(new ItemStack(Material.GOLD_BLOCK)).setDisplayName(ChatColor.BOLD + "" + ChatColor.YELLOW + "World Creator").addLore(
+                                return new ItemCreator(new ItemStack(Material.GOLD_BLOCK)).setName(ChatColor.BOLD + "" + ChatColor.YELLOW + "World Creator").addLore(
                                         ChatColor.GRAY + "Name: " + ChatColor.YELLOW + (name == null ? ChatColor.RED + "Not Set" : name),
                                         ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + (environment == null ? ChatColor.RED + "Not Set" : environment),
                                         ChatColor.GRAY + "World Type: " + ChatColor.YELLOW + (worldType == null ? ChatColor.RED + "Not Set" : worldType),
@@ -324,9 +324,9 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public ItemStack getItem() {
                                 if (name == null) {
-                                    return new ItemCreator(Material.OAK_SIGN).setDisplayName("Set World Name").addLore(ChatColor.YELLOW + "Click to set world name.").create();
+                                    return new ItemCreator(Material.OAK_SIGN).setName("Set World Name").addLore(ChatColor.YELLOW + "Click to set world name.").create();
                                 }
-                                return new ItemCreator(Material.BIRCH_SIGN).setDisplayName(name).addLore(ChatColor.YELLOW + "Click to change world name.").create();
+                                return new ItemCreator(Material.BIRCH_SIGN).setName(name).addLore(ChatColor.YELLOW + "Click to change world name.").create();
                             }
 
                             @Override
@@ -390,9 +390,9 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public ItemStack getItem() {
                                 if (environment == null) {
-                                    return new ItemCreator(Material.COMMAND_BLOCK).setDisplayName("Set World Environment").addLore(ChatColor.YELLOW + "Click to change world environment.").create();
+                                    return new ItemCreator(Material.COMMAND_BLOCK).setName("Set World Environment").addLore(ChatColor.YELLOW + "Click to change world environment.").create();
                                 }
-                                return new ItemCreator(getWorldEnvironmentBlock(environment)).setDisplayName(environment.name()).addLore(ChatColor.YELLOW + "Click to change world environment.").create();
+                                return new ItemCreator(getWorldEnvironmentBlock(environment)).setName(environment.name()).addLore(ChatColor.YELLOW + "Click to change world environment.").create();
                             }
 
                             @Override
@@ -417,9 +417,9 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public ItemStack getItem() {
                                 if (worldType == null) {
-                                    return new ItemCreator(Material.OAK_SAPLING).setDisplayName("Set World Type").addLore(ChatColor.YELLOW + "Click to change world type.").create();
+                                    return new ItemCreator(Material.OAK_SAPLING).setName("Set World Type").addLore(ChatColor.YELLOW + "Click to change world type.").create();
                                 }
-                                return new ItemCreator(Material.CHERRY_SAPLING).setDisplayName(worldType.getName()).addLore(ChatColor.YELLOW + "Click to change world type").create();
+                                return new ItemCreator(Material.CHERRY_SAPLING).setName(worldType.getName()).addLore(ChatColor.YELLOW + "Click to change world type").create();
                             }
 
                             @Override
@@ -444,8 +444,8 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                if (generate_structure) return new ItemCreator(Material.BIRCH_STAIRS).setDisplayName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "True").create();
-                                return new ItemCreator(Material.ACACIA_STAIRS).setDisplayName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "False").create();
+                                if (generate_structure) return new ItemCreator(Material.BIRCH_STAIRS).setName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "True").create();
+                                return new ItemCreator(Material.ACACIA_STAIRS).setName(ChatColor.GRAY + "Generate Structure: " + ChatColor.GREEN + "False").create();
                             }
 
                             @Override
@@ -466,7 +466,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.STRUCTURE_VOID).setDisplayName(ChatColor.GRAY + "World Border Size: " + ChatColor.YELLOW + borderSize).create();
+                                return new ItemCreator(Material.STRUCTURE_VOID).setName(ChatColor.GRAY + "World Border Size: " + ChatColor.YELLOW + borderSize).create();
                             }
 
                             @Override
@@ -529,7 +529,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.WHEAT_SEEDS).setDisplayName(ChatColor.GRAY + "Seed: " + ChatColor.YELLOW + seed).create();
+                                return new ItemCreator(Material.WHEAT_SEEDS).setName(ChatColor.GRAY + "Seed: " + ChatColor.YELLOW + seed).create();
                             }
 
                             @Override
@@ -592,7 +592,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.DIAMOND).setDisplayName(ChatColor.WHITE + "Create World").addLore(ChatColor.YELLOW + "Click to create world.").create();
+                                return new ItemCreator(Material.DIAMOND).setName(ChatColor.WHITE + "Create World").addLore(ChatColor.YELLOW + "Click to create world.").create();
                             }
 
                             @Override
@@ -634,7 +634,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public ItemStack getItem() {
 
-                                return new ItemCreator(getWorldEnvironmentBlock(world)).setDisplayName(ChatColor.GREEN + "World Info").addLore(ChatColor.GRAY + "Name: " + ChatColor.YELLOW + properWorldName(world), ChatColor.GRAY + "Difficulty: " + ChatColor.YELLOW + world.getDifficulty(), ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + world.getEnvironment()).create();
+                                return new ItemCreator(getWorldEnvironmentBlock(world)).setName(ChatColor.GREEN + "World Info").addLore(ChatColor.GRAY + "Name: " + ChatColor.YELLOW + properWorldName(world), ChatColor.GRAY + "Difficulty: " + ChatColor.YELLOW + world.getDifficulty(), ChatColor.GRAY + "Environment Type: " + ChatColor.YELLOW + world.getEnvironment()).create();
                             }
 
                             @Override
@@ -655,7 +655,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(new ItemStack(Material.BEACON)).setDisplayName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
+                                return new ItemCreator(new ItemStack(Material.BEACON)).setName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
                             }
 
                             @Override
@@ -698,7 +698,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                     return new Button() {
                         @Override
                         public ItemStack getItem() {
-                            return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED +"Delete").addLore(ChatColor.RED + "Click here to delete this world").create();
+                            return new ItemCreator(Material.RED_STAINED_GLASS).setName(ChatColor.RED +"Delete").addLore(ChatColor.RED + "Click here to delete this world").create();
                         }
 
                         @Override
@@ -747,7 +747,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(new ItemStack(getWorldEnvironmentBlock(targetWorld))).setDisplayName(ChatColor.RED + "Are you sure to delete " + targetWorld.getName() + "?").create();
+                                        return new ItemCreator(new ItemStack(getWorldEnvironmentBlock(targetWorld))).setName(ChatColor.RED + "Are you sure to delete " + targetWorld.getName() + "?").create();
                                     }
 
                                     @Override
@@ -768,7 +768,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setDisplayName(ChatColor.GREEN + "ACCEPT").create();
+                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setName(ChatColor.GREEN + "ACCEPT").create();
                                     }
 
                                     @Override
@@ -791,7 +791,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED + "DENY").create();
+                                        return new ItemCreator(Material.RED_STAINED_GLASS).setName(ChatColor.RED + "DENY").create();
                                     }
 
                                     @Override
@@ -862,7 +862,7 @@ public class DevTool implements SimpleCommand, CustomItem {
 
                 @Override
                 public ItemStack getItem() {
-                    return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(player.getName()).setDisplayName(player.getName()).create();
+                    return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(player.getName()).setName(player.getName()).create();
                 }
 
                 @Override
@@ -894,7 +894,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                         .format(new java.util.Date(target.getFirstPlayed()));
                                 return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD))
                                         .setOwner(target.getName())
-                                        .setDisplayName(target.getName())
+                                        .setName(target.getName())
                                         .addLore(ChatColor.BOLD + "" + ChatColor.GRAY + "First Joined: " + ChatColor.YELLOW + firstPlayedDate)
                                         .create();
                             }
@@ -916,7 +916,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(new ItemStack(Material.BEACON)).setDisplayName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
+                                return new ItemCreator(new ItemStack(Material.BEACON)).setName("Teleport").addLore(ChatColor.BOLD + "" + ChatColor.YELLOW + "Click to Teleport").create();
                             }
 
                             @Override
@@ -949,7 +949,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.ANVIL).setDisplayName(ChatColor.RED + "Ban").addLore(ChatColor.RED + "Click to ban.").create();
+                                return new ItemCreator(Material.ANVIL).setName(ChatColor.RED + "Ban").addLore(ChatColor.RED + "Click to ban.").create();
                             }
 
                             @Override
@@ -970,7 +970,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.REDSTONE).setDisplayName(ChatColor.RED + "Kick").addLore(ChatColor.RED + "Click to kick.").create();
+                                return new ItemCreator(Material.REDSTONE).setName(ChatColor.RED + "Kick").addLore(ChatColor.RED + "Click to kick.").create();
                             }
 
                             @Override
@@ -1002,7 +1002,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                         return new Button() {
                             @Override
                             public ItemStack getItem() {
-                                return new ItemCreator(Material.TOTEM_OF_UNDYING).setDisplayName("God: " + target.isInvulnerable()).create();
+                                return new ItemCreator(Material.TOTEM_OF_UNDYING).setName("God: " + target.isInvulnerable()).create();
                             }
 
                             @Override
@@ -1047,7 +1047,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(target.getName()).setDisplayName(ChatColor.RED + "Are you sure to ban " + target.getName() + "?").create();
+                                        return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(target.getName()).setName(ChatColor.RED + "Are you sure to ban " + target.getName() + "?").create();
                                     }
 
                                     @Override
@@ -1068,7 +1068,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setDisplayName(ChatColor.GREEN + "ACCEPT").create();
+                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setName(ChatColor.GREEN + "ACCEPT").create();
                                     }
 
                                     @Override
@@ -1090,7 +1090,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED + "DENY").create();
+                                        return new ItemCreator(Material.RED_STAINED_GLASS).setName(ChatColor.RED + "DENY").create();
                                     }
 
                                     @Override
@@ -1118,7 +1118,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(target.getName()).setDisplayName(ChatColor.RED + "Are you sure to kick " + target.getName() + "?").create();
+                                        return new ItemHeadCreator(new ItemStack(Material.PLAYER_HEAD)).setOwner(target.getName()).setName(ChatColor.RED + "Are you sure to kick " + target.getName() + "?").create();
                                     }
 
                                     @Override
@@ -1139,7 +1139,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setDisplayName(ChatColor.GREEN + "ACCEPT").create();
+                                        return new ItemCreator(Material.GREEN_STAINED_GLASS).setName(ChatColor.GREEN + "ACCEPT").create();
                                     }
 
                                     @Override
@@ -1161,7 +1161,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                                 return new Button() {
                                     @Override
                                     public ItemStack getItem() {
-                                        return new ItemCreator(Material.RED_STAINED_GLASS).setDisplayName(ChatColor.RED + "DENY").create();
+                                        return new ItemCreator(Material.RED_STAINED_GLASS).setName(ChatColor.RED + "DENY").create();
                                     }
 
                                     @Override

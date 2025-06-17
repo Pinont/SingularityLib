@@ -1,7 +1,6 @@
-package com.pinont.lib.api.creator.items;
+package com.pinont.lib.api.items;
 
 import com.pinont.lib.api.utils.Common;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +15,7 @@ public class ItemHeadCreator extends ItemCreator {
     }
 
     @Override
-    public ItemCreator setDisplayName(String displayName) {
+    public ItemCreator setName(String displayName) {
         if (skullMeta != null) {
             skullMeta.displayName(new Common().colorize(displayName));
         }

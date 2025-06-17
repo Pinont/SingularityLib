@@ -1,4 +1,4 @@
-package com.pinont.lib.plugin;
+package com.pinont.lib.api.command;
 
 import io.papermc.paper.command.brigadier.BasicCommand;
 

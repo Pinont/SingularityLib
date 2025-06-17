@@ -1,8 +1,7 @@
 package com.pinont.lib.api.creator;
 
+import com.pinont.lib.api.command.SimpleCommand;
 import com.pinont.lib.api.utils.Common;
-import com.pinont.lib.plugin.CorePlugin;
-import com.pinont.lib.plugin.SimpleCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
@@ -24,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
+import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class EnchantmentCreator implements SimpleCommand {
 
@@ -57,7 +59,7 @@ public class EnchantmentCreator implements SimpleCommand {
 
     @Override
     public void execute(CommandSourceStack commandSourceStack, String[] args) {
-        if (!(commandSourceStack.getSender() instanceof Player)) CorePlugin.sendConsoleMessage(ChatColor.RED + "You must be a player to use this command!");
+        if (!(commandSourceStack.getSender() instanceof Player)) sendConsoleMessage(ChatColor.RED + "You must be a player to use this command!");
         Player player = (Player) commandSourceStack.getSender();
         if (args.length < 2) {
             player.sendMessage("§cUsage: /enchant <player> <enchantment>");
@@ -140,7 +142,7 @@ public class EnchantmentCreator implements SimpleCommand {
 
     public interface Enchant {
         default String getNamespace() {
-            return CorePlugin.getInstance().getName();
+            return getInstance().getName();
         }
 
         String getName();

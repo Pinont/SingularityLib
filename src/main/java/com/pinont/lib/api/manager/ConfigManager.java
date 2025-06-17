@@ -1,6 +1,5 @@
 package com.pinont.lib.api.manager;
 
-import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -9,12 +8,14 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
+
 public class ConfigManager {
 
     private final File configFile;
     private final FileConfiguration config;
     private final String fileName;
-    private final Plugin plugin = CorePlugin.getInstance();
+    private final Plugin plugin = getInstance();
     private boolean isFirstLoad;
 
     public ConfigManager(String fileName) {
@@ -35,7 +36,7 @@ public class ConfigManager {
     }
 
     public static boolean isExists(String subFolder, String fileName) {
-        return new File(CorePlugin.getInstance().getDataFolder() + "/" + subFolder, fileName).exists();
+        return new File(getInstance().getDataFolder() + "/" + subFolder, fileName).exists();
     }
 
     public ConfigManager(String subFolder, String fileName) {

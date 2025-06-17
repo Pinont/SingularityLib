@@ -1,6 +1,6 @@
-package com.pinont.lib.plugin.essentialCommand;
+package com.pinont.lib.plugin.cmd;
 
-import com.pinont.lib.plugin.SimpleCommand;
+import com.pinont.lib.api.command.SimpleCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
 

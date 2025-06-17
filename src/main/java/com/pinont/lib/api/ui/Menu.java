@@ -1,7 +1,6 @@
 package com.pinont.lib.api.ui;
 
-import com.pinont.lib.api.creator.items.ItemCreator;
-import com.pinont.lib.plugin.CorePlugin;
+import com.pinont.lib.api.items.ItemCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -13,6 +12,9 @@ import org.bukkit.metadata.FixedMetadataValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
+import static com.pinont.lib.plugin.CorePlugin.sendDebugMessage;
 
 public class Menu {
 
@@ -78,7 +80,7 @@ public class Menu {
             inventory = Bukkit.createInventory(player, size, title);
         }
 
-        player.removeMetadata("Menu", CorePlugin.getInstance());
+        player.removeMetadata("Menu", getInstance());
         if (!patternLayout.isEmpty()) {
             for (int i = 0; i < patternLayout.size(); i++) {
                 String c = patternLayout.get(i);
@@ -100,7 +102,7 @@ public class Menu {
 
                         @Override
                         public ItemStack getItem() {
-                            return new ItemCreator(new ItemStack(Material.BARRIER)).setDisplayName(ChatColor.RED + "This feature are not implemented yet.").create();
+                            return new ItemCreator(new ItemStack(Material.BARRIER)).setName(ChatColor.RED + "This feature are not implemented yet.").create();
                         }
 
                         @Override
@@ -134,13 +136,13 @@ public class Menu {
             }
         }
         if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", CorePlugin.getInstance());
+            player.removeMetadata("Menu", getInstance());
             player.closeInventory();
         }
         // Set metadata to prevent multiple instances
-        CorePlugin.sendDebugMessage("Opening menu... " + getTitle());
+        sendDebugMessage("Opening menu... " + getTitle());
         player.openInventory(inventory);
-        player.setMetadata("Menu", new FixedMetadataValue(CorePlugin.getInstance(), this));
+        player.setMetadata("Menu", new FixedMetadataValue(getInstance(), this));
     }
 
 }
