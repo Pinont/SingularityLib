@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
 
+@Deprecated(since = "2.1.0", forRemoval = true)
 public class Vanish implements SimpleCommand {
     @Override
     public String getName() {

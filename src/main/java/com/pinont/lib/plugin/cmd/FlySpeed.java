@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.List;
 
+@Deprecated(since = "2.1.0", forRemoval = true)
 public class FlySpeed implements SimpleCommand {
 
     @Override
