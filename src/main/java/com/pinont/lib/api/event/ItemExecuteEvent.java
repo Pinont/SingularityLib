@@ -2,6 +2,7 @@ package com.pinont.lib.api.event;
 
 import com.pinont.lib.api.items.ItemInteraction;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -42,9 +43,11 @@ public class ItemExecuteEvent extends Event implements Cancellable {
     public void execute() {
         if (callEvent()) {
             if (interaction.getAction().contains(getAction())) {
-                item.setAmount(item.getAmount() - interaction.removeItemAmountOnExecute());
-                sendDebugMessage("Executing interaction: " + interaction.getName());
                 interaction.execute(player);
+                if (player.getGameMode() != GameMode.CREATIVE) {
+                    item.setAmount(item.getAmount() - interaction.removeItemAmountOnExecute());
+                }
+                sendDebugMessage("Executing interaction: " + interaction.getName());
             }
         }
     }

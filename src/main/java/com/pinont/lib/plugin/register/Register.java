@@ -30,9 +30,11 @@ public class Register {
                 Object instance = clazz.getDeclaredConstructor().newInstance();
                 if (Listener.class.isAssignableFrom(clazz)) {
                     listeners.add((Listener) instance);
-                } else if (SimpleCommand.class.isAssignableFrom(clazz)) {
+                }
+                if (SimpleCommand.class.isAssignableFrom(clazz)) {
                     commands.add((SimpleCommand) instance);
-                } else if (CustomItem.class.isAssignableFrom(clazz)) {
+                }
+                if (CustomItem.class.isAssignableFrom(clazz)) {
                     customItems.add((CustomItem) instance);
                 }
             } catch (NoSuchMethodException e) {

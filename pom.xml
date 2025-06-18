@@ -6,7 +6,7 @@
 
     <groupId>com.github.Pinont</groupId>
     <artifactId>SingularityLib</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>TEST</version>
     <packaging>jar</packaging>
 
     <name>SingularityLib</name>

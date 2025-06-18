@@ -18,6 +18,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
@@ -30,11 +31,12 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING)) {
-            if (event.getPlayer().getCooldown(player.getInventory().getItemInMainHand()) > 0) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
+            if (event.getPlayer().getCooldown(item) > 0) return;
             ItemInteraction itemInteraction;
             try {
-                itemInteraction = ItemCreator.getInteraction(player.getInventory().getItemInMainHand());
+                itemInteraction = ItemCreator.getInteraction(item);
             } catch (IllegalArgumentException e) {
                 sendInteractionError(player);
                 return;
@@ -43,7 +45,7 @@ public class PlayerListener implements Listener {
                 sendInteractionError(player);
                 return;
             }
-            ItemExecuteEvent itemExecuteEvent = new ItemExecuteEvent(event, player.getInventory().getItemInMainHand(), itemInteraction);
+            ItemExecuteEvent itemExecuteEvent = new ItemExecuteEvent(event, item, itemInteraction);
             Bukkit.getPluginManager().callEvent(itemExecuteEvent);
             if (!itemExecuteEvent.isCancelled()) {
                 itemExecuteEvent.execute();

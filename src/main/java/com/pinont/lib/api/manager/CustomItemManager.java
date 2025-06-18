@@ -15,13 +15,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 import static com.pinont.lib.plugin.CorePlugin.getInstance;
+import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class CustomItemManager implements SimpleCommand {
 
     public List<CustomItem> customItems = new ArrayList<>();
 
     public CustomItemManager register(List<CustomItem> item) {
-        customItems.addAll(item);
+        if (item.isEmpty()) return this;
+        sendConsoleMessage("Registering " + item.size() + " custom items");
+        for (CustomItem customItem : item) {
+            customItems.add(customItem);
+            customItem.register(); // call register to ensure the item is properly initialized
+            customItem.getItem(); // ensure the item is created and interaction is set up
+            if (customItem.getInteraction() != null) {
+                sendConsoleMessage("Registering interaction " + customItem.getInteraction().getName() + " for item " + customItem.getName());
+            }
+        }
         return this;
     }
 

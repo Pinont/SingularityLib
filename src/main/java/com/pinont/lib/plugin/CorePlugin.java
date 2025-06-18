@@ -1,7 +1,6 @@
 package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.command.SimpleCommand;
-import com.pinont.lib.api.manager.CommandManager;
 import com.pinont.lib.api.manager.ConfigManager;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.plugin.listener.PlayerListener;
@@ -99,12 +98,10 @@ public abstract class CorePlugin extends JavaPlugin {
         WorldManager.autoLoadWorlds();
 
         // Initialize API To Plugin.
-        addAPIListener(new PlayerListener());
-        new CommandManager().register(this, this.simpleCommands);
         sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
         onPluginStart();
-        registerAPIListener(this);
-        new CommandManager().register(this, this.simpleCommands);
+        registerAPIListener(this, new PlayerListener());
+//        new CommandManager().register(this, this.simpleCommands);
 
         // Register Command, CustomItem, and Listeners.
         Register register = new Register();
@@ -112,22 +109,16 @@ public abstract class CorePlugin extends JavaPlugin {
         register.registerAll(this);
     }
 
-    private void registerAPIListener(Plugin plugin) {
-        sendConsoleMessage(Color.GREEN + "" + ChatColor.ITALIC + "Registering events...");
-        for (Listener l : this.listeners) {
+    private void registerAPIListener(Plugin plugin, Listener... listener) {
+        sendConsoleMessage(Color.GREEN + "" + ChatColor.ITALIC + "Initializing API listeners for " + plugin.getName() + "...");
+        for (Listener l : listener) {
             Bukkit.getPluginManager().registerEvents(l, plugin);
-            sendConsoleMessage(Color.GREEN + "" + ChatColor.ITALIC + "Registered event: " + l.getClass().getSimpleName());
         }
-        this.listeners.clear();
     }
 
     @Deprecated
     public void registerCommand(SimpleCommand... simpleCommand) {
         this.simpleCommands.addAll(List.of(simpleCommand));
-    }
-
-    private void addAPIListener(Listener... listener) {
-        this.listeners.addAll(List.of(listener));
     }
 
     public abstract void onPluginStart();

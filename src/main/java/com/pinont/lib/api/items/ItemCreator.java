@@ -5,6 +5,7 @@ import com.pinont.lib.api.enums.AttributeType;
 import com.pinont.lib.api.enums.PersisDataType;
 import com.pinont.lib.api.utils.Common;
 import net.kyori.adventure.text.Component;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.AttributeModifier;
@@ -85,14 +86,14 @@ public class ItemCreator {
     public static ItemInteraction getInteraction(ItemStack item) {
         String id = getItemInteractionName(item);
         if (id == null) {
-            sendConsoleMessage("Item interaction not found for item " + item.getType());
+            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
             return null;
         }
         ItemInteraction interaction = ITEM_INTERACTIONS.stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
         if (interaction != null) {
             return interaction;
         } else {
-            sendConsoleMessage("Item interaction not found for  item " + item.getType());
+            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
         }
         return null;
     }
@@ -238,6 +239,7 @@ public class ItemCreator {
     }
 
     public ItemCreator addInteraction(ItemInteraction itemInteraction) {
+        if (itemInteraction == null) return this;
         ITEM_INTERACTIONS.add(itemInteraction);
         this.setDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
         return this;
