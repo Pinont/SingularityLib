@@ -52,51 +52,6 @@ public class PlayerListener implements Listener {
         }
     }
 
-//    @EventHandler
-//    public void sendChat(PlayerChatEvent event) {
-//        Player player = event.getPlayer();
-//        if (player.hasMetadata("devTool")) {
-//            DevTool.WorldCreatorContent worldCreatorContent = (DevTool.WorldCreatorContent) player.getMetadata("devTool").getFirst().value();
-//            if (worldCreatorContent.getInputContent() == null) {
-//                player.sendMessage(ChatColor.RED + "Seem like devTool World creator has occur an error.");
-//                return;
-//            }
-//            event.setCancelled(true);
-//            switch (worldCreatorContent.getInputContent()) {
-//                case "worldName" : {
-//                    new DevTool().showWorldCreator(player, event.getMessage(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
-//                    break;
-//                }
-//                case "worldBorder" : {
-//                    try {
-//                        int borderSize = Integer.parseInt(event.getMessage());
-//                        if (borderSize <= 0) {
-//                            player.sendMessage(ChatColor.RED + "World border size must be greater than 0");
-//                            new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
-//                            return;
-//                        }
-//                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), borderSize, worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
-//                    } catch (NumberFormatException e) {
-//                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
-//                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
-//                    }
-//                    break;
-//                }
-//                case "worldSeed" : {
-//                    try {
-//                        long seed = Long.parseLong(event.getMessage());
-//                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), seed);
-//                    } catch (NumberFormatException e) {
-//                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
-//                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
-//                    }
-//                    break;
-//                }
-//            }
-//            removePlayerMetadata(player, CorePlugin.getInstance(), "devTool");
-//        }
-//    }
-
     @EventHandler
     public void inventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();

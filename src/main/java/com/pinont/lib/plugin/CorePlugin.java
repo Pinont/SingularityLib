@@ -1,8 +1,6 @@
 package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.command.SimpleCommand;
-import com.pinont.lib.api.creator.EnchantmentCreator;
-import com.pinont.lib.api.items.CustomItem;
 import com.pinont.lib.api.manager.CommandManager;
 import com.pinont.lib.api.manager.ConfigManager;
 import com.pinont.lib.api.manager.WorldManager;
@@ -25,8 +23,6 @@ import java.util.Objects;
 public abstract class CorePlugin extends JavaPlugin {
     private static CorePlugin instance;
 
-    private final Boolean custom_items = false;
-
     public @NotNull FileConfiguration getConfig() {
         return new ConfigManager("config.yml").getConfig();
     }
@@ -41,34 +37,15 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private final List<SimpleCommand> simpleCommands = new ArrayList<>();
 
-    private final List<EnchantmentCreator.Enchant> enchantments = new ArrayList<>();
-
     private final List<Listener> listeners = new ArrayList<>();
 
-    private boolean custom_motd;
-
-    private final List<CustomItem> customItems = new ArrayList<>();
-
     public static String getAPIVersion() {
-        return "V2.1.0-BETA";
+        // Plugin version, can be updated as needed.
+        String version = new ConfigManager("SingularityVersion.yml").getConfig().getString("version");
+        return "V-" + version;
     }
 
     private ConfigManager pluginConfig;
-
-    private boolean getMotdEnable() {
-        if (getConfig().contains("custom_motd")) {
-            return getConfig().getBoolean("custom_motd");
-        } else {
-            return false;
-        }
-    }
-
-    private final List<String> motds = List.of(new String[]{
-            "SingularityAPI for all!\nThank you for using SingularityAPI!",
-            "Welcome to the server!\nMinimessage will be supported soon! <player>",
-            "Enjoy your stay!\n<player>",
-            "Have fun playing!\n<player>",
-    });
 
     public static JavaPlugin getInstance() {
         if (instance == null) {
@@ -93,33 +70,46 @@ public abstract class CorePlugin extends JavaPlugin {
 
     @Override
     public final void onDisable() {
+        // Save all worlds that have been loaded by the plugin.
+        // TODO: Move to Devtool
         for (World world : Bukkit.getWorlds()) {
             if (world.hasMetadata("loader")) {
                 new WorldManager(world.getName()).saveWorld();
             }
         }
+
+        // Plugin Stop Process
         onPluginStop();
     }
 
     @Override
     public final void onEnable() {
+        // Initialize the plugin instance.
         instance = this;
+
+        // Initialize Plugin Config.
         pluginConfig = new ConfigManager("config.yml");
         if (pluginConfig.isFirstLoad()) {
             pluginConfig.set("debug", false);
             pluginConfig.saveConfig();
         }
         pluginConfig.getConfig().options().copyDefaults(true);
-        custom_motd = getMotdEnable();
+
+        // TODO: Move to Devtool
         WorldManager.autoLoadWorlds();
+
+        // Initialize API To Plugin.
+        addAPIListener(new PlayerListener());
+        new CommandManager().register(this, this.simpleCommands);
         sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
         onPluginStart();
         registerAPIListener(this);
         new CommandManager().register(this, this.simpleCommands);
+
+        // Register Command, CustomItem, and Listeners.
         Register register = new Register();
         register.scanAndCollect(this.getClass().getPackageName());
         register.registerAll(this);
-        addAPIListener(new PlayerListener());
     }
 
     private void registerAPIListener(Plugin plugin) {
@@ -131,6 +121,7 @@ public abstract class CorePlugin extends JavaPlugin {
         this.listeners.clear();
     }
 
+    @Deprecated
     public void registerCommand(SimpleCommand... simpleCommand) {
         this.simpleCommands.addAll(List.of(simpleCommand));
     }

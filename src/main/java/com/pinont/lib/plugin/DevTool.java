@@ -1,27 +1,35 @@
 package com.pinont.lib.plugin;
 
-import com.pinont.lib.api.items.ItemHeadCreator;
+import com.pinont.lib.api.command.SimpleCommand;
+import com.pinont.lib.api.items.CustomItem;
 import com.pinont.lib.api.items.ItemCreator;
-import com.pinont.lib.api.custom.CustomItem;
+import com.pinont.lib.api.items.ItemHeadCreator;
+import com.pinont.lib.api.items.ItemInteraction;
 import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.api.ui.Button;
-import com.pinont.lib.api.items.ItemInteraction;
 import com.pinont.lib.api.ui.Layout;
 import com.pinont.lib.api.ui.Menu;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class DevTool implements SimpleCommand, CustomItem {
+import static com.pinont.lib.plugin.CorePlugin.getAPIVersion;
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
-    private final String version = CorePlugin.getInstance().getDescription().getVersion();
+@Deprecated(since = "2.1.0", forRemoval = true)
+public class DevTool implements SimpleCommand, CustomItem, Listener {
+
+    private final String version = getAPIVersion();
 
     @Override
     public ItemCreator register() {
@@ -332,7 +340,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public void onClick(Player player) {
                                 player.sendMessage(ChatColor.GRAY + "Please send a world name into chat.");
-                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                player.setMetadata("devTool", new FixedMetadataValue(getInstance(), new WorldCreatorContent() {
                                     @Override
                                     public String getInputContent() {
                                         return "worldName";
@@ -472,7 +480,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public void onClick(Player player) {
                                 player.sendMessage(ChatColor.GRAY + "Please send a world border size into chat.");
-                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                player.setMetadata("devTool", new FixedMetadataValue(getInstance(), new WorldCreatorContent() {
                                     @Override
                                     public String getInputContent() {
                                         return "worldBorder";
@@ -535,7 +543,7 @@ public class DevTool implements SimpleCommand, CustomItem {
                             @Override
                             public void onClick(Player player) {
                                 player.sendMessage(ChatColor.GRAY + "Please send a seed number into chat.");
-                                player.setMetadata("devTool", new FixedMetadataValue(CorePlugin.getInstance(), new WorldCreatorContent() {
+                                player.setMetadata("devTool", new FixedMetadataValue(getInstance(), new WorldCreatorContent() {
                                     @Override
                                     public String getInputContent() {
                                         return "worldSeed";
@@ -1174,6 +1182,53 @@ public class DevTool implements SimpleCommand, CustomItem {
                 ).show(origin);
     }
 
+    @EventHandler
+    public void sendChat(PlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasMetadata("devTool")) {
+            DevTool.WorldCreatorContent worldCreatorContent = (DevTool.WorldCreatorContent) player.getMetadata("devTool").getFirst().value();
+            if (worldCreatorContent.getInputContent() == null) {
+                player.sendMessage(ChatColor.RED + "Seem like devTool World creator has occur an error.");
+                return;
+            }
+            event.setCancelled(true);
+            switch (worldCreatorContent.getInputContent()) {
+                case "worldName": {
+                    new DevTool().showWorldCreator(player, event.getMessage(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    break;
+                }
+                case "worldBorder": {
+                    try {
+                        int borderSize = Integer.parseInt(event.getMessage());
+                        if (borderSize <= 0) {
+                            player.sendMessage(ChatColor.RED + "World border size must be greater than 0");
+                            new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                            return;
+                        }
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), borderSize, worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    }
+                    break;
+                }
+                case "worldSeed": {
+                    try {
+                        long seed = Long.parseLong(event.getMessage());
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), seed);
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(ChatColor.RED + "World border size must be a number.");
+                        new DevTool().showWorldCreator(player, worldCreatorContent.getWorldName(), worldCreatorContent.getEnvironment(), worldCreatorContent.getWorldType(), worldCreatorContent.getGenerateStructure(), worldCreatorContent.getBorderSize(), worldCreatorContent.getDifficulty(), worldCreatorContent.getSeed());
+                    }
+                    break;
+                }
+            }
+            if (player.hasMetadata("devTool")) {
+                player.removeMetadata("devTool", getInstance());
+            }
+        }
+    }
+
     /// Commands
 
     @Override
@@ -1246,6 +1301,11 @@ public class DevTool implements SimpleCommand, CustomItem {
     @Override
     public String getName() {
         return "devTool";
+    }
+
+    @Override
+    public ItemInteraction getInteraction() {
+        return null;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.pinont.lib.plugin.register;
+package com.pinont.lib.api.annotation;
 
 public @interface AutoRegister {
     /**

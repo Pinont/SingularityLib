@@ -1,11 +1,7 @@
 package com.pinont.lib.api.creator;
 
-import com.pinont.lib.plugin.CorePlugin;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.attribute.Attributable;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.util.Vector;
@@ -14,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
+import static com.pinont.lib.plugin.CorePlugin.sendDebugMessage;
 
 public class EntityCreator {
 
@@ -134,7 +130,7 @@ public class EntityCreator {
 
     public Entity spawn(Location location) {
         Entity entity = Objects.requireNonNull(location.getWorld()).spawnEntity(location, entityType);
-        CorePlugin.sendDebugMessage("Spawned " + entityType + " at " + location);
+        sendDebugMessage("Spawned " + entityType + " at " + location);
 //        Attributable attribute = (Attributable) entity;
 //        if (Objects.requireNonNull(attribute.getAttribute(Attribute.MAX_HEALTH)).getValue() != this.maxHealth) {
 //            AttributeInstance healthAttributeInstance = attribute.getAttribute(Attribute.MAX_HEALTH);

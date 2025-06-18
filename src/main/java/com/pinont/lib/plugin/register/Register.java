@@ -1,5 +1,6 @@
 package com.pinont.lib.plugin.register;
 
+import com.pinont.lib.api.annotation.AutoRegister;
 import com.pinont.lib.api.command.SimpleCommand;
 import com.pinont.lib.api.items.CustomItem;
 import com.pinont.lib.api.manager.CommandManager;
