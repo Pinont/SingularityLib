@@ -1,4 +1,4 @@
-package com.pinont.lib.api.creator;
+package com.pinont.lib.api.entity;
 
 import org.bukkit.Location;
 import org.bukkit.World;
