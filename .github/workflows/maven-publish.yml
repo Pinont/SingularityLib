@@ -4,8 +4,10 @@
 name: Maven Package
 
 on:
+  push:
+    branches: [ "API" ]
   release:
-    types: [push]
+    types: [create]
 
 jobs:
   build:
