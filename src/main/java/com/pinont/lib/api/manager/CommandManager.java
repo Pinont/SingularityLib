@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.pinont.lib.plugin.CorePlugin.getStartTime;
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 
 public class CommandManager {
@@ -52,6 +53,8 @@ public class CommandManager {
                 sendConsoleMessage(ChatColor.GREEN + "Command Register: successfully registered " + success + "/" + target_amount + " commands, " + ChatColor.RED + failure + " command failures");
             }
             sendConsoleMessage(ChatColor.GREEN + "Command Register: successfully registered " + success + "/" + target_amount + " commands.");
+            Long startTime = System.currentTimeMillis() - getStartTime();
+            sendConsoleMessage(ChatColor.WHITE + "Plugin is Enabled (took " + ChatColor.YELLOW + startTime + ChatColor.WHITE + " ms)");
         });
     }
 }

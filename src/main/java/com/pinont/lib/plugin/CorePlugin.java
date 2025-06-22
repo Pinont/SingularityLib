@@ -6,7 +6,6 @@ import com.pinont.lib.plugin.listener.PlayerListener;
 import com.pinont.lib.plugin.register.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -29,7 +28,11 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     private static String prefix;
-    private Long startTime;
+    private static Long startTime;
+
+    public static Long getStartTime() {
+        return startTime;
+    }
 
     public static String getPrefix() {
         if (prefix == null) {
@@ -120,12 +123,10 @@ public abstract class CorePlugin extends JavaPlugin {
         Register register = new Register();
         register.scanAndCollect(this.getClass().getPackageName());
         register.registerAll(this);
-        startTime = System.currentTimeMillis() - startTime;
-        sendConsoleMessage(ChatColor.GREEN + "Plugin is Enabled " + ChatColor.WHITE + "(took " + ChatColor.YELLOW + startTime + ChatColor.WHITE + "ms)");
     }
 
     private void registerAPIListener(Plugin plugin, Listener... listener) {
-        sendConsoleMessage(Color.GREEN + "" + ChatColor.ITALIC + "Initializing API listeners for " + plugin.getName() + "...");
+        sendConsoleMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "Initializing API listeners for " + plugin.getName() + "...");
         for (Listener l : listener) {
             Bukkit.getPluginManager().registerEvents(l, plugin);
         }
