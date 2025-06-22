@@ -1,6 +1,6 @@
 package com.pinont.lib.api.utils;
 
-import com.pinont.lib.plugin.CorePlugin;
+import com.pinont.lib.api.enums.PlayerInventorySlotType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -12,6 +12,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
+import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
 public class Common {
 
@@ -30,7 +32,7 @@ public class Common {
         return Arrays.asList(getAllItemsMaterials()).contains(material);
     }
 
-    public static Plugin plugin = CorePlugin.getInstance();
+    public static Plugin plugin = getInstance();
 
     public static Set<String> getCommands() {
         return plugin.getDescription().getCommands().keySet();
@@ -146,6 +148,39 @@ public class Common {
 
     public static Player getNearestPlayer(Location location, int radius) {
         return location.getNearbyPlayers(radius).stream().findFirst().orElse(null);
+    }
+
+    public static boolean checkAirInSlot(PlayerInventorySlotType type, Player player) {
+        return switch (type) {
+            case MAINHAND -> {
+                player.getInventory().getItemInMainHand();
+                yield player.getInventory().getItemInMainHand().getType() == Material.AIR;
+            }
+            case OFFHAND -> {
+                player.getInventory().getItemInOffHand();
+                yield player.getInventory().getItemInOffHand().getType() == Material.AIR;
+            }
+            case ARMOR_HEAD ->
+                    player.getInventory().getHelmet() == null || player.getInventory().getHelmet().getType() == Material.AIR;
+            case ARMOR_CHEST ->
+                    player.getInventory().getChestplate() == null || player.getInventory().getChestplate().getType() == Material.AIR;
+            case ARMOR_LEGS ->
+                    player.getInventory().getLeggings() == null || player.getInventory().getLeggings().getType() == Material.AIR;
+            case ARMOR_FEET ->
+                    player.getInventory().getBoots() == null || player.getInventory().getBoots().getType() == Material.AIR;
+        };
+    }
+
+    public static ItemStack getItemInSlot(PlayerInventorySlotType type, Player player) {
+        if (!checkAirInSlot(type, player)) return new ItemStack(Material.AIR);
+        return switch (type) {
+            case MAINHAND -> player.getInventory().getItemInMainHand();
+            case OFFHAND -> player.getInventory().getItemInOffHand();
+            case ARMOR_HEAD -> player.getInventory().getHelmet();
+            case ARMOR_CHEST -> player.getInventory().getChestplate();
+            case ARMOR_LEGS -> player.getInventory().getLeggings();
+            case ARMOR_FEET -> player.getInventory().getBoots();
+        };
     }
 
     @Deprecated
