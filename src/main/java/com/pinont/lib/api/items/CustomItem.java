@@ -3,17 +3,17 @@ package com.pinont.lib.api.items;
 import com.pinont.lib.api.utils.Common;
 import org.bukkit.inventory.ItemStack;
 
-public interface CustomItem {
+public abstract class CustomItem {
 
-    default ItemStack getItem() {
-        return register().addInteraction(getInteraction()).create(); // do not change this
+    public ItemStack getItem() {
+        return register().addInteraction(getInteraction()).create();
     }
 
-    default String getName() {
-        return Common.resetStringColor(getItem().getItemMeta().getDisplayName()).replace(" ", "_").toLowerCase(); // do not change this
+    public String getName() {
+        return Common.resetStringColor(getItem().getItemMeta().getDisplayName()).replace(" ", "_").toLowerCase();
     }
 
-    ItemInteraction getInteraction();
+    public abstract ItemInteraction getInteraction();
 
-    ItemCreator register();
+    public abstract ItemCreator register();
 }

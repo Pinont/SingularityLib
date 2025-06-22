@@ -21,8 +21,12 @@ public class CustomItemManager implements SimpleCommand {
 
     public List<CustomItem> customItems = new ArrayList<>();
 
-    public CustomItemManager register(List<CustomItem> item) {
-        if (item.isEmpty()) return this;
+    public List<CustomItem> getCustomItems() {
+        return customItems;
+    }
+
+    public void register(List<CustomItem> item) {
+        if (item.isEmpty()) return;
         sendConsoleMessage("Registering " + item.size() + " custom items");
         for (CustomItem customItem : item) {
             customItems.add(customItem);
@@ -32,7 +36,6 @@ public class CustomItemManager implements SimpleCommand {
                 sendConsoleMessage("Registering interaction " + customItem.getInteraction().getName() + " for item " + customItem.getName());
             }
         }
-        return this;
     }
 
     @Override

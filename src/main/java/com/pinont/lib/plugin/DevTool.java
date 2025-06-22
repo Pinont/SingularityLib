@@ -27,7 +27,7 @@ import static com.pinont.lib.plugin.CorePlugin.getAPIVersion;
 import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
 @Deprecated(since = "2.1.0", forRemoval = true)
-public class DevTool implements SimpleCommand, CustomItem, Listener {
+public class DevTool extends CustomItem implements SimpleCommand, Listener {
 
     private final String version = getAPIVersion();
 
