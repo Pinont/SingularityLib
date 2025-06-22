@@ -2,13 +2,11 @@ package com.pinont.lib.plugin;
 
 import com.pinont.lib.api.command.SimpleCommand;
 import com.pinont.lib.api.manager.ConfigManager;
-import com.pinont.lib.api.manager.WorldManager;
 import com.pinont.lib.plugin.listener.PlayerListener;
 import com.pinont.lib.plugin.register.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -30,8 +28,21 @@ public abstract class CorePlugin extends JavaPlugin {
         return new ConfigManager("config.yml");
     }
 
+    private static String prefix;
+    private Long startTime;
+
+    public static String getPrefix() {
+        if (prefix == null) {
+            return "[" + getInstance().getName() + "]";
+        }
+        if (!prefix.contains("[") || !prefix.contains("]")) {
+            prefix = "[" + prefix + "]";
+        }
+        return prefix;
+    }
+
     public static void sendConsoleMessage(String message) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Api" + getAPIVersion() + "] " + ChatColor.WHITE + "[" + getInstance().getName() + "]" + message);
+        Bukkit.getConsoleSender().sendMessage(getPrefix() + " " + message);
     }
 
     private final List<SimpleCommand> simpleCommands = new ArrayList<>();
@@ -64,7 +75,7 @@ public abstract class CorePlugin extends JavaPlugin {
 
     public static void sendDebugMessage(String message) {
         if (getInstance().getConfig().getBoolean("debug")) {
-            sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + "Singularity Debugger:" + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
+            sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + getPrefix() + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
         }
     }
 
@@ -72,11 +83,11 @@ public abstract class CorePlugin extends JavaPlugin {
     public final void onDisable() {
         // Save all worlds that have been loaded by the plugin.
         // TODO: Move to Devtool
-        for (World world : Bukkit.getWorlds()) {
-            if (world.hasMetadata("loader")) {
-                new WorldManager(world.getName()).saveWorld();
-            }
-        }
+//        for (World world : Bukkit.getWorlds()) {
+//            if (world.hasMetadata("loader")) {
+//                new WorldManager(world.getName()).saveWorld();
+//            }
+//        }
 
         // Plugin Stop Process
         onPluginStop();
@@ -84,9 +95,10 @@ public abstract class CorePlugin extends JavaPlugin {
 
     @Override
     public final void onEnable() {
+        startTime = System.currentTimeMillis();
         // Initialize the plugin instance.
         instance = this;
-
+        prefix = getInstance().getPluginMeta().getLoggerPrefix();
         // Initialize Plugin Config.
         pluginConfig = new ConfigManager("config.yml");
         if (pluginConfig.isFirstLoad()) {
@@ -96,10 +108,10 @@ public abstract class CorePlugin extends JavaPlugin {
         pluginConfig.getConfig().options().copyDefaults(true);
 
         // TODO: Move to Devtool
-        WorldManager.autoLoadWorlds();
+//        WorldManager.autoLoadWorlds();
 
         // Initialize API To Plugin.
-        sendConsoleMessage(ChatColor.WHITE  + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI!");
+        sendConsoleMessage(ChatColor.WHITE + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI! " + getAPIVersion());
         onPluginStart();
         registerAPIListener(this, new PlayerListener());
 //        new CommandManager().register(this, this.simpleCommands);
@@ -108,6 +120,8 @@ public abstract class CorePlugin extends JavaPlugin {
         Register register = new Register();
         register.scanAndCollect(this.getClass().getPackageName());
         register.registerAll(this);
+        startTime = System.currentTimeMillis() - startTime;
+        sendConsoleMessage(ChatColor.GREEN + "Plugin is Enabled " + ChatColor.WHITE + "(took " + ChatColor.YELLOW + startTime + ChatColor.WHITE + "ms)");
     }
 
     private void registerAPIListener(Plugin plugin, Listener... listener) {
