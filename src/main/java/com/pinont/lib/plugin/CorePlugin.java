@@ -31,7 +31,7 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     public static void sendConsoleMessage(String message) {
-        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Api" + getAPIVersion() + "] " + ChatColor.WHITE + "  [" + getInstance().getName() + "]" + message);
+        Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "[Api" + getAPIVersion() + "] " + ChatColor.WHITE + "[" + getInstance().getName() + "]" + message);
     }
 
     private final List<SimpleCommand> simpleCommands = new ArrayList<>();
@@ -40,7 +40,8 @@ public abstract class CorePlugin extends JavaPlugin {
 
     public static String getAPIVersion() {
         // Plugin version, can be updated as needed.
-        String version = new ConfigManager("SingularityVersion.yml").getConfig().getString("version");
+//        String version = new ConfigManager("SingularityVersion.yml").getConfig().getString("version");
+        String version = "1.0.0";
         return "V-" + version;
     }
 
