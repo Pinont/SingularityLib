@@ -9,7 +9,7 @@ import java.sql.Connection;
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 import static com.pinont.lib.plugin.CorePlugin.sendDebugMessage;
 
-public class MYSQL {
+public class MySQL {
 
     private Connection connection;
 
