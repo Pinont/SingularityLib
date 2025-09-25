@@ -9,7 +9,7 @@ import java.sql.Connection;
 import static com.pinont.lib.plugin.CorePlugin.sendConsoleMessage;
 import static com.pinont.lib.plugin.CorePlugin.sendDebugMessage;
 
-public class Database {
+public class MYSQL {
 
     private Connection connection;
 
@@ -73,8 +73,8 @@ public class Database {
         return connection;
     }
 
-    public void init() {
-        connection = getConnection();
+    public void init(String configPath) {
+        connection = getConnection(configPath);
         if (connection == null) {
             sendConsoleMessage(ChatColor.RED + "[DB] Failed to connect to the database. Please check your configuration in database.yml");
         } else {
