@@ -6,7 +6,7 @@
 
     <groupId>com.github.Pinont</groupId>
     <artifactId>SingularityLib</artifactId>
-    <version>SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>SingularityLib</name>
@@ -96,6 +96,11 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.10.2</version>
+        </dependency>
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>5.0.0-beta.21</version>
         </dependency>
     </dependencies>
 </project>

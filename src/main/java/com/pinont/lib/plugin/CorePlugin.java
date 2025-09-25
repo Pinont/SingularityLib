@@ -53,9 +53,8 @@ public abstract class CorePlugin extends JavaPlugin {
     private final List<Listener> listeners = new ArrayList<>();
 
     public static String getAPIVersion() {
-        // Plugin version, can be updated as needed.
-//        String version = new ConfigManager("SingularityVersion.yml").getConfig().getString("version");
-        String version = "1.0.0";
+        String version = new ConfigManager("api-version.yml").getConfig().getString("version");
+//        String version = "1.0.0";
         return "V-" + version;
     }
 
