@@ -1,4 +1,4 @@
-name: Release Deploy (Central + GitHub)
+name: Release Publish
 
 on:
   push:
@@ -11,71 +11,51 @@ jobs:
     permissions:
       contents: write
       packages: write
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Derive version
+      - name: Derive version from tag
         id: rel
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          TAG="${GITHUB_REF_NAME}"          # e.g. v2.2.0
+          VERSION="${TAG#v}"                # strip leading v
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Setup Java
+      - name: Set up JDK 23 (generate settings.xml)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '23'
+          server-id: github
+          settings-path: ${{ github.workspace }}
 
-      - name: Import GPG Key
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          gpg --list-secret-keys
+      - name: Cache Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
 
-      - name: Write settings.xml
-        env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set release version (remove -SNAPSHOT)
         run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<'EOF'
-          <settings>
-            <servers>
-              <server>
-                <id>sonatype</id>
-                <username>${env.SONATYPE_USERNAME}</username>
-                <password>${env.SONATYPE_PASSWORD}</password>
-              </server>
-              <server>
-                <id>github</id>
-                <username>${env.GITHUB_ACTOR}</username>
-                <password>${env.GITHUB_TOKEN}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-          sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
-
-      - name: Set Release Version
-        run: |
-          mvn -B versions:set -DnewVersion="${{ steps.rel.outputs.version }}" -DgenerateBackupPoms=false
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml versions:set -DnewVersion="${{ steps.rel.outputs.version }}" -DgenerateBackupPoms=false
           grep -m1 '<version>' pom.xml
 
-      - name: Deploy Release to Central (staging + signing)
+      - name: Deploy Release
         env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: mvn -B -DskipTests -Prelease-publish -Dgpg.passphrase="${GPG_PASSPHRASE}" deploy
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
-      - name: Deploy Release to GitHub Packages
-        run: mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
+      - name: Collect artifacts
+        run: |
+          ls -1 target
+          cp target/*.jar main-artifact.jar || true
 
-      - name: GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -84,7 +64,7 @@ jobs:
           files: |
             target/*-sources.jar
             target/*-javadoc.jar
-            target/*.jar
+            main-artifact.jar
 
       - name: Summary
-        run: echo "Released ${{ steps.rel.outputs.version }} to Central & GitHub."
+        run: echo "Published release ${{ steps.rel.outputs.version }}"

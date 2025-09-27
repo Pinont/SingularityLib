@@ -1,4 +1,4 @@
-name: Snapshot Deploy (Central + GitHub)
+name: Publish SNAPSHOT
 
 on:
   push:
@@ -10,60 +10,54 @@ jobs:
     permissions:
       contents: read
       packages: write
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Read version
-        id: v
+      - name: Extract version
+        id: version
         run: |
-          VER=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
-          echo "version=$VER" >> $GITHUB_OUTPUT
-          if [[ "$VER" == *-SNAPSHOT ]]; then echo "deploy=true" >> $GITHUB_OUTPUT; else echo "deploy=false" >> $GITHUB_OUTPUT; fi
+          VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Abort (not SNAPSHOT)
-        if: steps.v.outputs.deploy != 'true'
-        run: echo "Version ${{ steps.v.outputs.version }} not snapshot."
+      - name: Abort (not a SNAPSHOT)
+        if: steps.version.outputs.deploy != 'true'
+        run: echo "Version ${{ steps.version.outputs.version }} is not a SNAPSHOT. Skipping deploy."
 
-      - name: Setup Java
-        if: steps.v.outputs.deploy == 'true'
+      - name: Set up JDK 23 (generate settings.xml)
+        if: steps.version.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '23'
+          server-id: github
+          settings-path: ${{ github.workspace }}
 
-      - name: Write settings.xml
-        if: steps.v.outputs.deploy == 'true'
+      - name: Cache Maven
+        if: steps.version.outputs.deploy == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Build (package)
+        if: steps.version.outputs.deploy == 'true'
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml package
+
+      - name: Deploy SNAPSHOT
+        if: steps.version.outputs.deploy == 'true'
         env:
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<'EOF'
-          <settings>
-            <servers>
-              <server>
-                <id>sonatype</id>
-                <username>${env.SONATYPE_USERNAME}</username>
-                <password>${env.SONATYPE_PASSWORD}</password>
-              </server>
-              <server>
-                <id>github</id>
-                <username>${env.GITHUB_ACTOR}</username>
-                <password>${env.GITHUB_TOKEN}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
-          sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
-
-      - name: Deploy Snapshot to Sonatype
-        if: steps.v.outputs.deploy == 'true'
-        run: mvn -B -DskipTests deploy
-
-      - name: Deploy Snapshot to GitHub Packages
-        if: steps.v.outputs.deploy == 'true'
-        run: mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
       - name: Summary
-        run: echo "Snapshot ${{ steps.v.outputs.version }} deployed."
+        run: |
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Deployed: ${{ steps.version.outputs.deploy }}"
