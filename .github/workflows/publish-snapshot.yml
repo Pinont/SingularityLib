@@ -13,39 +13,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Determine version
-        id: ver
+      - name: Read version
+        id: v
         run: |
-          VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          if [[ "$VERSION" == *-SNAPSHOT ]]; then
-            echo "deploy=true" >> $GITHUB_OUTPUT
-          else
-            echo "deploy=false" >> $GITHUB_OUTPUT
-          fi
+          VER=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "version=$VER" >> $GITHUB_OUTPUT
+          if [[ "$VER" == *-SNAPSHOT ]]; then echo "deploy=true" >> $GITHUB_OUTPUT; else echo "deploy=false" >> $GITHUB_OUTPUT; fi
 
-      - name: Abort (not a snapshot)
-        if: steps.ver.outputs.deploy != 'true'
-        run: echo "Version ${{ steps.ver.outputs.version }} is not a SNAPSHOT, skipping."
+      - name: Abort (not SNAPSHOT)
+        if: steps.v.outputs.deploy != 'true'
+        run: echo "Version ${{ steps.v.outputs.version }} not snapshot."
 
       - name: Setup Java
-        if: steps.ver.outputs.deploy == 'true'
+        if: steps.v.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '23'
 
-      - name: Import GPG key
-        if: steps.ver.outputs.deploy == 'true'
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          gpg --list-secret-keys
-
-      - name: Write settings.xml (both servers)
-        if: steps.ver.outputs.deploy == 'true'
+      - name: Write settings.xml
+        if: steps.v.outputs.deploy == 'true'
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
@@ -70,19 +57,13 @@ jobs:
           EOF
           sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
 
-      - name: Deploy SNAPSHOT to Central
-        if: steps.ver.outputs.deploy == 'true'
-        env:
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          mvn -B -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}" deploy
+      - name: Deploy Snapshot to Sonatype
+        if: steps.v.outputs.deploy == 'true'
+        run: mvn -B -DskipTests deploy
 
-      - name: Deploy SNAPSHOT to GitHub Packages
-        if: steps.ver.outputs.deploy == 'true'
-        run: |
-          mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
+      - name: Deploy Snapshot to GitHub Packages
+        if: steps.v.outputs.deploy == 'true'
+        run: mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
 
       - name: Summary
-        run: |
-          echo "Version: ${{ steps.ver.outputs.version }}"
-          echo "Central + GitHub deploy attempted (snapshot)."
+        run: echo "Snapshot ${{ steps.v.outputs.version }} deployed."

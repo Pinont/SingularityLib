@@ -29,7 +29,7 @@ jobs:
           distribution: temurin
           java-version: '23'
 
-      - name: Import GPG key
+      - name: Import GPG Key
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -62,22 +62,20 @@ jobs:
           EOF
           sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
 
-      - name: Set release version
+      - name: Set Release Version
         run: |
           mvn -B versions:set -DnewVersion="${{ steps.rel.outputs.version }}" -DgenerateBackupPoms=false
           grep -m1 '<version>' pom.xml
 
-      - name: Deploy Release to Central
+      - name: Deploy Release to Central (staging + signing)
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-        run: |
-          mvn -B -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}" deploy
+        run: mvn -B -DskipTests -Prelease-publish -Dgpg.passphrase="${GPG_PASSPHRASE}" deploy
 
       - name: Deploy Release to GitHub Packages
-        run: |
-          mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
+        run: mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
 
-      - name: Create GitHub Release
+      - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -89,5 +87,4 @@ jobs:
             target/*.jar
 
       - name: Summary
-        run: |
-          echo "Released version ${{ steps.rel.outputs.version }} to Central & GitHub."
+        run: echo "Released ${{ steps.rel.outputs.version }} to Central & GitHub."

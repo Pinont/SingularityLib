@@ -66,58 +66,6 @@
         </repository>
     </distributionManagement>
 
-    <profiles>
-        <!-- Profile for GitHub Packages deployment -->
-        <profile>
-            <id>github</id>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>github</id>
-                    <url>https://maven.pkg.github.com/pinont/SingularityLib</url>
-                </snapshotRepository>
-                <repository>
-                    <id>github</id>
-                    <url>https://maven.pkg.github.com/pinont/SingularityLib</url>
-                </repository>
-            </distributionManagement>
-        </profile>
-        <profile>
-            <id>release-sign</id>
-            <activation>
-                <!-- Optional: automatically activate if property 'performRelease' is true -->
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.4</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                                <configuration>
-                                    <gpgArguments>
-                                        <arg>--batch</arg>
-                                        <arg>--pinentry-mode</arg><arg>loopback</arg>
-                                    </gpgArguments>
-                                    <!-- Passphrase supplied via -Dgpg.passphrase or env -->
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <repositories>
         <repository>
             <id>papermc</id>
@@ -196,19 +144,6 @@
                 </executions>
             </plugin>
 
-            <!-- Nexus Staging (auto release after close) -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>sonatype</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
-
             <!-- Deploy plugin explicit -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -217,4 +152,59 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Release publishing: sign + stage -->
+        <profile>
+            <id>release-publish</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals><goal>sign</goal></goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--batch</arg>
+                                        <arg>--pinentry-mode</arg><arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.13</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>sonatype</serverId>
+                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Optional GitHub Packages (deploy with -Pgithub) -->
+        <profile>
+            <id>github</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/pinont/SingularityLib</url>
+                </snapshotRepository>
+                <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/pinont/SingularityLib</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
