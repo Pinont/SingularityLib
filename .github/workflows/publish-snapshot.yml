@@ -7,7 +7,6 @@ on:
 
 jobs:
   publish-snapshot:
-    if: contains(github.event.head_commit.message, '[no-snapshot]') == false
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,19 +16,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Read version
-        id: read_version
+        id: version
         run: |
           VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
-            echo "Not a SNAPSHOT version ($VERSION); skipping deploy."
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
           else
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set up Temurin JDK 23
-        if: steps.read_version.outputs.should_deploy == 'true'
+      - name: Set up JDK (with GPR credentials)
+        if: steps.version.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -39,7 +37,7 @@ jobs:
           server-password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cache Maven
-        if: steps.read_version.outputs.should_deploy == 'true'
+        if: steps.version.outputs.deploy == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
@@ -48,10 +46,10 @@ jobs:
             maven-${{ runner.os }}-
 
       - name: Deploy SNAPSHOT
-        if: steps.read_version.outputs.should_deploy == 'true'
+        if: steps.version.outputs.deploy == 'true'
         run: mvn -B -DskipTests deploy
 
       - name: Summary
         run: |
-          echo "Version: ${{ steps.read_version.outputs.version }}"
-          echo "Deployed: ${{ steps.read_version.outputs.should_deploy }}"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Deployed: ${{ steps.version.outputs.deploy }}"

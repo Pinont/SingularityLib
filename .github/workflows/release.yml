@@ -18,14 +18,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Derive version from tag
+      - name: Derive version
         id: v
         run: |
-          TAG="${GITHUB_REF_NAME}"      # e.g. v2.2.0
+          TAG="${GITHUB_REF_NAME}"
           VERSION="${TAG#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Set up Temurin JDK 23
+      - name: Set up JDK (with GPR credentials)
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -42,7 +42,7 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Set release version (remove -SNAPSHOT)
+      - name: Set release version
         run: |
           mvn -B versions:set -DnewVersion="${{ steps.v.outputs.version }}" -DgenerateBackupPoms=false
           grep -m1 '<version>' pom.xml
@@ -50,21 +50,21 @@ jobs:
       - name: Deploy Release
         run: mvn -B -DskipTests deploy
 
-      - name: Package artifacts
+      - name: Collect Artifacts
         run: |
-          cp target/*.jar ./artifact.jar
-          ls -l
+          ls -1 target
+          cp target/*.jar ./artifact-main.jar || true
 
-      - name: Create or Update GitHub Release
+      - name: Create / Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: "SingularityLib ${{ steps.v.outputs.version }}"
           generate_release_notes: true
           files: |
-            artifact.jar
             target/*-sources.jar
             target/*-javadoc.jar
+            artifact-main.jar
 
-      - name: Post summary
-        run: echo "Published version ${{ steps.v.outputs.version }}"
+      - name: Summary
+        run: echo "Published release ${{ steps.v.outputs.version }}"
