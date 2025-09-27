@@ -1,8 +1,7 @@
 name: SingularityLib Build and Publish
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [created]
 
 jobs:
   build:
