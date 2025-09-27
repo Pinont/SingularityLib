@@ -1,12 +1,11 @@
+<!-- build.xml -->
 <project name="SingularityLib" default="copy-jar" basedir=".">
-
-    <property name="maven.build.dir" value="target"/>
-    <property name="maven.final.name" value="SingularityLib-2.1.3"/>
-    <!-- Or replace with ${project.build.finalName} if you inject properties -->
+    <xmlproperty file="pom.xml" keepRoot="false" collapseAttributes="true"/>
+    <property name="buildDir" value="target"/>
+    <property name="finalName" value="SingularityLib-${version}"/>
 
     <target name="copy-jar">
-        <copy file="${maven.build.dir}/${maven.final.name}.jar"
-              tofile="${user.home}/.m2/repository/${project.groupId.replace('.', '/')}/${project.artifactId}/${project.version}/${project.build.finalName}.jar" />
+        <copy file="${buildDir}/${finalName}.jar"
+              tofile="${user.home}/.m2/repository/${groupId}/${artifactId}/${version}/${finalName}.jar"/>
     </target>
-
 </project>
