@@ -1,5 +1,5 @@
 # SingularityLib
-[![wakatime](https://wakatime.com/badge/user/fa854c4c-5b98-4588-9b55-1dcd1509c1b5/project/d1822b62-d256-42bf-bc4e-ad773ce009dc.svg)](https://wakatime.com/badge/user/fa854c4c-5b98-4588-9b55-1dcd1509c1b5/project/d1822b62-d256-42bf-bc4e-ad773ce009dc)
+[![wakatime](https://wakatime.com/badge/user/fa854c4c-5b98-4588-9b55-1dcd1509c1b5/project/d1822b62-d256-42bf-bc4e-ad773ce009dc.svg)](https://wakatime.com/badge/user/fa854c4c-5b98-4588-9b55-1dcd1509c1b5/project/d1822b62-d256-42bf-bc4e-ad773ce009dc) [![Maven Package](https://github.com/Pinont/SingularityLib/actions/workflows/maven-package.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/maven-package.yml)
 
 A Minecraft plugin api that provides a lot of benefit to develop Minecraft plugin much easier 
 
