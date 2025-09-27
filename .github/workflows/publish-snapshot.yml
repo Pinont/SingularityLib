@@ -1,33 +1,42 @@
-name: Publish SNAPSHOT
+name: Publish SNAPSHOT (Minimal)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  publish-snapshot:
+  snapshot:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read version
-        id: version
+      - name: Show ref + actor (debug)
+        run: |
+          echo "Actor: $GITHUB_ACTOR"
+          echo "Ref:   $GITHUB_REF"
+
+      - name: Extract version
+        id: v
         run: |
           VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if [[ "$VERSION" == *"-SNAPSHOT" ]]; then
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
             echo "deploy=true" >> "$GITHUB_OUTPUT"
           else
             echo "deploy=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set up JDK (with GPR credentials)
-        if: steps.version.outputs.deploy == 'true'
+      - name: Abort (not a SNAPSHOT)
+        if: steps.v.outputs.deploy != 'true'
+        run: echo "Version ${{ steps.v.outputs.version }} is not a SNAPSHOT, skipping."
+
+      - name: Set up Java + credentials
+        if: steps.v.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,20 +45,18 @@ jobs:
           server-username: ${{ github.actor }}
           server-password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Cache Maven
-        if: steps.version.outputs.deploy == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-
+      - name: Print generated settings.xml (masked)
+        if: steps.v.outputs.deploy == 'true'
+        run: |
+          echo "---- settings.xml ----"
+          sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml || true
+          echo "----------------------"
 
-      - name: Deploy SNAPSHOT
-        if: steps.version.outputs.deploy == 'true'
-        run: mvn -B -DskipTests deploy
+      - name: Deploy
+        if: steps.v.outputs.deploy == 'true'
+        run: mvn -B -e -DskipTests deploy
 
       - name: Summary
         run: |
-          echo "Version: ${{ steps.version.outputs.version }}"
-          echo "Deployed: ${{ steps.version.outputs.deploy }}"
+          echo "Version: ${{ steps.v.outputs.version }}"
+          echo "Deploy:  ${{ steps.v.outputs.deploy }}"
