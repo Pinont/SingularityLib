@@ -2,8 +2,11 @@
 
 A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pinont/singularitylib/maven-package.yml)
-](https://github.com/Pinont/SingularityLib/actions/workflows/maven-package.yml) ![GitHub Tag](https://img.shields.io/github/v/tag/pinont/singularitylib)
+
+> ## ⚠️ Disclaimer
+> This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues)
+
+[![](https://jitpack.io/v/Pinont/SingularityLib.svg)](https://jitpack.io/#Pinont/SingularityLib) ![GitHub Tag](https://img.shields.io/github/v/tag/pinont/singularitylib)
 [![license](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) 
 
 ---
@@ -30,14 +33,31 @@ A Minecraft plugin api that provides a lot of benefit to develop Minecraft plugi
 - [ ] Discord JDA support (TextCommands, Listeners)
 - [ ] More database support (SQLite, MongoDB)
 
-## Installation
-On your `pom.xml`, add the following dependency:
+## Installation (Maven)
+
+If the library is published to GitHub Packages, add the GitHub repository and dependency to your `pom.xml`:
+
 ```xml
-<dependency>
-  <groupId>com.pinont</groupId>
-  <artifactId>singularitylib</artifactId>
-  <version>2.1.3</version>
-</dependency>
+<project>
+  ...
+  <repositories>
+    <repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+	    <groupId>com.github.Pinont</groupId>
+	    <artifactId>SingularityLib</artifactId>
+	    <version>Tag</version>
+	</dependency>
+  </dependencies>
+  ...
+</project>
 ```
 
 ## Usage
@@ -54,8 +74,3 @@ public class Main extends CorePlugin {
     }
 }
 ```
-
----
-
-> ## ⚠️ Disclaimer 
-> This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues)
