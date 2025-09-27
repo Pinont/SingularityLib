@@ -36,14 +36,7 @@ jobs:
           distribution: temurin
           java-version: '23'
           server-id: github
-          # You chose not to specify server-username/password; keeping that pattern.
-          # settings-path tells setup-java where to write settings.xml
           settings-path: ${{ github.workspace }}
-
-      # (Optional) Show generated settings.xml for debugging (mask password automatically absent here)
-      # - name: Debug settings.xml
-      #   if: steps.version.outputs.deploy == 'true'
-      #   run: sed 's/<password>.*<\/password>/<password>***<\/password>/' "${GITHUB_WORKSPACE}/settings.xml" || true
 
       - name: Cache Maven
         if: steps.version.outputs.deploy == 'true'

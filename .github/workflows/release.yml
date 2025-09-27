@@ -32,9 +32,6 @@ jobs:
           server-id: github
           settings-path: ${{ github.workspace }}
 
-      # - name: Debug settings.xml
-      #   run: sed 's/<password>.*<\/password>/<password>***<\/password>/' "${GITHUB_WORKSPACE}/settings.xml" || true
-
       - name: Cache Maven
         uses: actions/cache@v4
         with:
