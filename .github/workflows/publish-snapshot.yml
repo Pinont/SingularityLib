@@ -1,0 +1,57 @@
+name: Publish SNAPSHOT
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-snapshot:
+    if: contains(github.event.head_commit.message, '[no-snapshot]') == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: read_version
+        run: |
+          VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" != *"-SNAPSHOT" ]]; then
+            echo "Not a SNAPSHOT version ($VERSION); skipping deploy."
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Temurin JDK 23
+        if: steps.read_version.outputs.should_deploy == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '23'
+          server-id: github
+          server-username: ${{ github.actor }}
+          server-password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Maven
+        if: steps.read_version.outputs.should_deploy == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Deploy SNAPSHOT
+        if: steps.read_version.outputs.should_deploy == 'true'
+        run: mvn -B -DskipTests deploy
+
+      - name: Summary
+        run: |
+          echo "Version: ${{ steps.read_version.outputs.version }}"
+          echo "Deployed: ${{ steps.read_version.outputs.should_deploy }}"
