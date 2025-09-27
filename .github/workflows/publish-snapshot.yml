@@ -1,4 +1,4 @@
-name: Publish SNAPSHOT
+name: Snapshot Deploy (Central + GitHub)
 
 on:
   push:
@@ -10,54 +10,79 @@ jobs:
     permissions:
       contents: read
       packages: write
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract version
-        id: version
+      - name: Determine version
+        id: ver
         run: |
           VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           if [[ "$VERSION" == *-SNAPSHOT ]]; then
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            echo "deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "deploy=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Abort (not a SNAPSHOT)
-        if: steps.version.outputs.deploy != 'true'
-        run: echo "Version ${{ steps.version.outputs.version }} is not a SNAPSHOT. Skipping deploy."
+      - name: Abort (not a snapshot)
+        if: steps.ver.outputs.deploy != 'true'
+        run: echo "Version ${{ steps.ver.outputs.version }} is not a SNAPSHOT, skipping."
 
-      - name: Set up JDK 23 (generate settings.xml)
-        if: steps.version.outputs.deploy == 'true'
+      - name: Setup Java
+        if: steps.ver.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '23'
-          server-id: github
-          settings-path: ${{ github.workspace }}
 
-      - name: Cache Maven
-        if: steps.version.outputs.deploy == 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            maven-${{ runner.os }}-
-
-      - name: Build (package)
-        if: steps.version.outputs.deploy == 'true'
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml package
-
-      - name: Deploy SNAPSHOT
-        if: steps.version.outputs.deploy == 'true'
+      - name: Import GPG key
+        if: steps.ver.outputs.deploy == 'true'
         env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          gpg --list-secret-keys
+
+      - name: Write settings.xml (both servers)
+        if: steps.ver.outputs.deploy == 'true'
+        env:
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'EOF'
+          <settings>
+            <servers>
+              <server>
+                <id>sonatype</id>
+                <username>${env.SONATYPE_USERNAME}</username>
+                <password>${env.SONATYPE_PASSWORD}</password>
+              </server>
+              <server>
+                <id>github</id>
+                <username>${env.GITHUB_ACTOR}</username>
+                <password>${env.GITHUB_TOKEN}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+          sed 's/<password>.*<\/password>/<password>***<\/password>/' ~/.m2/settings.xml
+
+      - name: Deploy SNAPSHOT to Central
+        if: steps.ver.outputs.deploy == 'true'
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          mvn -B -DskipTests -Dgpg.passphrase="${GPG_PASSPHRASE}" deploy
+
+      - name: Deploy SNAPSHOT to GitHub Packages
+        if: steps.ver.outputs.deploy == 'true'
+        run: |
+          mvn -B -DskipTests -Pgithub -Dgpg.skip=true deploy
 
       - name: Summary
         run: |
-          echo "Version: ${{ steps.version.outputs.version }}"
-          echo "Deployed: ${{ steps.version.outputs.deploy }}"
+          echo "Version: ${{ steps.ver.outputs.version }}"
+          echo "Central + GitHub deploy attempted (snapshot)."
