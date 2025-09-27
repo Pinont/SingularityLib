@@ -2,6 +2,10 @@
 
 A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
+
+> ## ⚠️ Disclaimer
+> This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues)
+
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pinont/singularitylib/maven-package.yml)
 ](https://github.com/Pinont/SingularityLib/actions/workflows/maven-package.yml) ![GitHub Tag](https://img.shields.io/github/v/tag/pinont/singularitylib)
 [![license](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) 
@@ -36,7 +40,7 @@ On your `pom.xml`, add the following dependency:
 <dependency>
   <groupId>com.pinont</groupId>
   <artifactId>singularitylib</artifactId>
-  <version>2.1.3</version>
+  <version>TAG_VERSION</version>
 </dependency>
 ```
 
@@ -54,8 +58,3 @@ public class Main extends CorePlugin {
     }
 }
 ```
-
----
-
-> ## ⚠️ Disclaimer 
-> This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues)
