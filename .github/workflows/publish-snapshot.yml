@@ -2,13 +2,10 @@ name: Publish SNAPSHOT
 
 on:
   push:
-    branches: [ "main" ]
-  release:
-    types: [created]
+    branches: [ main ]
 
 jobs:
-  build:
-
+  snapshot:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -16,18 +13,58 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 23
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-SNAPSHOT ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Abort (not a SNAPSHOT)
+        if: steps.version.outputs.deploy != 'true'
+        run: echo "Version ${{ steps.version.outputs.version }} is not a SNAPSHOT. Skipping deploy."
+
+      - name: Set up JDK 23 (generate settings.xml)
+        if: steps.version.outputs.deploy == 'true'
         uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: '23'
-          distribution: 'temurin'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
+          server-id: github
+          # You chose not to specify server-username/password; keeping that pattern.
+          # settings-path tells setup-java where to write settings.xml
+          settings-path: ${{ github.workspace }}
 
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      # (Optional) Show generated settings.xml for debugging (mask password automatically absent here)
+      # - name: Debug settings.xml
+      #   if: steps.version.outputs.deploy == 'true'
+      #   run: sed 's/<password>.*<\/password>/<password>***<\/password>/' "${GITHUB_WORKSPACE}/settings.xml" || true
 
-      - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+      - name: Cache Maven
+        if: steps.version.outputs.deploy == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
+
+      - name: Build (package)
+        if: steps.version.outputs.deploy == 'true'
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml package
+
+      - name: Deploy SNAPSHOT
+        if: steps.version.outputs.deploy == 'true'
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
+
+      - name: Summary
+        run: |
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Deployed: ${{ steps.version.outputs.deploy }}"
