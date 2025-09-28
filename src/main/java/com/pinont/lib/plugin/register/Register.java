@@ -5,6 +5,7 @@ import com.pinont.lib.api.command.SimpleCommand;
 import com.pinont.lib.api.items.CustomItem;
 import com.pinont.lib.api.manager.CommandManager;
 import com.pinont.lib.api.manager.CustomItemManager;
+import com.pinont.lib.api.utils.Console;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -38,14 +39,14 @@ public class Register {
                     customItems.add((CustomItem) instance);
                 }
             } catch (NoSuchMethodException e) {
-                Bukkit.getLogger().severe("No default constructor found for class: " + clazz.getName());
+                Console.logError("No default constructor found for class: " + clazz.getName());
             } catch (InstantiationException e) {
-                Bukkit.getLogger().severe("Failed to instantiate class: " + clazz.getName());
+                Console.logError("Failed to instantiate class: " + clazz.getName());
             } catch (IllegalAccessException e) {
-                Bukkit.getLogger().severe("Illegal access while instantiating class: " + clazz.getName());
+                Console.logError("Illegal access while instantiating class: " + clazz.getName());
             } catch (Exception e) {
-                Bukkit.getLogger().severe("Unexpected error while processing class: " + clazz.getName());
-                e.printStackTrace();
+                Console.logError("Unexpected error while processing class: " + clazz.getName());
+                Console.logError(e.getMessage());
             }
         }
     }

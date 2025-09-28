@@ -14,6 +14,10 @@ public class Console {
         sendConsoleMessage(ChatColor.RED + "[ERROR] " + message);
     }
 
+    public static void logWarning(String message) {
+        sendConsoleMessage(ChatColor.YELLOW + "[WARNING] " + message);
+    }
+
     public static void debug(String message) {
         sendDebugMessage(message);
     }

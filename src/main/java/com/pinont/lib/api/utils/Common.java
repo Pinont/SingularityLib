@@ -35,7 +35,7 @@ public class Common {
         return Arrays.stream(Material.values()).filter(material -> !filterList.contains(material) && !material.name().startsWith("LEGACY_") && !material.name().contains("WALL_") && !material.name().startsWith("ATTACHED_") && !material.name().endsWith("_CAULDRON") && !material.name().startsWith("POTTED_") && !material.name().endsWith("_CROP") && !material.name().endsWith("_BUSH") && !material.name().endsWith("_PLANT") && !material.name().endsWith("_CAKE") && !material.name().startsWith("CAVE_")).toArray(Material[]::new);
     }
 
-    public static Boolean isItemMaterial(Material material) {
+    public static Boolean isItemIsMaterial(Material material) {
         return Arrays.asList(getAllItemsMaterials()).contains(material);
     }
 
@@ -45,10 +45,6 @@ public class Common {
 
     public static Plugin plugin = getInstance();
 
-    public static Set<String> getCommands() {
-        return plugin.getDescription().getCommands().keySet();
-    }
-
     public static void checkBoolean(final boolean expression, final String falseMessage, final Object... replacements) {
         if (!expression) {
             String message = falseMessage;
@@ -57,7 +53,7 @@ public class Common {
                 message = String.format(falseMessage, replacements);
 
             } catch (final Throwable t) {
-                Bukkit.getLogger().warning(t.getMessage());
+                Console.logWarning(t.getMessage());
             }
         }
     }
@@ -67,7 +63,7 @@ public class Common {
     }
 
     public static void sneaky(Throwable t) {
-        throw new RuntimeException(t);
+        Console.logError(t.getMessage());
     }
 
     public static Collection<? extends Player> getOnlinePlayers() {
@@ -86,7 +82,7 @@ public class Common {
         String[] words = string.replace("_", " ").split(" ");
         StringBuilder properName = new StringBuilder();
         for (String word : words) {
-            if (word.length() > 0) {
+            if (!word.isEmpty()) {
                 properName.append(word.substring(0, 1).toUpperCase());
                 properName.append(word.substring(1).toLowerCase());
                 properName.append(" ");
@@ -96,65 +92,66 @@ public class Common {
     }
 
     public static Boolean isMainHandEmpty(Player player) {
-        return (player.getInventory().getItemInMainHand().getType() == Material.AIR) || (player.getInventory().getItemInMainHand() == null);
+        return isAir(player.getInventory().getItemInMainHand());
     }
 
     public static String IntegerToRomanNumeral(int input) {
         if (input < 1 || input > 3999)
             return "Invalid Roman Number Value";
-        String s = "";
+        StringBuilder s = new StringBuilder();
         while (input >= 1000) {
-            s += "M";
-            input -= 1000;        }
+            s.append("M");
+            input -= 1000;
+        }
         while (input >= 900) {
-            s += "CM";
+            s.append("CM");
             input -= 900;
         }
         while (input >= 500) {
-            s += "D";
+            s.append("D");
             input -= 500;
         }
         while (input >= 400) {
-            s += "CD";
+            s.append("CD");
             input -= 400;
         }
         while (input >= 100) {
-            s += "C";
+            s.append("C");
             input -= 100;
         }
         while (input >= 90) {
-            s += "XC";
+            s.append("XC");
             input -= 90;
         }
         while (input >= 50) {
-            s += "L";
+            s.append("L");
             input -= 50;
         }
         while (input >= 40) {
-            s += "XL";
+            s.append("XL");
             input -= 40;
         }
         while (input >= 10) {
-            s += "X";
+            s.append("X");
             input -= 10;
         }
-        while (input >= 9) {
-            s += "IX";
+        while (input == 9) {
+            s.append("IX");
             input -= 9;
         }
         while (input >= 5) {
-            s += "V";
+            s.append("V");
             input -= 5;
         }
-        while (input >= 4) {
-            s += "IV";
+        while (input == 4) {
+            s.append("IV");
             input -= 4;
         }
         while (input >= 1) {
-            s += "I";
+            s.append("I");
             input -= 1;
         }
-        return s;
+        return s.toString();
     }
 
     public static Player getNearestPlayer(Location location, int radius) {
@@ -163,22 +160,12 @@ public class Common {
 
     public static boolean checkAirInSlot(PlayerInventorySlotType type, Player player) {
         return switch (type) {
-            case MAINHAND -> {
-                player.getInventory().getItemInMainHand();
-                yield player.getInventory().getItemInMainHand().getType() == Material.AIR;
-            }
-            case OFFHAND -> {
-                player.getInventory().getItemInOffHand();
-                yield player.getInventory().getItemInOffHand().getType() == Material.AIR;
-            }
-            case ARMOR_HEAD ->
-                    player.getInventory().getHelmet() == null || player.getInventory().getHelmet().getType() == Material.AIR;
-            case ARMOR_CHEST ->
-                    player.getInventory().getChestplate() == null || player.getInventory().getChestplate().getType() == Material.AIR;
-            case ARMOR_LEGS ->
-                    player.getInventory().getLeggings() == null || player.getInventory().getLeggings().getType() == Material.AIR;
-            case ARMOR_FEET ->
-                    player.getInventory().getBoots() == null || player.getInventory().getBoots().getType() == Material.AIR;
+            case MAINHAND -> isAir(player.getInventory().getItemInMainHand());
+            case OFFHAND -> isAir(player.getInventory().getItemInOffHand());
+            case ARMOR_HEAD -> isAir(player.getInventory().getHelmet());
+            case ARMOR_CHEST -> isAir(player.getInventory().getChestplate());
+            case ARMOR_LEGS -> isAir(player.getInventory().getLeggings());
+            case ARMOR_FEET -> isAir(player.getInventory().getBoots());
         };
     }
 
@@ -194,9 +181,8 @@ public class Common {
         };
     }
 
-    @Deprecated
-    public static String resetStringColor(String name) {
-        return name.replaceAll("§[0-9a-fk-or]", "");
+    public static String resetStringColor(String text) {
+        return text.replaceAll("§[0-9a-fk-or]", "");
     }
 
     public static String resetStringColor(Component component) {
