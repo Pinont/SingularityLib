@@ -77,7 +77,7 @@ public abstract class CorePlugin extends JavaPlugin {
 
     public static void sendDebugMessage(String message) {
         if (getInstance().getConfig().getBoolean("debug")) {
-            sendConsoleMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + getPrefix() + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
+            Bukkit.getConsoleSender().sendMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + getPrefix() + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
         }
     }
 
