@@ -60,6 +60,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
+      - name: Create Git Tag
+        if: steps.version.outputs.deploy == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const version = process.env.VERSION || '${{ steps.version.outputs.version }}';
+            const sha = process.env.GITHUB_SHA || '${{ github.sha }}';
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${version}`,
+              sha: sha
+            });
+
       - name: Summary
         run: |
           echo "Version: ${{ steps.version.outputs.version }}"
