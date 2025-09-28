@@ -69,7 +69,7 @@ public class ItemCreator {
         return Objects.requireNonNull(item.getItemMeta()).getPersistentDataContainer().has(new NamespacedKey(plugin, tag), PersistentDataType.STRING);
     }
 
-    public String getKey(String key) {
+    public String getTag(String key) {
         return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
     }
 
@@ -128,6 +128,12 @@ public class ItemCreator {
         return this;
     }
 
+    public ItemCreator setName(Component name) {
+        meta.displayName(name);
+        meta.itemName(name);
+        return this;
+    }
+
     public ItemCreator setDurability(short durability) {
         this.durability = durability;
         return this;
@@ -143,8 +149,13 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator addLore(String... lore) {
-        this.lore.add(common.colorize(Arrays.toString(lore)));
+    public ItemCreator addLore(String... lores) {
+        this.lore.add(common.colorize(Arrays.toString(lores)));
+        return this;
+    }
+
+    public ItemCreator addLore(Component... lores) {
+        this.lore.addAll(Arrays.asList(lores));
         return this;
     }
 

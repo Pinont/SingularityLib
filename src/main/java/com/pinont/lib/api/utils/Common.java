@@ -32,6 +32,10 @@ public class Common {
         return Arrays.asList(getAllItemsMaterials()).contains(material);
     }
 
+    public static Boolean isAir(ItemStack item) {
+        return (item == null) || (item.getType() == Material.AIR);
+    }
+
     public static Plugin plugin = getInstance();
 
     public static Set<String> getCommands() {
