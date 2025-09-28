@@ -37,6 +37,7 @@ public class ItemCreator {
     private Material type;
     private final Plugin plugin = getInstance();
     private static final Set<ItemInteraction> ITEM_INTERACTIONS = Sets.newHashSet();
+    private String name;
 
     public static Set<ItemInteraction> getInteractions() {
         return ITEM_INTERACTIONS;
@@ -46,11 +47,40 @@ public class ItemCreator {
         this(new ItemStack(type));
     }
 
+    public ItemCreator(Material type, int amount) {
+        this(new ItemStack(type, amount));
+    }
+
+    public ItemCreator(@NotNull Material type, int amount, short damage) {
+        this(new ItemStack(type, amount, damage, null));
+    }
+
+    public ItemCreator(@NotNull Material type, int amount, short damage, Byte data) {
+        this(new ItemStack(type, amount, damage, data));
+    }
+
     public ItemCreator(@NotNull ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
         this.type = item.getType();
+        this.name = item.getItemMeta().getDisplayName();
         data = meta != null ? meta.getPersistentDataContainer() : null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ItemMeta getItemMeta() {
+        return meta;
+    }
+
+    public Material getType() {
+        return type;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 
     public ItemStack create() {
@@ -70,6 +100,10 @@ public class ItemCreator {
     }
 
     public String getTag(String key) {
+        return getKey(key);
+    }
+
+    public String getKey(String key) {
         return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
     }
 
