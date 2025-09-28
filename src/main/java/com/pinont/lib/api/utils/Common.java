@@ -17,9 +17,16 @@ import static com.pinont.lib.plugin.CorePlugin.getInstance;
 
 public class Common {
 
-    public @NotNull Component colorize(String message) {
+    public @NotNull Component colorize(String message, boolean noItalic) {
         MiniMessage miniMessage = MiniMessage.miniMessage();
+        if (noItalic) {
+            message = "<!italic>" + message;
+        }
         return miniMessage.deserialize(message);
+    }
+
+    public @NotNull Component colorize(String message) {
+        return colorize(message, false);
     }
 
     public static Material[] getAllItemsMaterials() {

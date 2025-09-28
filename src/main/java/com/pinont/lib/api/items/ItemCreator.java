@@ -37,7 +37,7 @@ public class ItemCreator {
     private Material type;
     private final Plugin plugin = getInstance();
     private static final Set<ItemInteraction> ITEM_INTERACTIONS = Sets.newHashSet();
-    private String name;
+    private final String name;
 
     public static Set<ItemInteraction> getInteractions() {
         return ITEM_INTERACTIONS;
@@ -63,7 +63,7 @@ public class ItemCreator {
         this.item = item;
         this.meta = item.getItemMeta();
         this.type = item.getType();
-        this.name = item.getItemMeta().getDisplayName();
+        this.name = item.getItemMeta().getDisplayName().isEmpty() ? Common.normalizeStringName(item.getType().name()) : item.getItemMeta().getDisplayName();
         data = meta != null ? meta.getPersistentDataContainer() : null;
     }
 
