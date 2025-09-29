@@ -1,6 +1,6 @@
 # SingularityLib
 
-A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
+A fork of [ExperienceLib](https://github.com/pinont/Experiences-Lib)
 
 > ## ⚠️ Disclaimer
 > This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues).
