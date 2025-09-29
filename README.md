@@ -40,14 +40,12 @@ If the library is published to GitHub Packages, add the GitHub repository and de
 ```xml
 <project>
   ...
-  <repositories>
     <repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  </repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
   <dependencies>
     <dependency>
@@ -58,6 +56,38 @@ If the library is published to GitHub Packages, add the GitHub repository and de
   </dependencies>
   ...
 </project>
+```
+### Shading Plugin (Important)
+To avoid dependency conflicts with other plugins, it is highly recommended to shade the SingularityLib dependency
+using the Maven Shade Plugin. Here is an example configuration:
+
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.4</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <relocations>
+                            <relocation>
+                                <pattern>com.github.pinont.singularitylib</pattern>
+                                <shadedPattern>your.unique.package.singularitylib</shadedPattern>
+                            </relocation>
+                        </relocations>
+                        <minimizeJar>true</minimizeJar>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
 ```
 
 ## Usage
