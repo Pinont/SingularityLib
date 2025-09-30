@@ -1,0 +1,4 @@
+name: TestPlugin
+version: '2.2.3-SNAPSHOT'
+main: com.github.pinont.singularitylib.TestPlugin
+api-version: '1.21'

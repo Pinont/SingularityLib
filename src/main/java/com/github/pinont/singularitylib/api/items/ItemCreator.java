@@ -1,5 +1,6 @@
 package com.github.pinont.singularitylib.api.items;
 
+import com.github.pinont.singularitylib.api.utils.Console;
 import com.google.common.collect.Sets;
 import com.github.pinont.singularitylib.api.enums.AttributeType;
 import com.github.pinont.singularitylib.api.enums.PersisDataType;
@@ -51,14 +52,6 @@ public class ItemCreator {
         this(new ItemStack(type, amount));
     }
 
-    public ItemCreator(@NotNull Material type, int amount, short damage) {
-        this(new ItemStack(type, amount, damage, null));
-    }
-
-    public ItemCreator(@NotNull Material type, int amount, short damage, Byte data) {
-        this(new ItemStack(type, amount, damage, data));
-    }
-
     public ItemCreator(@NotNull ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
@@ -96,6 +89,7 @@ public class ItemCreator {
     }
 
     public Boolean hasTag(String tag) {
+
         return Objects.requireNonNull(item.getItemMeta()).getPersistentDataContainer().has(new NamespacedKey(plugin, tag), PersistentDataType.STRING);
     }
 
@@ -208,13 +202,80 @@ public class ItemCreator {
         return this;
     }
 
-    public ItemCreator setTag(String tag) {
-        data.set(new NamespacedKey(plugin, tag), PersistentDataType.STRING, tag);
+    private void sendTagNamingPatternWarn(String tag) {
+        Console.logWarning("Tag naming pattern warning: '" + tag + "' tag should not contain spaces and should be lowercase. It has been converted to '" + tag.replace(" ", "_").toLowerCase() + "'");
+    }
+
+    private String formatTag(String tag) {
+        String tagFormatted = String.join(" ", tag.replace(" ", "_"));
+        if (!tagFormatted.equals(tag)) {
+            sendTagNamingPatternWarn(tag);
+            tag = tagFormatted;
+        }
+        return tag;
+    }
+
+    public ItemCreator addTags(String... tags) {
+        for (String tag : tags) {
+            tag = formatTag(tag);
+            data.set(new NamespacedKey(plugin, tag), PersistentDataType.STRING, tag);
+        }
         return this;
     }
 
-    public ItemCreator setTag(String key, String value) {
+    public ItemCreator addTag(String key) {
+        key = formatTag(key);
+        addTag(key, key);
+        return this;
+    }
+
+    public ItemCreator addTag(String key, String value) {
+        key = formatTag(key);
         data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, value);
+        return this;
+    }
+
+    public ItemCreator replaceTag(String oldKey, String newKey) {
+        oldKey = formatTag(oldKey);
+        newKey = formatTag(newKey);
+        if (hasTag(oldKey)) {
+            if (oldKey.equals(getTag(oldKey))) {
+                removeTag(oldKey);
+                data.set(new NamespacedKey(plugin, newKey), PersistentDataType.STRING, newKey);
+                return this;
+            }
+            String value = getTagValue(oldKey);
+            removeTag(oldKey);
+            data.set(new NamespacedKey(plugin, newKey), PersistentDataType.STRING, value);
+        } else {
+            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + oldKey);
+        }
+        return this;
+    }
+
+    public String getTagValue(String key) {
+        key = formatTag(key);
+        return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
+    }
+
+    public ItemCreator setTagValue(String key, String newValue) {
+        key = formatTag(key);
+        if (hasTag(key)) {
+            removeTag(key);
+            data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, newValue);
+        } else {
+            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + key);
+        }
+        return this;
+    }
+
+    public ItemCreator removeTag(String tag) {
+        tag = formatTag(tag);
+        if (hasTag(tag)) {
+            data.remove(new NamespacedKey(plugin, tag));
+        } else {
+            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + tag);
+        }
         return this;
     }
 

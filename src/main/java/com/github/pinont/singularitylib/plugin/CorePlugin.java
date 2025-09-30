@@ -29,6 +29,7 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private static String prefix;
     private static Long startTime;
+    public boolean isTest = false;
 
     public static Long getStartTime() {
         return startTime;
@@ -119,9 +120,11 @@ public abstract class CorePlugin extends JavaPlugin {
 //        new CommandManager().register(this, this.simpleCommands);
 
         // Register Command, CustomItem, and Listeners.
-        Register register = new Register();
-        register.scanAndCollect(this.getClass().getPackageName());
-        register.registerAll(this);
+        if (!isTest) {
+            Register register = new Register();
+            register.scanAndCollect(this.getClass().getPackageName());
+            register.registerAll(this);
+        }
     }
 
     private void registerAPIListener(Plugin plugin, Listener... listener) {
