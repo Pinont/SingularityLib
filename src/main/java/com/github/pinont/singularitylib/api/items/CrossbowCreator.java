@@ -12,7 +12,7 @@ public class CrossbowCreator extends ItemCreator {
     }
 
     public ItemCreator addChargedProjectile(ItemStack arrow) {
-        ItemMeta meta = this.getMeta();
+        ItemMeta meta = this.getItemMeta();
         CrossbowMeta crossbowMeta = (CrossbowMeta) meta;
         crossbowMeta.addChargedProjectile(arrow);
         this.setItemMeta(meta);
