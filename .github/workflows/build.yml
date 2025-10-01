@@ -1,10 +1,11 @@
-name: Build & Test (No Deploy)
+name: Build & Test
 
 on:
   pull_request:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build:
