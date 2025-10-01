@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -17,7 +18,7 @@ import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
 public class Common {
 
-    public @NotNull Component colorize(String message, boolean noItalic) {
+    public @NotNull Component colorize(@NotNull String message, boolean noItalic) {
         MiniMessage miniMessage = MiniMessage.miniMessage();
         if (noItalic) {
             message = "<!italic>" + message;
@@ -25,7 +26,7 @@ public class Common {
         return miniMessage.deserialize(message);
     }
 
-    public @NotNull Component colorize(String message) {
+    public @NotNull Component colorize(@NotNull String message) {
         return colorize(message, false);
     }
 
