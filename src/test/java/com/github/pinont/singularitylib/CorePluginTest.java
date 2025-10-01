@@ -6,14 +6,11 @@ import org.mockbukkit.mockbukkit.ServerMock;
 
 public class CorePluginTest {
 
-    private ServerMock server;
-    private TestPlugin plugin;
+    public TestPlugin plugin;
 
     @BeforeEach
     public void setUp() {
-        // Start the mock server
-        this.server = MockBukkit.mock();
-        // Load your plugin
+        MockBukkit.mock();
         this.plugin = MockBukkit.load(TestPlugin.class);
     }
 
