@@ -1,10 +1,10 @@
 package com.github.pinont.singularitylib.api.items;
 
-import com.github.pinont.singularitylib.api.utils.Console;
-import com.google.common.collect.Sets;
 import com.github.pinont.singularitylib.api.enums.AttributeType;
 import com.github.pinont.singularitylib.api.enums.PersisDataType;
 import com.github.pinont.singularitylib.api.utils.Common;
+import com.github.pinont.singularitylib.api.utils.Console;
+import com.google.common.collect.Sets;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
