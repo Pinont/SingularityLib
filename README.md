@@ -47,7 +47,7 @@ If the library is published to GitHub Packages, add the GitHub repository and de
 
   <dependencies>
     <dependency>
-	    <groupId>io.github.pinont</groupId>
+	    <groupId>com.github.pinont</groupId>
 	    <artifactId>SingularityLib</artifactId>
 	    <version>Tag</version>
 	</dependency>
