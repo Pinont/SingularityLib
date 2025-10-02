@@ -8,16 +8,34 @@ import java.util.Objects;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
+/**
+ * Manager class for creating, loading, and managing worlds.
+ * Provides functionality for world creation with custom settings and world persistence.
+ */
 public final class WorldManager {
 
     private final String worldName;
 
     private static final ConfigManager worldConfig = new ConfigManager("devTools", "worlds.yml");
 
+    /**
+     * Creates a new WorldManager for the specified world.
+     *
+     * @param worldName the name of the world to manage
+     */
     public WorldManager(String worldName) {
         this.worldName = worldName;
     }
 
+    /**
+     * Creates a new world with the specified parameters.
+     *
+     * @param worldType the type of world to create
+     * @param environment the environment type (normal, nether, end)
+     * @param generateStructures whether to generate structures
+     * @param borderSize the world border size
+     * @param difficulty the world difficulty
+     */
     public void create(WorldType worldType, World.Environment environment, boolean generateStructures, int borderSize, Difficulty difficulty) {
         WorldCreator worldCreator = new WorldCreator(worldName);
         worldCreator.type(worldType);
@@ -26,6 +44,16 @@ public final class WorldManager {
         createWorld(borderSize, difficulty, worldCreator);
     }
 
+    /**
+     * Creates a new world with the specified parameters including a custom seed.
+     *
+     * @param worldType the type of world to create
+     * @param environment the environment type (normal, nether, end)
+     * @param generateStructures whether to generate structures
+     * @param borderSize the world border size
+     * @param difficulty the world difficulty
+     * @param seed the world seed for generation
+     */
     public void create(WorldType worldType, World.Environment environment, boolean generateStructures, int borderSize, Difficulty difficulty, long seed) {
         WorldCreator worldCreator = new WorldCreator(worldName);
         worldCreator.type(worldType);
@@ -46,6 +74,9 @@ public final class WorldManager {
         setWorldConfig();
     }
 
+    /**
+     * Sets the world configuration in the config file.
+     */
     public void setWorldConfig() {
         World world = Bukkit.getWorld(worldName);
         assert world != null;
@@ -69,14 +100,27 @@ public final class WorldManager {
         worldConfig.saveConfig();
     }
 
+    /**
+     * Saves the world to disk.
+     */
     public void saveWorld() {
         setWorldConfig();
     }
 
+    /**
+     * Loads a world by name.
+     *
+     * @param worldName the name of the world to load
+     */
     public static void load(String worldName) {
         Bukkit.createWorld(WorldCreator.name(worldName));
     }
 
+    /**
+     * Unloads a world by name.
+     *
+     * @param worldName the name of the world to unload
+     */
     public static void unload(String worldName) {
         World world = Bukkit.getWorld(worldName);
         if (world != null) {
@@ -84,6 +128,12 @@ public final class WorldManager {
         }
     }
 
+    /**
+     * Deletes a world by name.
+     *
+     * @param worldName the name of the world to delete
+     * @return true if the world was successfully marked for deletion, false otherwise
+     */
     public static Boolean delete(String worldName) {
         World world = Bukkit.getWorld(worldName);
         if (worldConfig.get(worldName) != null) {
@@ -102,6 +152,12 @@ public final class WorldManager {
         return true;
     }
 
+    /**
+     * Gets a world by name.
+     *
+     * @param worldName the name of the world to get
+     * @return the World object, or null if not found
+     */
     public static World getWorld(String worldName) {
         if (Bukkit.getWorld(worldName) == null && worldConfig.get(worldName) != null) {
             return Bukkit.createWorld(WorldCreator.name(worldName));
@@ -109,6 +165,9 @@ public final class WorldManager {
         return null;
     }
 
+    /**
+     * Automatically loads worlds from configuration.
+     */
     public static void autoLoadWorlds() {
         if (ConfigManager.isExists("devTools", "worlds.yml"))
             for (String worldName : worldConfig.getConfig().getKeys(false)) {
@@ -119,19 +178,11 @@ public final class WorldManager {
             }
     }
 
-//    public static void reloadWorlds() {
-//        World[] worlds = Bukkit.getWorlds().toArray(World[]::new);
-//        for (World world : worlds) {
-//            assert world != null;
-//            setWorldFromConfig(world);
-//        }
-//    }
-
-//    public static void importWorld(String name) {
-//        Bukkit.getLogger().info("Importing world " + name);
-//        World world = Bukkit.createWorld(WorldCreator.name(name));
-//    }
-
+    /**
+     * Applies world settings from configuration to the specified world.
+     *
+     * @param world the world to apply settings to
+     */
     public static void setWorldFromConfig(World world) {
         String worldName = world.getName();
         ConfigurationSection section = worldConfig.getConfig().getConfigurationSection(worldName);

@@ -1,5 +1,6 @@
-package com.github.pinont.singularitylib;
+package com.github.pinont.singularitylib.plugins;
 
+import com.github.pinont.singularitylib.TestPlugin;
 import org.junit.jupiter.api.*;
 import org.mockbukkit.mockbukkit.MockBukkit;
 

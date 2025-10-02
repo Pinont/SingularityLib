@@ -26,8 +26,23 @@ import java.util.Objects;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.*;
 
+/**
+ * Event listener for handling player interactions and menu operations.
+ * Manages item interactions, inventory clicks, and player join/leave events.
+ */
 public class PlayerListener implements Listener {
 
+    /**
+     * Default constructor for PlayerListener.
+     */
+    public PlayerListener() {
+    }
+
+    /**
+     * Handles player interaction events for custom item interactions.
+     *
+     * @param event the player interact event
+     */
     @EventHandler
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -54,6 +69,11 @@ public class PlayerListener implements Listener {
         }
     }
 
+    /**
+     * Handles inventory click events for menu interactions.
+     *
+     * @param event the inventory click event
+     */
     @EventHandler
     public void inventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -72,6 +92,11 @@ public class PlayerListener implements Listener {
         }
     }
 
+    /**
+     * Handles recipe book click events.
+     *
+     * @param event the recipe book click event
+     */
     @EventHandler
     public void recipeOpen(PlayerRecipeBookClickEvent event) {
         Player player = event.getPlayer();
@@ -81,6 +106,11 @@ public class PlayerListener implements Listener {
         }
     }
 
+    /**
+     * Handles inventory close events for menu cleanup.
+     *
+     * @param event the inventory close event
+     */
     @EventHandler
     public void inventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
@@ -90,12 +120,22 @@ public class PlayerListener implements Listener {
         removePlayerMetadata(player, getInstance(), "Menu", "god");
     }
 
+    /**
+     * Handles player quit events.
+     *
+     * @param event the player quit event
+     */
     @EventHandler
     public void playerLeave(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         removePlayerMetadata(player, getInstance(), "Menu", "DevTool");
     }
 
+    /**
+     * Handles player join events.
+     *
+     * @param event the player join event
+     */
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
@@ -105,6 +145,11 @@ public class PlayerListener implements Listener {
         removePlayerMetadata(player, getInstance(), "Menu", "DevTool");
     }
 
+    /**
+     * Handles food level change events.
+     *
+     * @param event the food level change event
+     */
     @EventHandler
     public void hungerChange(FoodLevelChangeEvent event) {
         if (event.getEntity() instanceof Player player) {

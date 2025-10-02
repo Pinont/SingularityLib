@@ -7,6 +7,7 @@ import com.github.pinont.singularitylib.api.manager.CommandManager;
 import com.github.pinont.singularitylib.api.manager.CustomItemManager;
 import com.github.pinont.singularitylib.api.utils.Console;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.reflections.Reflections;
@@ -16,12 +17,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+
+/**
+ * Class for automatically registering annotated components.
+ * Scans packages for classes annotated with @AutoRegister and registers them appropriately.
+ */
 public class Register {
 
     private final Set<Listener> listeners = new HashSet<>();
     private final List<SimpleCommand> commands = new ArrayList<>();
     private final List<CustomItem> customItems = new ArrayList<>();
 
+    /**
+     * Default constructor for Register.
+     */
+    public Register() {
+    }
+
+    /**
+     * Scans the specified package for annotated classes and collects them for registration.
+     *
+     * @param packageName the package name to scan
+     */
     public void scanAndCollect(String packageName) {
         Reflections reflections = new Reflections(packageName);
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AutoRegister.class);
@@ -39,18 +57,23 @@ public class Register {
                     customItems.add((CustomItem) instance);
                 }
             } catch (NoSuchMethodException e) {
-                Console.logError("No default constructor found for class: " + clazz.getName());
+                Console.logError(ChatColor.RED + "No default constructor found for class: " + clazz.getName());
             } catch (InstantiationException e) {
-                Console.logError("Failed to instantiate class: " + clazz.getName());
+                Console.logError(ChatColor.RED + "Failed to instantiate class: " + clazz.getName());
             } catch (IllegalAccessException e) {
-                Console.logError("Illegal access while instantiating class: " + clazz.getName());
+                Console.logError(ChatColor.RED + "Illegal access while instantiating class: " + clazz.getName());
             } catch (Exception e) {
-                Console.logError("Unexpected error while processing class: " + clazz.getName());
-                Console.logError(e.getMessage());
+                Console.logError(ChatColor.RED + "Unexpected error while processing class: " + clazz.getName());
+                Console.logError(ChatColor.RED + e.getMessage());
             }
         }
     }
 
+    /**
+     * Registers all collected components with the specified plugin.
+     *
+     * @param plugin the plugin to register components with
+     */
     public void registerAll(Plugin plugin) {
         // Register listeners
         for (Listener listener : listeners) {
@@ -66,14 +89,29 @@ public class Register {
         new CustomItemManager().register(customItems);
     }
 
+    /**
+     * Gets the collected listeners.
+     *
+     * @return set of listeners
+     */
     public Set<Listener> getListeners() {
         return listeners;
     }
 
+    /**
+     * Gets the collected commands.
+     *
+     * @return list of commands
+     */
     public List<SimpleCommand> getCommands() {
         return commands;
     }
 
+    /**
+     * Gets the collected custom items.
+     *
+     * @return list of custom items
+     */
     public List<CustomItem> getCustomItems() {
         return customItems;
     }

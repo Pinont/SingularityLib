@@ -16,6 +16,10 @@ import java.util.Objects;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
+/**
+ * Class for creating and managing custom inventory menus.
+ * Provides functionality to create interactive GUIs with buttons and layouts.
+ */
 public class Menu {
 
     private final String title;
@@ -24,27 +28,59 @@ public class Menu {
     private final ArrayList<Layout> layouts = new ArrayList<>();
     private final ArrayList<Button> buttons = new ArrayList<>();
 
+    /**
+     * Gets the list of buttons in this menu.
+     *
+     * @return the list of buttons
+     */
     public ArrayList<Button> getButtons() {
         return buttons;
     }
 
+    /**
+     * Creates a new Menu with the specified title and automatic size.
+     *
+     * @param title the title of the menu
+     */
     public Menu(String title) {
         this(title, -1);
     }
 
+    /**
+     * Creates a new Menu with the specified title and size.
+     *
+     * @param title the title of the menu
+     * @param size the size of the menu inventory
+     */
     public Menu(String title, int size) {
         this.title = title;
         this.size = size;
     }
 
+    /**
+     * Gets the title of this menu.
+     *
+     * @return the menu title
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Gets the size of this menu.
+     *
+     * @return the menu size
+     */
     public int getSize() {
         return size;
     }
 
+    /**
+     * Sets the layout pattern for this menu using string patterns.
+     *
+     * @param layout the layout strings defining the menu structure
+     * @return this Menu for method chaining
+     */
     public Menu setLayout(String... layout) {
         String[] split = String.join("", layout).split("");
         for (String s : split) {
@@ -56,20 +92,42 @@ public class Menu {
         return this;
     }
 
+    /**
+     * Gets the layout pattern of this menu.
+     *
+     * @return the layout pattern as a list of strings
+     */
     public ArrayList<String> getLayout() {
         return patternLayout;
     }
 
+    /**
+     * Sets the layout keys that map characters to buttons.
+     *
+     * @param layouts the layout mappings
+     * @return this Menu for method chaining
+     */
     public Menu setKey(Layout... layouts) {
         this.layouts.addAll(Arrays.asList(layouts));
         return this;
     }
 
+    /**
+     * Adds a button to this menu.
+     *
+     * @param button the button to add
+     * @return this Menu for method chaining
+     */
     public Menu addButton(Button button) {
         this.buttons.add(button);
         return this;
     }
 
+    /**
+     * Shows this menu to the specified player.
+     *
+     * @param player the player to show the menu to
+     */
     public void show(Player player) {
         Inventory inventory;
         if (size == -1 && patternLayout.isEmpty()) {

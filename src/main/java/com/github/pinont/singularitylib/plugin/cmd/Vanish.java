@@ -6,8 +6,18 @@ import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
 
+/**
+ * Command for toggling player vanish mode.
+ * Allows players to become invisible to other players.
+ */
 @Deprecated(since = "2.1.0", forRemoval = true)
 public class Vanish implements SimpleCommand {
+    /**
+     * Default constructor for Vanish command.
+     */
+    public Vanish() {
+    }
+
     @Override
     public String getName() {
         return "vanish:v";

@@ -26,10 +26,23 @@ import java.util.*;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getAPIVersion;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
+/**
+ * Developer tool for testing and debugging plugin functionality.
+ * Provides a comprehensive interface for developers to test various features
+ * including world management, teleportation, and other debugging utilities.
+ *
+ * @deprecated since 2.1.0, will be removed in future versions
+ */
 @Deprecated(since = "2.1.0", forRemoval = true)
 public class DevTool extends CustomItem implements SimpleCommand, Listener {
 
     private final String version = getAPIVersion();
+
+    /**
+     * Default constructor for DevTool.
+     */
+    public DevTool() {
+    }
 
     @Override
     public ItemCreator register() {
@@ -53,6 +66,11 @@ public class DevTool extends CustomItem implements SimpleCommand, Listener {
         );
     }
 
+    /**
+     * Opens the developer tool interface for the specified player.
+     *
+     * @param player the player to open the interface for
+     */
     public void openDevTool(Player player) {
         Menu devMenu = new Menu(ChatColor.DARK_RED + "Developer Tools " + ChatColor.GRAY + "(" + version + ")", 9*5);
         devMenu.setLayout("=========", "====i====", "=========", "==w=p=t==", "=========");
@@ -248,18 +266,81 @@ public class DevTool extends CustomItem implements SimpleCommand, Listener {
         getWorldCreatorMenu(null, World.Environment.NORMAL, WorldType.NORMAL, true, 1000, Difficulty.EASY, new Random().nextLong(System.currentTimeMillis())).show(player);
     }
 
+    /**
+     * Shows the world creator interface with specified parameters.
+     *
+     * @param player the player to show the interface to
+     * @param world_name the name of the world to create
+     * @param environment the world environment type
+     * @param worldType the world type
+     * @param generate_structure whether to generate structures
+     * @param borderSize the world border size
+     * @param difficulty the world difficulty
+     * @param seed the world seed
+     */
     public void showWorldCreator(Player player, String world_name, World.Environment environment, WorldType worldType, boolean generate_structure, int borderSize, Difficulty difficulty, long seed) {
         getWorldCreatorMenu(world_name, environment, worldType, generate_structure, borderSize, difficulty, seed).show(player);
     }
 
+    /**
+     * Interface for capturing world creator content and user input.
+     * Used to maintain state during world creation process when players input values via chat.
+     */
     public interface WorldCreatorContent {
+        /**
+         * Gets the type of input content being processed.
+         *
+         * @return the input content type
+         */
         String getInputContent();
+
+        /**
+         * Gets the name of the world being created.
+         *
+         * @return the world name
+         */
         String getWorldName();
+
+        /**
+         * Gets the world environment type.
+         *
+         * @return the world environment
+         */
         World.Environment getEnvironment();
+
+        /**
+         * Gets the world type for generation.
+         *
+         * @return the world type
+         */
         WorldType getWorldType();
+
+        /**
+         * Gets whether structures should be generated in the world.
+         *
+         * @return true if structures should be generated, false otherwise
+         */
         boolean getGenerateStructure();
+
+        /**
+         * Gets the world border size.
+         *
+         * @return the border size in blocks
+         */
         int getBorderSize();
+
+        /**
+         * Gets the world difficulty setting.
+         *
+         * @return the difficulty level
+         */
         Difficulty getDifficulty();
+
+        /**
+         * Gets the world seed for generation.
+         *
+         * @return the world seed
+         */
         Long getSeed();
     }
 
@@ -991,8 +1072,8 @@ public class DevTool extends CustomItem implements SimpleCommand, Listener {
                 new Layout() {
                     @Override
                     public char getKey() {
-                        return 'o';
-                    } // op Player
+                        return 'o'; // op Player
+                    }
 
                     @Override
                     public Button getButton() {
@@ -1002,8 +1083,8 @@ public class DevTool extends CustomItem implements SimpleCommand, Listener {
                 new Layout() {
                     @Override
                     public char getKey() {
-                        return 'n';
-                    } // invincibility
+                        return 'n'; // invincibility
+                    }
 
                     @Override
                     public Button getButton() {
@@ -1182,6 +1263,12 @@ public class DevTool extends CustomItem implements SimpleCommand, Listener {
                 ).show(origin);
     }
 
+    /**
+     * Handles player chat events for world creator input.
+     * Processes user input for world creation parameters when players are in world creator mode.
+     *
+     * @param event the player chat event
+     */
     @EventHandler
     public void sendChat(PlayerChatEvent event) {
         Player player = event.getPlayer();

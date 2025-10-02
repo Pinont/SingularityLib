@@ -9,8 +9,20 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Command for setting player flying speed.
+ * Allows players to adjust their flying speed or reset it to default.
+ *
+ * @deprecated since 2.1.0, will be removed in future versions
+ */
 @Deprecated(since = "2.1.0", forRemoval = true)
 public class FlySpeed implements SimpleCommand {
+
+    /**
+     * Default constructor for FlySpeed command.
+     */
+    public FlySpeed() {
+    }
 
     @Override
     public String getName() {

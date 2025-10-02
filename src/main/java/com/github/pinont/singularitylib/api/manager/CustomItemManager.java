@@ -17,14 +17,38 @@ import java.util.*;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
+/**
+ * Manages custom items and provides a give command for them.
+ * This class handles registration of custom items and provides functionality
+ * to give items to players through commands.
+ */
 public class CustomItemManager implements SimpleCommand {
 
+    /**
+     * List of registered custom items.
+     */
     public List<CustomItem> customItems = new ArrayList<>();
 
+    /**
+     * Default constructor for CustomItemManager.
+     */
+    public CustomItemManager() {
+    }
+
+    /**
+     * Gets the list of registered custom items.
+     *
+     * @return the list of custom items
+     */
     public List<CustomItem> getCustomItems() {
         return customItems;
     }
 
+    /**
+     * Registers a list of custom items with the manager.
+     *
+     * @param item the list of custom items to register
+     */
     public void register(List<CustomItem> item) {
         if (item.isEmpty()) return;
         sendConsoleMessage("Registering " + item.size() + " custom items");

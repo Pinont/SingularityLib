@@ -13,12 +13,31 @@ import java.util.List;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getStartTime;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
+/**
+ * Manages the registration of commands for the plugin.
+ * This class handles the registration of SimpleCommand instances and their aliases
+ * during the plugin's lifecycle events.
+ */
 public class CommandManager {
 
     private int success = 0;
     private int failure = 0;
     private int target_amount = 0;
 
+    /**
+     * Default constructor for CommandManager.
+     */
+    public CommandManager() {
+    }
+
+    /**
+     * Registers a list of SimpleCommand instances with the plugin.
+     * This method registers commands and their aliases during the COMMANDS lifecycle event.
+     * It tracks registration success and failure counts and provides console feedback.
+     *
+     * @param plugin the plugin instance to register commands for
+     * @param simpleCommands the list of SimpleCommand instances to register
+     */
     public void register(Plugin plugin, List<SimpleCommand> simpleCommands) {
         final LifecycleEventManager<@NotNull Plugin> lifecycleManager = plugin.getLifecycleManager();
         sendConsoleMessage(ChatColor.WHITE + "Registering Commands: " + Arrays.toString(simpleCommands.stream().map(SimpleCommand::getName).toArray()));

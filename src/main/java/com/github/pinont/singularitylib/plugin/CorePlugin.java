@@ -16,25 +16,55 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Abstract base class for plugins using the SingularityLib framework.
+ * This class provides core functionality including configuration management,
+ * command registration, and plugin lifecycle management.
+ */
 public abstract class CorePlugin extends JavaPlugin {
     private static CorePlugin instance;
+
+    /**
+     * Default constructor for CorePlugin.
+     */
+    public CorePlugin() {
+    }
 
     public @NotNull FileConfiguration getConfig() {
         return new ConfigManager("config.yml").getConfig();
     }
 
+    /**
+     * Gets the configuration manager for the main config file.
+     *
+     * @return the ConfigManager instance for config.yml
+     */
     public @NotNull ConfigManager getConfigManager() {
         return new ConfigManager("config.yml");
     }
 
     private static String prefix;
     private static Long startTime;
+
+    /**
+     * Flag indicating if the plugin is running in test mode.
+     */
     public boolean isTest = false;
 
+    /**
+     * Gets the time when the plugin started loading.
+     *
+     * @return the start time in milliseconds
+     */
     public static Long getStartTime() {
         return startTime;
     }
 
+    /**
+     * Gets the plugin's console message prefix.
+     *
+     * @return the formatted prefix string
+     */
     public static String getPrefix() {
         if (prefix == null) {
             return "[" + getInstance().getName() + "]";
@@ -45,6 +75,11 @@ public abstract class CorePlugin extends JavaPlugin {
         return prefix;
     }
 
+    /**
+     * Sends a message to the console with the plugin prefix.
+     *
+     * @param message the message to send
+     */
     public static void sendConsoleMessage(String message) {
         Bukkit.getConsoleSender().sendMessage(getPrefix() + " " + message);
     }
@@ -53,6 +88,11 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private final List<Listener> listeners = new ArrayList<>();
 
+    /**
+     * Gets the current API version.
+     *
+     * @return the API version string
+     */
     public static String getAPIVersion() {
         String version = new ConfigManager("api-version.yml").getConfig().getString("version");
 //        String version = "1.0.0";
@@ -61,6 +101,12 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private ConfigManager pluginConfig;
 
+    /**
+     * Gets the singleton instance of the plugin.
+     *
+     * @return the plugin instance
+     * @throws IllegalStateException if the plugin instance cannot be retrieved
+     */
     public static JavaPlugin getInstance() {
         if (instance == null) {
             try {
@@ -76,6 +122,11 @@ public abstract class CorePlugin extends JavaPlugin {
         return instance;
     }
 
+    /**
+     * Sends a debug message to the console if debug mode is enabled.
+     *
+     * @param message the debug message to send
+     */
     public static void sendDebugMessage(String message) {
         if (getInstance().getConfig().getBoolean("debug")) {
             Bukkit.getConsoleSender().sendMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + getPrefix() + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
@@ -134,12 +185,24 @@ public abstract class CorePlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * Registers commands with the plugin.
+     *
+     * @param simpleCommand the commands to register
+     * @deprecated Use the automatic registration system instead
+     */
     @Deprecated
     public void registerCommand(SimpleCommand... simpleCommand) {
         this.simpleCommands.addAll(List.of(simpleCommand));
     }
 
+    /**
+     * Called when the plugin starts. Implement this method to add plugin-specific startup logic.
+     */
     public abstract void onPluginStart();
 
+    /**
+     * Called when the plugin stops. Implement this method to add plugin-specific shutdown logic.
+     */
     public abstract void onPluginStop();
 }

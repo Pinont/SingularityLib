@@ -11,8 +11,15 @@ import java.util.Collections;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
+/**
+ * Abstract base class for Discord bot applications using JDA (Java Discord API).
+ * Provides a framework for creating Discord bots with slash command support and configuration management.
+ */
 public abstract class DiscordApp {
 
+    /**
+     * List of registered slash commands for the Discord bot.
+     */
     public final ArrayList<SimpleSlashCommands> slashCommands = new ArrayList<>();
     private final boolean multiThread;
     private final ConfigManager configManager;
@@ -20,21 +27,39 @@ public abstract class DiscordApp {
     private Thread jdaThread;
     private JDA jda;
 
+    /**
+     * Creates a new DiscordApp with single-threaded execution.
+     *
+     * @param configPath the path to the bot configuration file
+     */
     public DiscordApp(String configPath) {
         this(configPath, false);
     }
 
+    /**
+     * Creates a new DiscordApp with specified threading configuration.
+     *
+     * @param configPath the path to the bot configuration file
+     * @param multiThread whether to run the bot in a separate thread
+     */
     public DiscordApp(String configPath, boolean multiThread) {
         this.configPath = configPath;
         configManager = new ConfigManager(configPath);
         this.multiThread = multiThread;
     }
 
+    /**
+     * Reloads the bot configuration and restarts the bot.
+     */
     public void reloadConfig() {
         shutdown();
         start();
     }
 
+    /**
+     * Starts the Discord bot with the configured settings.
+     * If multi-threading is enabled, the bot will run in a separate thread.
+     */
     public final void start() {
         String token = getToken();
         if (multiThread) {
@@ -71,6 +96,10 @@ public abstract class DiscordApp {
         jda = bot.build();
     }
 
+    /**
+     * Shuts down the Discord bot and cleans up resources.
+     * If running in multi-threaded mode, waits for the thread to complete.
+     */
     public final void shutdown() {
         onShutdown();
         if (multiThread) {
@@ -86,13 +115,29 @@ public abstract class DiscordApp {
         }
     }
 
+    /**
+     * Adds slash commands to the bot.
+     *
+     * @param commands the slash commands to add
+     */
     public void addCommands(SimpleSlashCommands... commands) {
         Collections.addAll(slashCommands, commands);
     }
 
+    /**
+     * Called when the bot is starting up. Override this method to add startup logic.
+     */
     public abstract void onStartup();
 
+    /**
+     * Called when the bot is ready and connected to Discord.
+     *
+     * @param event the ready event from Discord
+     */
     public abstract void onAppReady(ReadyEvent event);
 
+    /**
+     * Called when the bot is shutting down. Override this method to add cleanup logic.
+     */
     public abstract void onShutdown();
 }

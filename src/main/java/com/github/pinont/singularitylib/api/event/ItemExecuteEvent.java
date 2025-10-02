@@ -14,6 +14,10 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
+/**
+ * Event that is fired when a player executes an item interaction.
+ * This event allows for listening to and potentially cancelling item interactions.
+ */
 public class ItemExecuteEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
@@ -23,6 +27,13 @@ public class ItemExecuteEvent extends Event implements Cancellable {
     private final Action action;
     private boolean isCancelled;
 
+    /**
+     * Creates a new ItemExecuteEvent.
+     *
+     * @param event the original PlayerInteractEvent
+     * @param item the ItemStack that was interacted with
+     * @param interaction the ItemInteraction that will be executed
+     */
     public ItemExecuteEvent(PlayerInteractEvent event, ItemStack item, ItemInteraction interaction) {
         this.player = event.getPlayer();
         this.item = item;
@@ -30,6 +41,11 @@ public class ItemExecuteEvent extends Event implements Cancellable {
         this.action = event.getAction();
     }
 
+    /**
+     * Gets the handler list for this event.
+     *
+     * @return the handler list
+     */
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
@@ -40,6 +56,10 @@ public class ItemExecuteEvent extends Event implements Cancellable {
         return !isCancelled();
     }
 
+    /**
+     * Executes the item interaction if the event is not cancelled.
+     * Will consume the item if the player is not in creative mode.
+     */
     public void execute() {
         if (callEvent()) {
             if (interaction.getAction().contains(getAction())) {
@@ -52,18 +72,38 @@ public class ItemExecuteEvent extends Event implements Cancellable {
         }
     }
 
+    /**
+     * Gets the player who triggered this event.
+     *
+     * @return the player
+     */
     public Player getPlayer() {
         return this.player;
     }
 
+    /**
+     * Gets the ItemStack that was interacted with.
+     *
+     * @return the ItemStack
+     */
     public ItemStack getItem() {
         return this.item;
     }
 
+    /**
+     * Gets the ItemInteraction that will be executed.
+     *
+     * @return the ItemInteraction
+     */
     public ItemInteraction getInteraction() {
         return this.interaction;
     }
 
+    /**
+     * Gets the action that triggered this event.
+     *
+     * @return the Action
+     */
     public Action getAction() {
         return this.action;
     }
@@ -79,7 +119,7 @@ public class ItemExecuteEvent extends Event implements Cancellable {
     }
 
     @Override
-    public void setCancelled(boolean b) {
-        this.isCancelled = b;
+    public void setCancelled(boolean cancel) {
+        this.isCancelled = cancel;
     }
 }

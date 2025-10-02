@@ -1,4 +1,4 @@
-package com.github.pinont.singularitylib.items;
+package com.github.pinont.singularitylib.api.items;
 
 import com.github.pinont.singularitylib.TestPlugin;
 import com.github.pinont.singularitylib.api.items.ItemCreator;

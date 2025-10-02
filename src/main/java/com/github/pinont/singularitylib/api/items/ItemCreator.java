@@ -26,6 +26,10 @@ import java.util.*;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
+/**
+ * Builder class for creating and modifying ItemStacks with enhanced functionality.
+ * Provides a fluent API for setting item properties, adding enchantments, lore, tags, and interactions.
+ */
 public class ItemCreator {
 
     private final Common common = new Common();
@@ -41,6 +45,11 @@ public class ItemCreator {
     private static final Set<ItemInteraction> ITEM_INTERACTIONS = Sets.newHashSet();
     private final String name;
 
+    /**
+     * Gets all registered item interactions.
+     *
+     * @return set of all item interactions
+     */
     public static Set<ItemInteraction> getInteractions() {
         return ITEM_INTERACTIONS;
     }
@@ -49,14 +58,30 @@ public class ItemCreator {
         return new ItemCreator(this.create());
     }
 
+    /**
+     * Creates a new ItemCreator for the specified material type.
+     *
+     * @param type the material type for the item
+     */
     public ItemCreator(Material type) {
         this(new ItemStack(type));
     }
 
+    /**
+     * Creates a new ItemCreator for the specified material type and amount.
+     *
+     * @param type the material type for the item
+     * @param amount the amount of items in the stack
+     */
     public ItemCreator(Material type, int amount) {
         this(new ItemStack(type, amount));
     }
 
+    /**
+     * Creates a new ItemCreator from an existing ItemStack.
+     *
+     * @param item the ItemStack to create from
+     */
     public ItemCreator(@NotNull ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
@@ -66,22 +91,47 @@ public class ItemCreator {
         data = meta != null ? meta.getPersistentDataContainer() : null;
     }
 
+    /**
+     * Gets the display name of the item.
+     *
+     * @return the display name
+     */
     public String getName() {
         return this.create().getItemMeta().getDisplayName();
     }
 
+    /**
+     * Gets the ItemMeta of the item.
+     *
+     * @return the ItemMeta
+     */
     public ItemMeta getItemMeta() {
         return this.create().getItemMeta();
     }
 
+    /**
+     * Gets the material type of the item.
+     *
+     * @return the material type
+     */
     public Material getType() {
         return this.create().getType();
     }
 
+    /**
+     * Gets the amount of items in the stack.
+     *
+     * @return the amount
+     */
     public int getAmount() {
         return this.create().getAmount();
     }
 
+    /**
+     * Creates the final ItemStack with all applied properties.
+     *
+     * @return the created ItemStack
+     */
     public ItemStack create() {
         this.item.setType(type);
         if (this.meta == null) {this.meta = this.item.getItemMeta();}
@@ -94,24 +144,54 @@ public class ItemCreator {
         return this.item;
     }
 
+    /**
+     * Checks if the item has a specific tag.
+     *
+     * @param tag the tag to check for
+     * @return true if the item has the tag, false otherwise
+     */
     public Boolean hasTag(String tag) {
         return data.has(new NamespacedKey(plugin, tag), PersistentDataType.STRING);
     }
 
+    /**
+     * Gets the value of a specific key from the item's tags.
+     *
+     * @param key the key to get the value for
+     * @return the value associated with the key
+     */
     public String getKey(String key) {
         return getTagValue(key);
     }
 
+    /**
+     * Adds lore to the item.
+     *
+     * @param lore the lore text to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addLore(String lore) {
         this.lore.add(common.colorize(lore));
         return this;
     }
 
+    /**
+     * Sets the ItemMeta for the item.
+     *
+     * @param meta the ItemMeta to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setItemMeta(ItemMeta meta) {
         this.meta = meta;
         return this;
     }
 
+    /**
+     * Gets the interaction associated with the given ItemStack.
+     *
+     * @param item the ItemStack to get the interaction for
+     * @return the ItemInteraction, or null if none found
+     */
     public static ItemInteraction getInteraction(ItemStack item) {
         String id = getItemInteractionName(item);
         if (id == null) {
@@ -127,11 +207,23 @@ public class ItemCreator {
         return null;
     }
 
+    /**
+     * Sets the material type of the item.
+     *
+     * @param type the material type to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setType(Material type) {
         this.type = type;
         return this;
     }
 
+    /**
+     * Adds item flags to hide certain item properties.
+     *
+     * @param flags the item flags to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addItemFlag(ItemFlag... flags) {
         for (ItemFlag flag : flags) {
             meta.addItemFlags(flag);
@@ -139,6 +231,12 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Sets whether the item can be moved in inventories.
+     *
+     * @param b true if the item cannot be moved, false otherwise
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setCannotMove(boolean b) {
         if (b) {
             this.setDataContainer("cannot_move", "true", PersisDataType.STRING);
@@ -146,15 +244,33 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Sets the amount of items in the stack.
+     *
+     * @param amount the amount to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setAmount(int amount) {
         this.amount = Math.max(amount, 1);
         return this;
     }
 
+    /**
+     * Sets the display name of the item.
+     *
+     * @param name the display name to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setName(@Nullable String name) {
         return this.setName(common.colorize(name != null ? name : ""));
     }
 
+    /**
+     * Sets the display name of the item using a Component.
+     *
+     * @param name the Component display name to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setName(@Nullable Component name) {
         if (name == null) name = common.colorize("");
         meta.displayName(name);
@@ -162,41 +278,94 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Sets the durability of the item.
+     *
+     * @param durability the durability value
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setDurability(short durability) {
         this.durability = durability;
         return this;
     }
 
+    /**
+     * Sets whether the item is unbreakable.
+     *
+     * @param unbreakable true if the item should be unbreakable, false otherwise
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setUnbreakable(boolean unbreakable) {
         meta.setUnbreakable(unbreakable);
         return this;
     }
 
+    /**
+     * Adds an enchantment to the item.
+     *
+     * @param enchantment the enchantment to add
+     * @param level the level of the enchantment
+     * @param ignoreLevelRestriction whether to ignore level restrictions
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addEnchant(Enchantment enchantment, int level, boolean ignoreLevelRestriction) {
         meta.addEnchant(enchantment, level, ignoreLevelRestriction);
         return this;
     }
 
+    /**
+     * Adds lore to the item.
+     *
+     * @param lores the lore texts to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addLore(String... lores) {
         this.lore.add(common.colorize(Arrays.toString(lores)));
         return this;
     }
 
+    /**
+     * Adds lore to the item.
+     *
+     * @param lores the lore Components to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addLore(Component... lores) {
         this.lore.addAll(Arrays.asList(lores));
         return this;
     }
 
+    /**
+     * Adds an attribute modifier to the item.
+     *
+     * @param attributeType the type of the attribute to modify
+     * @param amount the amount to modify the attribute by
+     * @param operation the operation to perform (addition, multiplication, etc.)
+     * @param slot the equipment slot this modifier applies to
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addAttribute(AttributeType attributeType, double amount, AttributeModifier.Operation operation, EquipmentSlot slot) {
         meta.addAttributeModifier(attributeType.getAttribute(), new AttributeModifier(UUID.randomUUID(), attributeType.name(), amount, operation, slot));
         return this;
     }
 
+    /**
+     * Sets the item as unstackable.
+     *
+     * @param bool true to make the item unstackable, false otherwise
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setUnstackable(boolean bool) {
         setDataContainer("unstackable", (short) new Random().nextInt(), PersisDataType.SHORT);
         return this;
     }
 
+    /**
+     * Sets the custom model data for the item.
+     *
+     * @param data the custom model data value
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setModelData(int data) {
         meta.setCustomModelData(data);
         return this;
@@ -215,6 +384,12 @@ public class ItemCreator {
         return tag;
     }
 
+    /**
+     * Adds tags to the item.
+     *
+     * @param tags the tags to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addTags(String... tags) {
         for (String tag : tags) {
             String formatTag = formatTag(tag);
@@ -223,18 +398,38 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Adds a single tag to the item.
+     *
+     * @param key the key of the tag to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addTag(String key) {
         String formatTag = formatTag(key);
         addTag(formatTag, key);
         return this;
     }
 
+    /**
+     * Adds a tag with a specific value to the item.
+     *
+     * @param key the key of the tag to add
+     * @param value the value of the tag
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addTag(String key, String value) {
         key = formatTag(key);
         data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, value);
         return this;
     }
 
+    /**
+     * Replaces an existing tag with a new key.
+     *
+     * @param oldKey the current key of the tag
+     * @param newKey the new key to replace with
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator replaceTag(String oldKey, String newKey) {
         oldKey = formatTag(oldKey);
         newKey = formatTag(newKey);
@@ -253,11 +448,24 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Gets the value of a specific tag.
+     *
+     * @param key the key of the tag to get the value from
+     * @return the value of the tag, or null if not present
+     */
     public String getTagValue(String key) {
         key = formatTag(key);
         return data.get(new NamespacedKey(plugin, key), PersistentDataType.STRING);
     }
 
+    /**
+     * Sets the value of a specific tag.
+     *
+     * @param key the key of the tag to set the value for
+     * @param newValue the new value to set
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setTagValue(String key, String newValue) {
         key = formatTag(key);
         if (hasTag(key)) {
@@ -269,6 +477,12 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Removes a tag from the item.
+     *
+     * @param tag the tag to remove
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator removeTag(String tag) {
         tag = formatTag(tag);
         if (hasTag(tag)) {
@@ -279,11 +493,25 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Sets the durability of the item.
+     *
+     * @param durability the durability value
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setDurability(int durability) {
         this.durability = durability < 0 ? 0 : (short) durability;
         return this;
     }
 
+    /**
+     * Gets the persistent data of an item.
+     *
+     * @param item the ItemStack to get data from
+     * @param key the key of the data to get
+     * @param type the PersistentDataType of the data
+     * @return the data value, or null if not present
+     */
     public static Object getItemPersistData(ItemStack item, String key, PersistentDataType type) {
         if (isItemHasPersistData(item, key, type)) {
             ItemMeta meta = item.getItemMeta();
@@ -294,6 +522,14 @@ public class ItemCreator {
         return null;
     }
 
+    /**
+     * Sets data in the item's PersistentDataContainer.
+     *
+     * @param key the key of the data to set
+     * @param value the value to set
+     * @param type the type of the data
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator setDataContainer(String key, Object value, PersisDataType type) {
         switch (type) {
             case STRING:
@@ -340,6 +576,12 @@ public class ItemCreator {
         return null;
     }
 
+    /**
+     * Adds an interaction to the item.
+     *
+     * @param itemInteraction the ItemInteraction to add
+     * @return this ItemCreator for method chaining
+     */
     public ItemCreator addInteraction(ItemInteraction itemInteraction) {
         if (itemInteraction == null) return this;
         ITEM_INTERACTIONS.add(itemInteraction);
@@ -347,7 +589,16 @@ public class ItemCreator {
         return this;
     }
 
+    /**
+     * Checks if the item has persistent data of a specific type.
+     *
+     * @param item the ItemStack to check
+     * @param key the key of the data to check for
+     * @param type the PersistentDataType of the data
+     * @return true if the data exists, false otherwise
+     */
     public static Boolean isItemHasPersistData(ItemStack item, String key, PersistentDataType type) {
         return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(getInstance(), key), type);
     }
 }
+

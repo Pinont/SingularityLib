@@ -181,7 +181,10 @@ class CommonTest {
 
     @Test
     void testGetNearestPlayerNull() {
-        Location location = new Location(MockBukkit.getMock().getWorlds().get(0), 0, 0, 0);
-        assertNull(Common.getNearestPlayer(location, 10));
+        Location location = new Location(server.getWorlds().getFirst(), 0, 0, 0);
+        player.teleport(location.clone().add(100, 100, 100));
+        assertNull(Common.getNearestPlayer(location, 10),
+                "Player is At: x: " + player.getLocation().x() + " y: " + player.getLocation().y() + " z: " + player.getLocation().z() + "\nTesting Location: x: " + location.x() + " y: " + location.y() + " z: " + location.z());
+        player.teleport(location.add(0, 0, 0));
     }
 }

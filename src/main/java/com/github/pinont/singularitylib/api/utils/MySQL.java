@@ -9,9 +9,19 @@ import java.sql.Connection;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
+/**
+ * Utility class for managing MySQL database connections.
+ * Provides functionality to connect to MySQL databases with automatic configuration setup.
+ */
 public class MySQL {
 
     private Connection connection;
+
+    /**
+     * Default constructor for MySQL utility class.
+     */
+    public MySQL() {
+    }
 
     private void defaultConfigSetup(String configPath) {
         ConfigManager configManager = new ConfigManager(configPath);
@@ -26,10 +36,21 @@ public class MySQL {
         sendConsoleMessage(ChatColor.YELLOW + "[DB] Please set the database configuration in database.yml");
     }
 
+    /**
+     * Gets a connection to the database using the default config file.
+     *
+     * @return the database connection, or null if connection failed
+     */
     public Connection getConnection() {
         return getConnection("config.yml");
     }
 
+    /**
+     * Gets a connection to the database using the specified config file.
+     *
+     * @param configPath the path to the configuration file
+     * @return the database connection, or null if connection failed
+     */
     public Connection getConnection(String configPath) {
         ConfigManager configManager = new ConfigManager(configPath);
         FileConfiguration config = configManager.getConfig();
@@ -73,6 +94,11 @@ public class MySQL {
         return connection;
     }
 
+    /**
+     * Initializes the database connection using the specified config file.
+     *
+     * @param configPath the path to the configuration file
+     */
     public void init(String configPath) {
         connection = getConnection(configPath);
         if (connection == null) {
@@ -82,6 +108,9 @@ public class MySQL {
         }
     }
 
+    /**
+     * Closes the database connection if it exists.
+     */
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
