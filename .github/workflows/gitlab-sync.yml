@@ -15,9 +15,11 @@ jobs:
           fetch-depth: 0
       - name: Push all branches to GitLab
         env:
-          GITLAB_URL: https://gitlab.com/pinontmclab/singularitylab/SingularityLib.git
+          GITLAB_NAMESPACE: pinontmclab/singularitylab
+          GITLAB_PROJECT: SingularityLib
+          GITLAB_URL: https://gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
           git remote add gitlab $GITLAB_URL
-          git push --all https://oauth2:$GITLAB_TOKEN@$GITLAB_URL
-          git push --tags https://oauth2:$GITLAB_TOKEN@$GITLAB_URL
+          git push --all https://oauth2:$GITLAB_TOKEN@gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
+          git push --tags https://oauth2:$GITLAB_TOKEN@gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
