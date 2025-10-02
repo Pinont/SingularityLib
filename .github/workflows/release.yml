@@ -3,7 +3,7 @@ name: Release Publish
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "*.*.*"
 
 jobs:
   release:
@@ -20,8 +20,8 @@ jobs:
       - name: Derive version from tag
         id: rel
         run: |
-          TAG="${GITHUB_REF_NAME}"          # e.g. v2.2.0
-          VERSION="${TAG#v}"                # strip leading v
+          TAG="${GITHUB_REF_NAME}"          # e.g. 2.2.0
+          VERSION="${TAG}"                # e.g. VERSION=2.2.0
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 23 (generate settings.xml)
