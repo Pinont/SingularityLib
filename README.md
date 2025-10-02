@@ -1,13 +1,11 @@
 # SingularityLib
 
-A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
+[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://jitpack.io/v/Pinont/SingularityLib.svg)](https://jitpack.io/#Pinont/SingularityLib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml)
 
+A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
 > ## ⚠️ Disclaimer
 > This project is still in development, so expect some bugs and missing features. If you find any bugs or have any feature requests, please open an issue on the [GitHub repository](https://github.com/Pinont/SingularityLib/issues)
-
-[![](https://jitpack.io/v/Pinont/SingularityLib.svg)](https://jitpack.io/#Pinont/SingularityLib) ![GitHub Tag](https://img.shields.io/github/v/tag/pinont/singularitylib)
-[![license](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![Build & Test (No Deploy)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml)
 
 ---
 
@@ -51,7 +49,7 @@ If the library is published to GitHub Packages, add the GitHub repository and de
 
   <dependencies>
     <dependency>
-	    <groupId>com.github.pinont</groupId>
+	    <groupId>io.github.pinont</groupId>
 	    <artifactId>SingularityLib</artifactId>
 	    <version>Tag</version>
 	</dependency>

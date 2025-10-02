@@ -1,0 +1,30 @@
+name: Sync all branches to GitLab
+
+on:
+  push:
+    branches:
+      - '**' # Any branch
+    tags:
+      - "*.*.*" # e.g. 2.2.0
+  pull_request:
+    types: [ closed ]
+    branches: [ '**' ] # Any branch
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout all branches
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Push all branches to GitLab
+        env:
+          GITLAB_NAMESPACE: pinontmclab/singularitylab
+          GITLAB_PROJECT: SingularityLib
+          GITLAB_URL: https://gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+        run: |
+          git remote add gitlab $GITLAB_URL
+          git push --all https://oauth2:$GITLAB_TOKEN@gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
+          git push --tags https://oauth2:$GITLAB_TOKEN@gitlab.com/$GITLAB_NAMESPACE/$GITLAB_PROJECT.git
