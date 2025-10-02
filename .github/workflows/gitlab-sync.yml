@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - '**' # Any branch
+    tags:
+      - "*.*.*" # e.g. 2.2.0
+  pull_request:
+    types: [ closed ]
+    branches: [ '**' ] # Any branch
 
 jobs:
   sync:
