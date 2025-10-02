@@ -1,28 +1,72 @@
 name: Release Publish
 
 on:
-  push:
-    tags:
-      - "*.*.*" # e.g. 2.2.0
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
 
 jobs:
   release:
+    name: Create & Publish Release
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout (full history & tags)
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Derive version from tag
-        id: rel
+      - name: Fetch all tags
         run: |
-          TAG="${GITHUB_REF_NAME}"          # e.g. 2.2.0
-          VERSION="${TAG}"                # e.g. VERSION=2.2.0
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          git fetch --tags --quiet
+          echo "Existing tags:"
+          git tag -l | sort -V | tail -n 20 || true
+
+      - name: Derive release version (with Hotfix fallback)
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          RAW_VERSION=$(grep -m1 '<version>' pom.xml | sed -E 's/.*<version>([^<]+)<\/version>.*/\1/')
+          if [[ -z "${RAW_VERSION}" ]]; then
+            echo "Could not extract version from pom.xml"
+            exit 1
+          fi
+
+            # Strip -SNAPSHOT suffix if present.
+          BASE_VERSION="${RAW_VERSION%-SNAPSHOT}"
+
+          echo "Base version from pom: ${BASE_VERSION}"
+
+          # Determine if base version tag already exists.
+          if git rev-parse -q --verify "refs/tags/${BASE_VERSION}" >/dev/null; then
+            echo "Tag ${BASE_VERSION} already exists. Deriving Hotfix version..."
+            i=1
+            while git rev-parse -q --verify "refs/tags/${BASE_VERSION}-Hotfix-${i}" >/dev/null; do
+              i=$((i+1))
+            done
+            FINAL_VERSION="${BASE_VERSION}-Hotfix-${i}"
+            echo "Using hotfix version: ${FINAL_VERSION}"
+            echo "hotfix=true" >> "$GITHUB_OUTPUT"
+            echo "hotfix_index=${i}" >> "$GITHUB_OUTPUT"
+          else
+            FINAL_VERSION="${BASE_VERSION}"
+            echo "Using base version: ${FINAL_VERSION}"
+            echo "hotfix=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "raw_version=${RAW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "base_version=${BASE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version=${FINAL_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Set up JDK 23 (generate settings.xml)
         uses: actions/setup-java@v4
@@ -40,26 +84,66 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
 
-      - name: Set release version (remove -SNAPSHOT)
+      - name: Set release version in pom.xml
         run: |
-          mvn -B -s $GITHUB_WORKSPACE/settings.xml versions:set -DnewVersion="${{ steps.rel.outputs.version }}" -DgenerateBackupPoms=false
+          set -e
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml versions:set -DnewVersion="${{ steps.version.outputs.version }}" -DgenerateBackupPoms=false
+          echo "Effective pom version line:"
           grep -m1 '<version>' pom.xml
 
-      - name: Deploy Release
+      - name: Commit version change (if modified)
+        run: |
+          set -e
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pom.xml
+            git commit -m "chore(release): set version ${{ steps.version.outputs.version }}"
+            git push origin HEAD:main
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Build (package)
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml package
+
+      - name: Deploy Release to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
-      - name: Collect artifacts
+      - name: Verify built artifacts
         run: |
+          set -e
+          echo "Contents of target/:"
           ls -1 target
-          cp target/*.jar main-artifact.jar || true
+          # Capture a primary jar (non sources/javadoc) for convenience
+          MAIN_JAR=$(ls target/*.jar | grep -v '\-sources\.jar$' | grep -v '\-javadoc\.jar$' | head -n1 || true)
+          if [[ -z "$MAIN_JAR" ]]; then
+            echo "ERROR: No main artifact jar found."
+            exit 1
+          fi
+          cp "$MAIN_JAR" main-artifact.jar
+          echo "Selected main artifact: $MAIN_JAR"
+
+      - name: Create & Push Git Tag
+        run: |
+          set -e
+          TAG="${{ steps.version.outputs.version }}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "Tag ${TAG} already exists unexpectedly (race condition?)."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Release ${TAG}"
+          git push origin "${TAG}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "SingularityLib ${{ steps.rel.outputs.version }}"
+          tag_name: ${{ steps.version.outputs.version }}
+          name: "SingularityLib ${{ steps.version.outputs.version }}"
           generate_release_notes: true
           files: |
             target/*-sources.jar
@@ -67,4 +151,25 @@ jobs:
             main-artifact.jar
 
       - name: Summary
-        run: echo "Published release ${{ steps.rel.outputs.version }}"
+        run: |
+          echo "Published release ${{ steps.version.outputs.version }}"
+          echo "Hotfix: ${{ steps.version.outputs.hotfix }}"
+
+      - name: Bump to next snapshot
+        if: always()
+        run: |
+          set -e
+          CURRENT="${{ steps.version.outputs.version }}"
+          # Basic semver increment of patch for next snapshot (ignoring hotfix tags)
+          CORE="${CURRENT%%-Hotfix-*}"
+          IFS='.' read -r MA MI PA <<< "$CORE"
+          NEXT_PATCH=$((PA + 1))
+          NEXT_VERSION="${MA}.${MI}.${NEXT_PATCH}-SNAPSHOT"
+          mvn -B versions:set -DnewVersion="${NEXT_VERSION}" -DgenerateBackupPoms=false
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pom.xml
+            git commit -m "chore: prepare next development iteration ${NEXT_VERSION}"
+            git push origin HEAD:main
+          fi
