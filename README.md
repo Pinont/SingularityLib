@@ -38,14 +38,12 @@ If the library is published to GitHub Packages, add the GitHub repository and de
 ```xml
 <project>
   ...
-  <repositories>
     <repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>
-  </repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 
   <dependencies>
     <dependency>
