@@ -229,19 +229,56 @@ public class CustomItemManager implements SimpleCommand {
     }
 
     /**
-     * Provides command suggestions for tab completion.
+     * Provides intelligent tab completion suggestions for the give command.
      *
-     * <p>Suggestions provided:</p>
-     * <ul>
-     *   <li>Argument 1: Player names and selectors (@a, @s, @r)</li>
-     *   <li>Argument 2: Available items (minecraft: and plugin: prefixed)</li>
-     *   <li>Argument 3: Count placeholder</li>
-     * </ul>
+     * <p>This method dynamically generates context-aware suggestions based on the current
+     * argument position and existing input, enhancing the user experience by providing
+     * relevant completions for each stage of command construction.</p>
      *
-     * @param commandSourceStack the source of the command execution
-     * @param args the current command arguments being typed
-     * @return a collection of suggested completions for the current argument
+     * <h3>Tab Completion Behavior:</h3>
+     * <table border="1">
+     *   <tr>
+     *     <th>Argument Position</th>
+     *     <th>Suggestions Provided</th>
+     *     <th>Description</th>
+     *   </tr>
+     *   <tr>
+     *     <td>1 (Player)</td>
+     *     <td>Online player names + selectors</td>
+     *     <td>All currently connected players, plus @a (all), @s (self), @r (random)</td>
+     *   </tr>
+     *   <tr>
+     *     <td>2 (Item)</td>
+     *     <td>Available items with namespaces</td>
+     *     <td>Minecraft items (minecraft:) and registered custom items (plugin:)</td>
+     *   </tr>
+     *   <tr>
+     *     <td>3 (Count)</td>
+     *     <td>&lt;count&gt; placeholder</td>
+     *     <td>Visual hint indicating numeric quantity expected</td>
+     *   </tr>
+     * </table>
+     *
+     * <h3>Intelligent Filtering:</h3>
+     * <p>For item suggestions (argument 2), the method applies smart filtering when partial
+     * input is detected, matching against the item name portion after the namespace prefix.
+     * This allows for efficient item discovery through progressive typing.</p>
+     *
+     * <h3>Performance Considerations:</h3>
+     * <p>The method efficiently streams and filters large collections of materials and
+     * custom items, ensuring responsive tab completion even with extensive item registries.</p>
+     *
+     * @param commandSourceStack the command execution context providing sender information
+     * @param args the array of command arguments currently being typed by the user
+     * @return a collection of contextually relevant completion suggestions, never null
+     *
+     * @since 1.0.0
+     * @deprecated since 1.1.0, scheduled for removal - use new completion system
+     *
+     * @see #execute(CommandSourceStack, String[]) for command execution logic
+     * @see CustomItem#getName() for custom item name retrieval
      */
+    @Deprecated(since = "1.1.0", forRemoval = true)
     @Override
     public @NotNull Collection<String> suggest(CommandSourceStack commandSourceStack, String[] args) {
         return switch (args.length) {
