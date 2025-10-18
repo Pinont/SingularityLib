@@ -74,6 +74,10 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <build>
@@ -173,6 +177,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.16</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.Pinont</groupId>
+            <artifactId>Singularity-DevTool</artifactId>
+            <version>cbd0e31e44</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
