@@ -12,25 +12,14 @@ import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
 /**
  * Manages configuration files for the plugin.
- * <p>
- * This class provides functionality to create, load, save, reload, and manipulate YAML configuration files
- * in the plugin's data folder or subfolders.
+ * This class provides functionality to create, load, save, and manipulate YAML configuration files.
  */
 public class ConfigManager {
 
-    /** The configuration file on disk */
     private final File configFile;
-
-    /** The in-memory representation of the YAML configuration */
     private FileConfiguration config;
-
-    /** The name of the configuration file */
     private final String fileName;
-
-    /** Reference to the plugin instance */
     private final Plugin plugin = getInstance();
-
-    /** True if the config file was just created (first load) */
     private boolean isFirstLoad;
 
     /**
@@ -40,29 +29,26 @@ public class ConfigManager {
      */
     public ConfigManager(String fileName) {
         this.fileName = fileName;
-        this.configFile = new File(plugin.getDataFolder(), fileName);
-        initializeFile();
-        this.config = YamlConfiguration.loadConfiguration(configFile);
-    }
-
-    /**
-     * Creates a ConfigManager for a configuration file in a specific subfolder.
-     *
-     * @param subFolder the subfolder where the configuration file should be located
-     * @param fileName  the name of the configuration file
-     */
-    public ConfigManager(String subFolder, String fileName) {
-        this.fileName = fileName;
-        this.configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);
-        initializeFile();
-        this.config = YamlConfiguration.loadConfiguration(configFile);
+        configFile = new File(plugin.getDataFolder(), fileName);
+        if (!configFile.exists()) {
+            try {
+                configFile.getParentFile().mkdirs();
+                configFile.createNewFile();
+                isFirstLoad = true;
+            } catch (IOException e) {
+                Bukkit.getLogger().warning(e.getMessage());
+            }
+        } else {
+            isFirstLoad = false;
+        }
+        config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     /**
      * Checks if a configuration file exists in a specific subfolder.
      *
      * @param subFolder the subfolder to check in
-     * @param fileName  the name of the configuration file
+     * @param fileName the name of the configuration file
      * @return true if the file exists, false otherwise
      */
     public static boolean isExists(String subFolder, String fileName) {
@@ -70,26 +56,32 @@ public class ConfigManager {
     }
 
     /**
-     * Initializes the configuration file by creating it if it does not exist.
+     * Creates a ConfigManager for a configuration file in a specific subfolder.
+     *
+     * @param subFolder the subfolder where the configuration file should be located
+     * @param fileName the name of the configuration file
      */
-    private void initializeFile() {
+    public ConfigManager(String subFolder, String fileName) {
+        this.fileName = fileName;
+        configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);
         if (!configFile.exists()) {
             try {
                 configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
                 isFirstLoad = true;
             } catch (IOException e) {
-                Bukkit.getLogger().warning("Failed to create config file: " + e.getMessage());
+                Bukkit.getLogger().warning(e.getMessage());
             }
         } else {
             isFirstLoad = false;
         }
+        config = YamlConfiguration.loadConfiguration(configFile);
     }
 
     /**
      * Sets a value at the specified path in the configuration.
      *
-     * @param path  the configuration path
+     * @param path the configuration path
      * @param value the value to set
      */
     public void set(String path, Object value) {
@@ -108,15 +100,28 @@ public class ConfigManager {
 
     /**
      * Saves the configuration to the file.
-     * <p>
-     * Writes all changes made to the configuration back to the disk.
+     * This method writes all changes made to the configuration back to the file.
      */
     public void saveConfig() {
         try {
             config.save(configFile);
+            config.options().copyDefaults(true);
         } catch (IOException e) {
-            Bukkit.getLogger().warning("Failed to save config file: " + e.getMessage());
+            Bukkit.getLogger().warning(e.getMessage());
         }
+    }
+
+    /**
+     * Gets the FileConfiguration instance.
+     *
+     * @return the FileConfiguration instance, or null if there was an error loading
+     */
+    public FileConfiguration getConfig() {
+        if (config == null) {
+            Bukkit.getLogger().warning("An error occurred while loading the config file: " + fileName);
+            return null;
+        }
+        return config;
     }
 
     /**
@@ -130,18 +135,6 @@ public class ConfigManager {
         } else {
             Bukkit.getLogger().warning("Config file does not exist: " + fileName);
         }
-    }
-
-    /**
-     * Gets the FileConfiguration instance.
-     *
-     * @return the FileConfiguration instance, or null if there was an error loading
-     */
-    public FileConfiguration getConfig() {
-        if (config == null) {
-            Bukkit.getLogger().warning("An error occurred while loading the config file: " + fileName);
-        }
-        return config;
     }
 
     /**
