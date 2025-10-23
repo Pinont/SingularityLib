@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
@@ -313,5 +314,15 @@ public class Common {
      */
     public static String resetStringColor(Component component) {
         return MiniMessage.miniMessage().serialize(component);
+    }
+
+    public static long toTicks(long amount, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> amount * 20;
+            case MINUTES -> amount * 20 * 60;
+            case HOURS -> amount * 20 * 60 * 60;
+            case DAYS -> amount * 20 * 60 * 60 * 24;
+            default -> amount;
+        };
     }
 }

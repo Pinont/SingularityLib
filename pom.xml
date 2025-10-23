@@ -52,6 +52,7 @@
 
     <properties>
         <java.version>23</java.version>
+        <paperapi.version>1.21.5-R0.1-SNAPSHOT</paperapi.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>${java.version}</maven.compiler.release>
@@ -148,7 +149,13 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.8-R0.1-SNAPSHOT</version>
+            <version>${paperapi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.folia</groupId>
+            <artifactId>folia-api</artifactId>
+            <version>${paperapi.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
