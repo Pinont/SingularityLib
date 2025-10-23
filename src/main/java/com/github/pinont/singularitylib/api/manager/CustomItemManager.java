@@ -37,7 +37,7 @@ public class CustomItemManager implements SimpleCommand {
      * Used when the dev tool plugin is present to provide additional
      * development and debugging features for custom items.
      */
-    private final CItemManager customItemManager = new CItemManager();
+    private CItemManager customItemManager;
 
     /**
      * Default constructor for CustomItemManager.
@@ -73,7 +73,7 @@ public class CustomItemManager implements SimpleCommand {
     public void register(List<CustomItem> item) {
         if (item.isEmpty()) return;
         sendConsoleMessage("Registering " + item.size() + " custom items");
-        if (getInstance().getServer().getPluginManager().getPlugin("SingularityDevTool") != null) {
+        if (Common.plugin != null) {
             registerAllItems(item, true);
         }
         registerAllItems(item);
@@ -104,6 +104,9 @@ public class CustomItemManager implements SimpleCommand {
      * @param forDevTool whether to register items with the development tool
      */
     private void registerAllItems(List<CustomItem> items, boolean forDevTool) {
+        if (forDevTool) {
+            customItemManager = new CItemManager();
+        }
         for (CustomItem customItem : items) {
             customItems.add(customItem);
             if (forDevTool) {

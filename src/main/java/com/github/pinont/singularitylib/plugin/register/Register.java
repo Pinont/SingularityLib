@@ -1,6 +1,5 @@
 package com.github.pinont.singularitylib.plugin.register;
 
-import com.github.pinont.devtool.api.CItemManager;
 import com.github.pinont.singularitylib.api.annotation.AutoRegister;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.items.CustomItem;
