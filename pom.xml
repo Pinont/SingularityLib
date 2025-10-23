@@ -6,7 +6,7 @@
 
     <groupId>com.github.pinont</groupId>
     <artifactId>singularitylib</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>SingularityLib</name>
@@ -52,7 +52,9 @@
 
     <properties>
         <java.version>23</java.version>
-        <paperapi.version>1.21.5-R0.1-SNAPSHOT</paperapi.version>
+        <paperapi.version>1.21.8-R0.1-SNAPSHOT</paperapi.version>
+        <mockbukkit.version>4.87.0</mockbukkit.version>
+        <paper.version.from.mockbukkit>${paperapi.version}</paper.version.from.mockbukkit>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.release>${java.version}</maven.compiler.release>
@@ -135,6 +137,40 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.2</version>
             </plugin>
+
+
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>groovy-maven-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                // Extract Paper version from MockBukkit JAR
+                                def mockbukkitJar = project.artifacts.find {
+                                    it.artifactId.startsWith('mockbukkit-')
+                                }?.file
+
+                                if (mockbukkitJar) {
+                                    def jar = new java.util.jar.JarFile(mockbukkitJar)
+                                    def manifest = jar.manifest
+                                    def paperVersion = manifest.mainAttributes.getValue('Paper-Version')
+                                    jar.close()
+
+                                    if (paperVersion) {
+                                        project.properties['paper.version.from.mockbukkit'] = paperVersion
+                                    }
+                                }
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <resources>
@@ -176,7 +212,13 @@
         <dependency>
             <groupId>org.mockbukkit.mockbukkit</groupId>
             <artifactId>mockbukkit-v1.21</artifactId>
-            <version>4.77.0</version>
+            <version>${mockbukkit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+            <version>${paper.version.from.mockbukkit}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
