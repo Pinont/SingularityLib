@@ -24,7 +24,6 @@ public class EntityCreator {
 
     private List<String> ScoreboardTag;
 
-
     private boolean isSetFireTicks = false;
     private int fireTicks;
 
