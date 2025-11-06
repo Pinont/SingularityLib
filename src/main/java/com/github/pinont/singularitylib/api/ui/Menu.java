@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.plugin.CorePlugin.getInstance;
+import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Class for creating and managing custom inventory menus.

@@ -9,7 +9,7 @@ import org.bukkit.ChatColor;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Abstract base class for Discord bot applications using JDA (Java Discord API).

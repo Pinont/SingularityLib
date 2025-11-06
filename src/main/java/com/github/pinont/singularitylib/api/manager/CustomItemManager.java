@@ -1,23 +1,14 @@
 package com.github.pinont.singularitylib.api.manager;
 
 import com.github.pinont.devtool.api.CItemManager;
-import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.items.CustomItem;
-import com.github.pinont.singularitylib.api.utils.Common;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Manages custom items and provides a give command for them.

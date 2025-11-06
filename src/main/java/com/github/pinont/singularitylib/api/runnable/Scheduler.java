@@ -1,7 +1,7 @@
 package com.github.pinont.singularitylib.api.runnable;
 
 import com.github.pinont.singularitylib.api.utils.Common;
-import com.github.pinont.singularitylib.plugin.CorePlugin;
+import com.github.pinont.plugin.CorePlugin;
 import io.papermc.paper.threadedregions.scheduler.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Builder class for creating and modifying ItemStacks with enhanced functionality.

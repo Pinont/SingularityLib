@@ -1,0 +1,8 @@
+name: SingularityLib
+version: '1.0-SNAPSHOT'
+main: com.github.pinont.plugin.CorePlugin
+api-version: '1.21'
+prefix: Singularity
+load: STARTUP
+description: A plugin library for Singularity Plugins
+author: Pinont

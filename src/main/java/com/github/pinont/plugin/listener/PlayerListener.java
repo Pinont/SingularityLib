@@ -1,12 +1,12 @@
-package com.github.pinont.singularitylib.plugin.listener;
+package com.github.pinont.plugin.listener;
 
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import com.github.pinont.plugin.CorePlugin;
 import com.github.pinont.singularitylib.api.event.ItemExecuteEvent;
 import com.github.pinont.singularitylib.api.items.ItemInteraction;
 import com.github.pinont.singularitylib.api.ui.Button;
 import com.github.pinont.singularitylib.api.ui.Menu;
 import com.github.pinont.singularitylib.api.utils.Common;
-import com.github.pinont.singularitylib.plugin.CorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -25,7 +25,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.Objects;
 
 import static com.github.pinont.singularitylib.api.items.ItemInteraction.*;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.*;
+import static com.github.pinont.plugin.CorePlugin.*;
 
 /**
  * Event listener for handling player interactions and menu operations.

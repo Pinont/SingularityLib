@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Event that is fired when a player executes an item interaction.

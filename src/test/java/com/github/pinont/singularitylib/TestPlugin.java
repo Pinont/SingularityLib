@@ -1,6 +1,6 @@
 package com.github.pinont.singularitylib;
 
-import com.github.pinont.singularitylib.plugin.CorePlugin;
+import com.github.pinont.plugin.CorePlugin;
 
 // This is a simple test plugin extending CorePlugin for testing purposes.
 public class TestPlugin extends CorePlugin {

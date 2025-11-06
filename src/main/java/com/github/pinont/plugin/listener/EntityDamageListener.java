@@ -1,4 +1,4 @@
-package com.github.pinont.singularitylib.plugin.listener;
+package com.github.pinont.plugin.listener;
 
 import com.github.pinont.singularitylib.api.annotation.AutoRegister;
 import com.github.pinont.singularitylib.api.event.PlayerDamageByPlayerEvent;

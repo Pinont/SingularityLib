@@ -8,10 +8,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Builder class for creating and configuring entities before spawning them.
