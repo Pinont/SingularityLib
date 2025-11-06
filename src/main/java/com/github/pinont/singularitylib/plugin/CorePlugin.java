@@ -1,9 +1,9 @@
-package com.github.pinont.plugin;
+package com.github.pinont.singularitylib.plugin;
 
-import com.github.pinont.plugin.listener.PlayerListener;
+import com.github.pinont.singularitylib.plugin.listener.PlayerListener;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
-import com.github.pinont.plugin.register.Register;
+import com.github.pinont.singularitylib.plugin.register.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;

@@ -6,7 +6,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Objects;
 
-import static com.github.pinont.plugin.CorePlugin.getInstance;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
 /**
  * Manager class for creating, loading, and managing worlds.

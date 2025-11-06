@@ -2,8 +2,8 @@ package com.github.pinont.singularitylib.api.utils;
 
 import org.bukkit.ChatColor;
 
-import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
-import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Utility class for console logging operations.

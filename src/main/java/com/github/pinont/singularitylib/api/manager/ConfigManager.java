@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.pinont.plugin.CorePlugin.getInstance;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
 /**
  * Manages configuration files for the plugin.

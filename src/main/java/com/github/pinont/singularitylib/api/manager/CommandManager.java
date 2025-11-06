@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.pinont.plugin.CorePlugin.getStartTime;
-import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.getStartTime;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Manages the registration of commands for the plugin.
