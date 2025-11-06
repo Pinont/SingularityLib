@@ -120,19 +120,25 @@ jobs:
           # Capture a primary jar (non sources/javadoc) for convenience
           MAIN_JAR=$(ls target/*.jar | grep -v '\-sources\.jar$' | grep -v '\-javadoc\.jar$' | head -n1 || true)
           if [[ -z "$MAIN_JAR" ]]; then
-            echo "ERROR: No main artifact jar found."
-            exit 1
+          echo "ERROR: No main artifact jar found."
+          exit 1
           fi
-          cp "$MAIN_JAR" main-artifact.jar
+          
+          # Extract filename and remove 'original-' prefix if present
+          BASENAME=$(basename "$MAIN_JAR")
+          BASENAME=${BASENAME#original-}
+          
+          cp "$MAIN_JAR" "$BASENAME"
           echo "Selected main artifact: $MAIN_JAR"
+          echo "Copied to: $BASENAME"
 
       - name: Create & Push Git Tag
         run: |
           set -e
           TAG="${{ steps.version.outputs.version }}"
           if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists unexpectedly (race condition?)."
-            exit 1
+          echo "Tag ${TAG} already exists unexpectedly (race condition?)."
+          exit 1
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -148,7 +154,7 @@ jobs:
           files: |
             target/*-sources.jar
             target/*-javadoc.jar
-            main-artifact.jar
+            singularitylib-*.jar
 
       - name: Summary
         run: |

@@ -99,7 +99,7 @@ public abstract class CorePlugin extends JavaPlugin {
      * @return the API version string
      */
     public static String getAPIVersion() {
-        String version = "1.3.0";
+        String version = "1.3.3-SNAPSHOT";
         return "V-" + version;
     }
 
