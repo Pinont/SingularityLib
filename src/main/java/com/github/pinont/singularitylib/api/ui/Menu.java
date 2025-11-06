@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
 /**
@@ -141,7 +140,7 @@ public class Menu {
             inventory = Bukkit.createInventory(player, size, title);
         }
 
-        player.removeMetadata("Menu", getInstance());
+        player.removeMetadata("Menu", plugin);
         if (!patternLayout.isEmpty()) {
             for (int i = 0; i < patternLayout.size(); i++) {
                 String c = patternLayout.get(i);
@@ -197,13 +196,13 @@ public class Menu {
             }
         }
         if (player.hasMetadata("Menu")) {
-            player.removeMetadata("Menu", getInstance());
+            player.removeMetadata("Menu", plugin);
             player.closeInventory();
         }
         // Set metadata to prevent multiple instances
         sendDebugMessage("Opening menu... " + getTitle());
         player.openInventory(inventory);
-        player.setMetadata("Menu", new FixedMetadataValue(getInstance(), this));
+        player.setMetadata("Menu", new FixedMetadataValue(plugin, this));
     }
 
 }

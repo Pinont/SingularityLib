@@ -3,6 +3,7 @@ package com.github.pinont.singularitylib.api.utils;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.Plugin;
 
 import java.sql.Connection;
 
@@ -16,15 +17,17 @@ import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessag
 public class MySQL {
 
     private Connection connection;
+    private Plugin plugin;
 
     /**
      * Default constructor for MySQL utility class.
      */
-    public MySQL() {
+    public MySQL(Plugin plugin) {
+        this.plugin = plugin;
     }
 
-    private void defaultConfigSetup(String configPath) {
-        ConfigManager configManager = new ConfigManager(configPath);
+    private void defaultConfigSetup(Plugin plugin, String configPath) {
+        ConfigManager configManager = new ConfigManager(plugin, configPath);
         configManager.set("database.host", "localhost");
         configManager.set("database.port", 3306);
         configManager.set("database.databaseName", "database");
@@ -52,7 +55,7 @@ public class MySQL {
      * @return the database connection, or null if connection failed
      */
     public Connection getConnection(String configPath) {
-        ConfigManager configManager = new ConfigManager(configPath);
+        ConfigManager configManager = new ConfigManager(plugin, configPath);
         FileConfiguration config = configManager.getConfig();
         boolean database =
                 config.getString("database.host") == null ||
@@ -60,7 +63,7 @@ public class MySQL {
                         config.getString("database.username") == null || config.getString("database.password") == null ||
                         config.getString("database.timezone") == null || config.getString("database.useSSL") == null;
         if (database) {
-            defaultConfigSetup(configPath);
+            defaultConfigSetup(plugin, configPath);
             return null;
         }
         String host = config.getString("database.host");

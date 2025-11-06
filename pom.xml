@@ -131,45 +131,36 @@
                 </executions>
             </plugin>
 
+            <!-- Shade -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.3</version>
+                <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>org.reflections:reflections</artifact>
+                            <includes>
+                                <include>org/reflections/**</include>
+                            </includes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Explicit deploy plugin version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.2</version>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>groovy-maven-plugin</artifactId>
-                <version>2.1.1</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source>
-                                // Extract Paper version from MockBukkit JAR
-                                def mockbukkitJar = project.artifacts.find {
-                                    it.artifactId.startsWith('mockbukkit-')
-                                }?.file
-
-                                if (mockbukkitJar) {
-                                    def jar = new java.util.jar.JarFile(mockbukkitJar)
-                                    def manifest = jar.manifest
-                                    def paperVersion = manifest.mainAttributes.getValue('Paper-Version')
-                                    jar.close()
-
-                                    if (paperVersion) {
-                                        project.properties['paper.version.from.mockbukkit'] = paperVersion
-                                    }
-                                }
-                            </source>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
 

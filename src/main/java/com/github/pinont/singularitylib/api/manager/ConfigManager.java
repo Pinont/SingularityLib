@@ -8,8 +8,6 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
-
 /**
  * Manages configuration files for the plugin.
  * This class provides functionality to create, load, save, and manipulate YAML configuration files.
@@ -19,7 +17,7 @@ public class ConfigManager {
     private final File configFile;
     private FileConfiguration config;
     private final String fileName;
-    private final Plugin plugin = getInstance();
+    private final Plugin plugin;
     private boolean isFirstLoad;
 
     /**
@@ -27,7 +25,8 @@ public class ConfigManager {
      *
      * @param fileName the name of the configuration file
      */
-    public ConfigManager(String fileName) {
+    public ConfigManager(Plugin plugin, String fileName) {
+        this.plugin = plugin;
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder(), fileName);
         if (!configFile.exists()) {
@@ -51,8 +50,8 @@ public class ConfigManager {
      * @param fileName the name of the configuration file
      * @return true if the file exists, false otherwise
      */
-    public static boolean isExists(String subFolder, String fileName) {
-        return new File(getInstance().getDataFolder() + "/" + subFolder, fileName).exists();
+    public static boolean isExists(Plugin plugin, String subFolder, String fileName) {
+        return new File(plugin.getDataFolder() + "/" + subFolder, fileName).exists();
     }
 
     /**
@@ -61,7 +60,8 @@ public class ConfigManager {
      * @param subFolder the subfolder where the configuration file should be located
      * @param fileName the name of the configuration file
      */
-    public ConfigManager(String subFolder, String fileName) {
+    public ConfigManager(Plugin plugin, String subFolder, String fileName) {
+        this.plugin = plugin;
         this.fileName = fileName;
         configFile = new File(plugin.getDataFolder() + "/" + subFolder, fileName);
         if (!configFile.exists()) {
