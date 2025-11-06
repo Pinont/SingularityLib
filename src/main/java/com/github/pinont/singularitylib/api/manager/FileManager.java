@@ -1,6 +1,7 @@
 package com.github.pinont.singularitylib.api.manager;
 
 import com.github.pinont.singularitylib.plugin.CorePlugin;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -19,12 +20,13 @@ public class FileManager {
     /**
      * The plugin instance for accessing the data folder.
      */
-    public final JavaPlugin plugin = CorePlugin.getInstance();
+    public final Plugin plugin;
 
     /**
      * Default constructor for FileManager.
      */
-    public FileManager() {
+    public FileManager(Plugin plugin) {
+        this.plugin = plugin;
     }
 
     /**

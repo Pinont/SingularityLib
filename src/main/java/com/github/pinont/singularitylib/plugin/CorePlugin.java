@@ -31,7 +31,7 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     public @NotNull FileConfiguration getConfig() {
-        return new ConfigManager("config.yml").getConfig();
+        return new ConfigManager(this, "config.yml").getConfig();
     }
 
     /**
@@ -40,7 +40,7 @@ public abstract class CorePlugin extends JavaPlugin {
      * @return the ConfigManager instance for config.yml
      */
     public @NotNull ConfigManager getConfigManager() {
-        return new ConfigManager("config.yml");
+        return new ConfigManager(this, "config.yml");
     }
 
     private static String prefix;
@@ -99,8 +99,7 @@ public abstract class CorePlugin extends JavaPlugin {
      * @return the API version string
      */
     public static String getAPIVersion() {
-        new ConfigManager("api-version.yml").saveConfig();
-        String version = new ConfigManager("api-version.yml").getConfig().getString("version") == null ? "1.0.0" : new ConfigManager("api-version.yml").getConfig().getString("version");
+        String version = "1.3.0";
         return "V-" + version;
     }
 
@@ -159,7 +158,7 @@ public abstract class CorePlugin extends JavaPlugin {
         instance = this;
         prefix = getInstance().getPluginMeta().getLoggerPrefix();
         // Initialize Plugin Config.
-        pluginConfig = new ConfigManager("config.yml");
+        pluginConfig = new ConfigManager(this, "config.yml");
         if (pluginConfig.isFirstLoad()) {
             pluginConfig.set("debug", false);
             pluginConfig.saveConfig();

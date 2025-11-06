@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,8 +33,8 @@ public abstract class DiscordApp {
      *
      * @param configPath the path to the bot configuration file
      */
-    public DiscordApp(String configPath) {
-        this(configPath, false);
+    public DiscordApp(Plugin plugin, String configPath) {
+        this(plugin, configPath, false);
     }
 
     /**
@@ -42,9 +43,9 @@ public abstract class DiscordApp {
      * @param configPath the path to the bot configuration file
      * @param multiThread whether to run the bot in a separate thread
      */
-    public DiscordApp(String configPath, boolean multiThread) {
+    public DiscordApp(Plugin plugin, String configPath, boolean multiThread) {
         this.configPath = configPath;
-        configManager = new ConfigManager(configPath);
+        configManager = new ConfigManager(plugin, configPath);
         this.multiThread = multiThread;
     }
 
