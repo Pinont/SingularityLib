@@ -1,4 +1,4 @@
-package com.github.pinont.plugin.register;
+package com.github.pinont.singularitylib.plugin.register;
 
 import com.github.pinont.singularitylib.api.annotation.AutoRegister;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;

@@ -1,14 +1,14 @@
 package com.github.pinont.singularitylib.api.manager;
 
-import com.github.pinont.plugin.CorePlugin;
+import com.github.pinont.singularitylib.plugin.CorePlugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
-import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
-import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Manages file operations for the plugin.

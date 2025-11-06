@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Interface for defining custom item interactions.

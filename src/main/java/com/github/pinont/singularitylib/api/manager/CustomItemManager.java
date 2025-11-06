@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Manages custom items and provides a give command for them.
