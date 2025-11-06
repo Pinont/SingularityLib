@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -16,8 +15,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 
 /**
  * Utility class providing common operations and helper methods.
@@ -38,7 +35,7 @@ public class Common {
      * @param noItalic whether to disable italic formatting
      * @return the colorized Component
      */
-    public @NotNull Component colorize(@NotNull String message, boolean noItalic) {
+    public static @NotNull Component colorize(@NotNull String message, boolean noItalic) {
         MiniMessage miniMessage = MiniMessage.miniMessage();
         if (noItalic) {
             message = "<!italic>" + message;
@@ -52,7 +49,7 @@ public class Common {
      * @param message the message to colorize
      * @return the colorized Component
      */
-    public @NotNull Component colorize(@NotNull String message) {
+    public static @NotNull Component colorize(@NotNull String message) {
         return colorize(message, false);
     }
 
@@ -86,11 +83,6 @@ public class Common {
     public static Boolean isAir(ItemStack item) {
         return (item == null) || (item.getType() == Material.AIR);
     }
-
-    /**
-     * The plugin instance.
-     */
-    public static Plugin plugin = getInstance();
 
     /**
      * Checks if a boolean expression is true, logs a message if false.

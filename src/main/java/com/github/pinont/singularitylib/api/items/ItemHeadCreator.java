@@ -3,6 +3,7 @@ package com.github.pinont.singularitylib.api.items;
 import com.github.pinont.singularitylib.api.utils.Common;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,8 +19,8 @@ public class ItemHeadCreator extends ItemCreator {
      *
      * @param item the ItemStack to create from (should be a player head)
      */
-    public ItemHeadCreator(@NotNull ItemStack item) {
-        super(item);
+    public ItemHeadCreator(Plugin plugin, @NotNull ItemStack item) {
+        super(plugin, item);
         skullMeta = (SkullMeta) item.getItemMeta();
     }
 

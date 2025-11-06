@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -57,50 +58,50 @@ public class Scheduler {
         return isFolia ? scheduledTask : bukkitTask;
     }
 
-    public void runTaskAsync(Runner runner) {
+    public void runTaskAsync(Plugin plugin, Runner runner) {
         this.runner = runner;
         if (isFolia) {
             asyncScheduler = server.getAsyncScheduler();
-            scheduledTask = asyncScheduler.runNow(Common.plugin, _ -> runner.run());
+            scheduledTask = asyncScheduler.runNow(plugin, _ -> runner.run());
         } else {
             bukkitScheduler = server.getScheduler();
-            bukkitTask = bukkitScheduler.runTaskAsynchronously(Common.plugin, runner::run);
+            bukkitTask = bukkitScheduler.runTaskAsynchronously(plugin, runner::run);
         }
     }
 
-    public void runTask(Runner runner) {
+    public void runTask(Plugin plugin, Runner runner) {
         this.runner = runner;
         if (isFolia) {
             globalScheduler = server.getGlobalRegionScheduler();
-            scheduledTask = globalScheduler.run(Common.plugin, _ -> runner.run());
+            scheduledTask = globalScheduler.run(plugin, _ -> runner.run());
         } else {
             bukkitScheduler = server.getScheduler();
-            bukkitTask = bukkitScheduler.runTask(Common.plugin, runner::run);
+            bukkitTask = bukkitScheduler.runTask(plugin, runner::run);
         }
     }
 
-    public void runRepeatingTask(Location location, Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
+    public void runRepeatingTask(Plugin plugin, Location location, Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
         this.runner = runner;
         if (isFolia) {
             regionScheduler = server.getRegionScheduler();
-            scheduledTask = regionScheduler.runAtFixedRate(Common.plugin, location, _ -> runner.run(), delayTicks, periodTicks);
+            scheduledTask = regionScheduler.runAtFixedRate(plugin, location, _ -> runner.run(), delayTicks, periodTicks);
         } else {
             bukkitScheduler = server.getScheduler();
-            bukkitTask = bukkitScheduler.runTaskTimer(Common.plugin, runner::run, 0L, periodTicks * timeUnit.toMillis(periodTicks));
+            bukkitTask = bukkitScheduler.runTaskTimer(plugin, runner::run, 0L, periodTicks * timeUnit.toMillis(periodTicks));
         }
     }
 
-    public void runRepeatingTask(World world, Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
-        runRepeatingTask(new Location(world, 0, 0, 0), runner,delayTicks, periodTicks, timeUnit);
+    public void runRepeatingTask(Plugin plugin, World world, Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
+        new Scheduler().runRepeatingTask(plugin, new Location(world, 0, 0, 0), runner,delayTicks, periodTicks, timeUnit);
     }
 
-    public void runRepeatingTaskAsync(Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
+    public void runRepeatingTaskAsync(Plugin plugin, Runner runner, int delayTicks, long periodTicks, TimeUnit timeUnit) {
         if (isFolia) {
             asyncScheduler = server.getAsyncScheduler();
-            scheduledTask = asyncScheduler.runAtFixedRate(Common.plugin, _ -> runner.run(), delayTicks, periodTicks, timeUnit);
+            scheduledTask = asyncScheduler.runAtFixedRate(plugin, _ -> runner.run(), delayTicks, periodTicks, timeUnit);
         } else {
             bukkitScheduler = server.getScheduler();
-            bukkitTask = bukkitScheduler.runTaskTimer(Common.plugin, runner::run, delayTicks, Common.toTicks(periodTicks, timeUnit));
+            bukkitTask = bukkitScheduler.runTaskTimer(plugin, runner::run, delayTicks, Common.toTicks(periodTicks, timeUnit));
         }
     }
 
@@ -116,11 +117,11 @@ public class Scheduler {
         }
     }
 
-    public void cancelAllTasks() {
+    public void cancelAllTasks(Plugin plugin) {
         if (isFolia) {
-            asyncScheduler.cancelTasks(Common.plugin);
+            asyncScheduler.cancelTasks(plugin);
         } else {
-            bukkitScheduler.cancelTasks(Common.plugin);
+            bukkitScheduler.cancelTasks(plugin);
         }
     }
 }

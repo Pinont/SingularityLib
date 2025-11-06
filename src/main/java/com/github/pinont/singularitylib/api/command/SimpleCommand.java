@@ -16,6 +16,14 @@ public interface SimpleCommand extends BasicCommand {
      */
     String getName();
 
+//    /**
+//     * Gets the description of the command.
+//     * This description is used in help messages and command documentation.
+//     *
+//     * @return the command description
+//     */
+//    String getDescription();
+
     /**
      * Gets the usage string for this command.
      *
@@ -25,12 +33,4 @@ public interface SimpleCommand extends BasicCommand {
     default String usage(Boolean bool) {
         return "/" + getName();
     }
-
-    /**
-     * Gets the description of the command.
-     * This description is used in help messages and command documentation.
-     *
-     * @return the command description
-     */
-    String description();
 }
