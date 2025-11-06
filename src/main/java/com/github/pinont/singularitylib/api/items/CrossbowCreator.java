@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CrossbowMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 /**
  * A specialized ItemCreator for creating crossbow items.
@@ -14,8 +15,8 @@ public class CrossbowCreator extends ItemCreator {
     /**
      * Creates a new CrossbowCreator with a crossbow ItemStack.
      */
-    public CrossbowCreator() {
-        super(new ItemStack(Material.CROSSBOW));
+    public CrossbowCreator(Plugin plugin) {
+        super(plugin, new ItemStack(Material.CROSSBOW));
     }
 
     /**

@@ -35,7 +35,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Pass: setName should match ItemStack meta display name")
     public void testSetNamePass() {
         String name = "Test Sword";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setName(name);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setName(name);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(name);
@@ -47,7 +47,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Fail: setName should not match different name")
     public void testSetNameFail() {
         String name = "Test Sword";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setName(name);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setName(name);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName("Wrong Name");
@@ -58,7 +58,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: setUnbreakable should match ItemStack meta unbreakable")
     public void testSetUnbreakablePass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setUnbreakable(true);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setUnbreakable(true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setUnbreakable(true);
@@ -69,7 +69,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: setUnbreakable should not match different unbreakable value")
     public void testSetUnbreakableFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setUnbreakable(true);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setUnbreakable(true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setUnbreakable(false);
@@ -81,7 +81,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Pass: setModelData should match ItemStack meta model data")
     public void testSetModelDataPass() {
         int modelData = 123;
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setModelData(modelData);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setModelData(modelData);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setCustomModelData(modelData);
@@ -93,7 +93,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Fail: setModelData should not match different model data")
     public void testSetModelDataFail() {
         int modelData = 123;
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setModelData(modelData);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setModelData(modelData);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setCustomModelData(456);
@@ -104,7 +104,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: addEnchant should match ItemStack meta enchantments")
     public void testAddEnchantPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addEnchant(Enchantment.SHARPNESS, 2, true);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addEnchant(Enchantment.SHARPNESS, 2, true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.addEnchant(Enchantment.SHARPNESS, 2, true);
@@ -115,7 +115,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: addEnchant should not match different enchantments")
     public void testAddEnchantFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addEnchant(Enchantment.SHARPNESS, 2, true);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addEnchant(Enchantment.SHARPNESS, 2, true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.addEnchant(Enchantment.SHARPNESS, 1, true);
@@ -127,7 +127,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Pass: addLore should match ItemStack meta lore")
     public void testAddLorePass() {
         String lore = "Legendary Sword";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addLore(lore);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addLore(lore);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setLore(java.util.Collections.singletonList(lore));
@@ -139,7 +139,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Fail: addLore should not match different lore")
     public void testAddLoreFail() {
         String lore = "Legendary Sword";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addLore(lore);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addLore(lore);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setLore(java.util.Collections.singletonList("Ordinary Sword"));
@@ -150,7 +150,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: setType should match ItemStack type")
     public void testSetTypePass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setType(Material.IRON_SWORD);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setType(Material.IRON_SWORD);
         ItemStack stack = new ItemStack(Material.IRON_SWORD);
         assertEquals(stack.getType(), creator.getType());
     }
@@ -158,7 +158,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: setType should not match different type")
     public void testSetTypeFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setType(Material.IRON_SWORD);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setType(Material.IRON_SWORD);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         assertNotEquals(stack.getType(), creator.getType());
     }
@@ -167,7 +167,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Pass: addItemFlag should match ItemStack meta flags")
     public void testAddItemFlagPass() {
         ItemFlag flag = ItemFlag.HIDE_ATTRIBUTES;
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addItemFlag(flag);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addItemFlag(flag);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.addItemFlags(flag);
@@ -179,7 +179,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Fail: addItemFlag should not match different flags")
     public void testAddItemFlagFail() {
         ItemFlag flag = ItemFlag.HIDE_ATTRIBUTES;
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addItemFlag(flag);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addItemFlag(flag);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -194,7 +194,7 @@ public class ItemCreatorMetaTest {
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName("Meta Sword");
         stack.setItemMeta(meta);
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setItemMeta(meta);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setItemMeta(meta);
         assertEquals(stack.getItemMeta(), creator.getItemMeta());
     }
 
@@ -207,14 +207,14 @@ public class ItemCreatorMetaTest {
         stack.setItemMeta(meta);
         ItemMeta meta2 = stack.getItemMeta();
         meta2.setDisplayName("Other Sword");
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setItemMeta(meta2);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setItemMeta(meta2);
         assertNotEquals(stack.getItemMeta(), creator.getItemMeta());
     }
 
     @Test
     @DisplayName("Pass: setAmount via constructor should match ItemStack amount")
     public void testSetAmountPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD, 5);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD, 5);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD, 5);
         assertEquals(stack.getAmount(), creator.getAmount());
     }
@@ -222,7 +222,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: setAmount via constructor should not match different amount")
     public void testSetAmountFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD, 5);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD, 5);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD, 1);
         assertNotEquals(stack.getAmount(), creator.getAmount());
     }
@@ -232,7 +232,7 @@ public class ItemCreatorMetaTest {
     public void testAddTagPass() {
         String tag = "test_tag";
         String value = "test_value";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag, value);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag, value);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag.split(" ")).toLowerCase();
@@ -247,7 +247,7 @@ public class ItemCreatorMetaTest {
     public void testAddTagFail() {
         String tag = "test_tag";
         String value = "test_value";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag, value);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag, value);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag.split(" ")).toLowerCase();
@@ -261,7 +261,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Pass: add multiple lore lines should match ItemStack meta lore")
     public void testAddMultipleLorePass() {
         java.util.List<String> loreLines = java.util.Arrays.asList("Line 1", "Line 2", "Line 3");
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD);
         for (String line : loreLines) creator.addLore(line);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
@@ -274,7 +274,7 @@ public class ItemCreatorMetaTest {
     @DisplayName("Fail: add multiple lore lines should not match different lore")
     public void testAddMultipleLoreFail() {
         java.util.List<String> loreLines = java.util.Arrays.asList("Line 1", "Line 2", "Line 3");
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD);
         for (String line : loreLines) creator.addLore(line);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
@@ -286,7 +286,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: add multiple enchantments should match ItemStack meta enchantments")
     public void testAddMultipleEnchantsPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD)
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD)
             .addEnchant(Enchantment.SHARPNESS, 2, true)
             .addEnchant(Enchantment.FIRE_ASPECT, 1, true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
@@ -300,7 +300,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: add multiple enchantments should not match different enchantments")
     public void testAddMultipleEnchantsFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD)
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD)
             .addEnchant(Enchantment.SHARPNESS, 2, true)
             .addEnchant(Enchantment.FIRE_ASPECT, 1, true);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
@@ -314,7 +314,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: add multiple item flags should match ItemStack meta flags")
     public void testAddMultipleItemFlagsPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD)
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD)
             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
             .addItemFlag(ItemFlag.HIDE_ENCHANTS);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
@@ -327,7 +327,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Fail: add multiple item flags should not match different flags")
     public void testAddMultipleItemFlagsFail() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD)
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD)
             .addItemFlag(ItemFlag.HIDE_ATTRIBUTES)
             .addItemFlag(ItemFlag.HIDE_ENCHANTS);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
@@ -343,7 +343,7 @@ public class ItemCreatorMetaTest {
         String tag = "test tag";
         String value1 = "value1";
         String value2 = "value2";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag, value1).setTagValue(tag, value2);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag, value1).setTagValue(tag, value2);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag.split(" ")).toLowerCase();
@@ -359,7 +359,7 @@ public class ItemCreatorMetaTest {
         String tag = "test tag";
         String value1 = "value1";
         String value2 = "value2";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag, value1).setTagValue(tag, value2);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag, value1).setTagValue(tag, value2);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag.split(" ")).toLowerCase();
@@ -377,7 +377,7 @@ public class ItemCreatorMetaTest {
         String tag2 = "test tag2";
         String value1 = "value1";
         String value2 = "value2";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag1, value1).replaceTag(tag1, tag2).setTagValue(tag2, value2);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag1, value1).replaceTag(tag1, tag2).setTagValue(tag2, value2);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag2.split(" ")).toLowerCase();
@@ -394,7 +394,7 @@ public class ItemCreatorMetaTest {
         String tag2 = "test tag2";
         String value1 = "value1";
         String value2 = "value2";
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addTag(tag1, value1).replaceTag(tag1, tag2).setTagValue(tag2, value2);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addTag(tag1, value1).replaceTag(tag1, tag2).setTagValue(tag2, value2);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         String formattedKey = String.join("_", tag2.split(" ")).toLowerCase();
@@ -408,7 +408,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: setName with null should match ItemStack meta display name")
     public void testSetNameNullPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).setName((String) null);
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).setName((String) null);
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setDisplayName(null);
@@ -419,7 +419,7 @@ public class ItemCreatorMetaTest {
     @Test
     @DisplayName("Pass: addLore with empty string should match ItemStack meta lore")
     public void testAddLoreEmptyPass() {
-        ItemCreator creator = new ItemCreator(Material.DIAMOND_SWORD).addLore("");
+        ItemCreator creator = new ItemCreator(plugin, Material.DIAMOND_SWORD).addLore("");
         ItemStack stack = new ItemStack(Material.DIAMOND_SWORD);
         ItemMeta meta = stack.getItemMeta();
         meta.setLore(java.util.Collections.singletonList(""));

@@ -8,13 +8,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.plugin.CorePlugin.getInstance;
+import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Class for creating and managing custom inventory menus.
@@ -24,6 +25,7 @@ public class Menu {
 
     private final String title;
     private final int size;
+    private final Plugin plugin;
     private final ArrayList<String> patternLayout = new ArrayList<>();
     private final ArrayList<Layout> layouts = new ArrayList<>();
     private final ArrayList<Button> buttons = new ArrayList<>();
@@ -42,8 +44,8 @@ public class Menu {
      *
      * @param title the title of the menu
      */
-    public Menu(String title) {
-        this(title, -1);
+    public Menu(Plugin plugin, String title) {
+        this(plugin, title, -1);
     }
 
     /**
@@ -52,7 +54,8 @@ public class Menu {
      * @param title the title of the menu
      * @param size the size of the menu inventory
      */
-    public Menu(String title, int size) {
+    public Menu(Plugin plugin, String title, int size) {
+        this.plugin = plugin;
         this.title = title;
         this.size = size;
     }
@@ -160,7 +163,7 @@ public class Menu {
 
                         @Override
                         public ItemStack getItem() {
-                            return new ItemCreator(new ItemStack(Material.BARRIER)).setName(ChatColor.RED + "This feature are not implemented yet.").create();
+                            return new ItemCreator(plugin, new ItemStack(Material.BARRIER)).setName(ChatColor.RED + "This feature are not implemented yet.").create();
                         }
 
                         @Override

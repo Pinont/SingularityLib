@@ -1,9 +1,9 @@
-package com.github.pinont.singularitylib.plugin;
+package com.github.pinont.plugin;
 
+import com.github.pinont.plugin.listener.PlayerListener;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
-import com.github.pinont.singularitylib.plugin.listener.PlayerListener;
-import com.github.pinont.singularitylib.plugin.register.Register;
+import com.github.pinont.plugin.register.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -45,11 +45,16 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private static String prefix;
     private static Long startTime;
+    private static boolean isFolia;
 
     /**
      * Flag indicating if the plugin is running in test mode.
      */
     public boolean isTest = false;
+
+    public static boolean isFolia() {
+        return isFolia;
+    }
 
     /**
      * Gets the time when the plugin started loading.
@@ -94,8 +99,8 @@ public abstract class CorePlugin extends JavaPlugin {
      * @return the API version string
      */
     public static String getAPIVersion() {
-        String version = new ConfigManager("api-version.yml").getConfig().getString("version");
-//        String version = "1.0.0";
+        new ConfigManager("api-version.yml").saveConfig();
+        String version = new ConfigManager("api-version.yml").getConfig().getString("version") == null ? "1.0.0" : new ConfigManager("api-version.yml").getConfig().getString("version");
         return "V-" + version;
     }
 
@@ -164,6 +169,11 @@ public abstract class CorePlugin extends JavaPlugin {
         // TODO: Move to Devtool
 //        WorldManager.autoLoadWorlds();
 
+        isFolia = foliaCheck();
+        if (isFolia) {
+            sendConsoleMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "Folia environment detected, enabling Folia compatibility mode...");
+        }
+
         // Initialize API To Plugin.
         sendConsoleMessage(ChatColor.WHITE + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI! " + getAPIVersion());
         onPluginStart();
@@ -175,6 +185,15 @@ public abstract class CorePlugin extends JavaPlugin {
             Register register = new Register();
             register.scanAndCollect(this.getClass().getPackageName());
             register.registerAll(this);
+        }
+    }
+
+    private boolean foliaCheck() {
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

@@ -23,8 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
 
 /**
  * Builder class for creating and modifying ItemStacks with enhanced functionality.
@@ -34,16 +33,16 @@ public class ItemCreator {
 
     private final Common common = new Common();
 
-    private final ItemStack item;
+    private ItemStack item;
     private ItemMeta meta;
     private short durability = 0;
-    private final PersistentDataContainer data;
+    private PersistentDataContainer data;
     private final ArrayList<Component> lore = new ArrayList<>();
     private int amount = 1;
     private Material type;
-    private final Plugin plugin = getInstance();
+    private final Plugin plugin;
     private static final Set<ItemInteraction> ITEM_INTERACTIONS = Sets.newHashSet();
-    private final String name;
+    private String name;
 
     /**
      * Gets all registered item interactions.
@@ -55,7 +54,7 @@ public class ItemCreator {
     }
 
     public ItemCreator clone() {
-        return new ItemCreator(this.create());
+        return new ItemCreator(plugin, this.create());
     }
 
     /**
@@ -63,8 +62,8 @@ public class ItemCreator {
      *
      * @param type the material type for the item
      */
-    public ItemCreator(Material type) {
-        this(new ItemStack(type));
+    public ItemCreator(Plugin plugin, Material type) {
+        this(plugin, new ItemStack(type));
     }
 
     /**
@@ -73,8 +72,8 @@ public class ItemCreator {
      * @param type the material type for the item
      * @param amount the amount of items in the stack
      */
-    public ItemCreator(Material type, int amount) {
-        this(new ItemStack(type, amount));
+    public ItemCreator(Plugin plugin, Material type, int amount) {
+        this(plugin, new ItemStack(type, amount));
     }
 
     /**
@@ -82,9 +81,10 @@ public class ItemCreator {
      *
      * @param item the ItemStack to create from
      */
-    public ItemCreator(@NotNull ItemStack item) {
+    public ItemCreator(Plugin plugin, @NotNull ItemStack item) {
         this.item = item;
         this.meta = item.getItemMeta();
+        this.plugin = plugin;
         this.type = item.getType();
         this.amount = item.getAmount();
         this.name = item.getItemMeta().getDisplayName().isEmpty() ? Common.normalizeStringName(item.getType().name()) : item.getItemMeta().getDisplayName();
@@ -184,27 +184,6 @@ public class ItemCreator {
     public ItemCreator setItemMeta(ItemMeta meta) {
         this.meta = meta;
         return this;
-    }
-
-    /**
-     * Gets the interaction associated with the given ItemStack.
-     *
-     * @param item the ItemStack to get the interaction for
-     * @return the ItemInteraction, or null if none found
-     */
-    public static ItemInteraction getInteraction(ItemStack item) {
-        String id = getItemInteractionName(item);
-        if (id == null) {
-            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
-            return null;
-        }
-        ItemInteraction interaction = ITEM_INTERACTIONS.stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
-        if (interaction != null) {
-            return interaction;
-        } else {
-            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
-        }
-        return null;
     }
 
     /**
@@ -505,24 +484,6 @@ public class ItemCreator {
     }
 
     /**
-     * Gets the persistent data of an item.
-     *
-     * @param item the ItemStack to get data from
-     * @param key the key of the data to get
-     * @param type the PersistentDataType of the data
-     * @return the data value, or null if not present
-     */
-    public static Object getItemPersistData(ItemStack item, String key, PersistentDataType type) {
-        if (isItemHasPersistData(item, key, type)) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                return meta.getPersistentDataContainer().get(new NamespacedKey(getInstance(), key), type);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Sets data in the item's PersistentDataContainer.
      *
      * @param key the key of the data to set
@@ -566,16 +527,6 @@ public class ItemCreator {
         return this;
     }
 
-    private static String getItemInteractionName(ItemStack item) {
-        if (isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                return Objects.requireNonNull(meta.getPersistentDataContainer().get(new NamespacedKey(getInstance(), "interaction"), PersistentDataType.STRING));
-            }
-        }
-        return null;
-    }
-
     /**
      * Adds an interaction to the item.
      *
@@ -587,18 +538,6 @@ public class ItemCreator {
         ITEM_INTERACTIONS.add(itemInteraction);
         this.setDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
         return this;
-    }
-
-    /**
-     * Checks if the item has persistent data of a specific type.
-     *
-     * @param item the ItemStack to check
-     * @param key the key of the data to check for
-     * @param type the PersistentDataType of the data
-     * @return true if the data exists, false otherwise
-     */
-    public static Boolean isItemHasPersistData(ItemStack item, String key, PersistentDataType type) {
-        return item.getItemMeta().getPersistentDataContainer().has(new NamespacedKey(getInstance(), key), type);
     }
 }
 

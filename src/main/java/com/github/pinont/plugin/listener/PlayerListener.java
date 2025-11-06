@@ -1,8 +1,8 @@
-package com.github.pinont.singularitylib.plugin.listener;
+package com.github.pinont.plugin.listener;
 
 import com.destroystokyo.paper.event.player.PlayerRecipeBookClickEvent;
+import com.github.pinont.plugin.CorePlugin;
 import com.github.pinont.singularitylib.api.event.ItemExecuteEvent;
-import com.github.pinont.singularitylib.api.items.ItemCreator;
 import com.github.pinont.singularitylib.api.items.ItemInteraction;
 import com.github.pinont.singularitylib.api.ui.Button;
 import com.github.pinont.singularitylib.api.ui.Menu;
@@ -24,7 +24,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Objects;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.*;
+import static com.github.pinont.singularitylib.api.items.ItemInteraction.*;
+import static com.github.pinont.plugin.CorePlugin.*;
 
 /**
  * Event listener for handling player interactions and menu operations.
@@ -32,11 +33,7 @@ import static com.github.pinont.singularitylib.plugin.CorePlugin.*;
  */
 public class PlayerListener implements Listener {
 
-    /**
-     * Default constructor for PlayerListener.
-     */
-    public PlayerListener() {
-    }
+    private final Plugin plugin = CorePlugin.getInstance();
 
     /**
      * Handles player interaction events for custom item interactions.
@@ -47,11 +44,11 @@ public class PlayerListener implements Listener {
     public void interaction(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (!Common.isMainHandEmpty(player) && ItemCreator.isItemHasPersistData(item, "interaction", PersistentDataType.STRING)) {
+        if (!Common.isMainHandEmpty(player) && isItemHasPersistData(plugin, item, "interaction", PersistentDataType.STRING)) {
             if (event.getPlayer().getCooldown(item) > 0) return;
             ItemInteraction itemInteraction;
             try {
-                itemInteraction = ItemCreator.getInteraction(item);
+                itemInteraction = getInteraction(plugin, item);
             } catch (IllegalArgumentException e) {
                 sendInteractionError(player);
                 return;
@@ -171,7 +168,7 @@ public class PlayerListener implements Listener {
     }
 
     private void sendInteractionError(Player player) {
-        sendConsoleMessage("Interaction ID is not valid: " + ItemCreator.getItemPersistData(player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING));
+        sendConsoleMessage("Interaction ID is not valid: " + getItemPersistData(plugin, player.getInventory().getItemInMainHand(), "interaction", PersistentDataType.STRING));
     }
 
 }

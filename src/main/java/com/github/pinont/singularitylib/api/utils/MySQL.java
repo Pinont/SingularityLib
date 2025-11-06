@@ -6,8 +6,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.sql.Connection;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
-import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
+import static com.github.pinont.plugin.CorePlugin.sendConsoleMessage;
+import static com.github.pinont.plugin.CorePlugin.sendDebugMessage;
 
 /**
  * Utility class for managing MySQL database connections.

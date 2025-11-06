@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
-import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
+import static com.github.pinont.plugin.CorePlugin.getInstance;
 
 /**
  * Manages configuration files for the plugin.
@@ -17,7 +17,7 @@ import static com.github.pinont.singularitylib.plugin.CorePlugin.getInstance;
 public class ConfigManager {
 
     private final File configFile;
-    private final FileConfiguration config;
+    private FileConfiguration config;
     private final String fileName;
     private final Plugin plugin = getInstance();
     private boolean isFirstLoad;
@@ -122,6 +122,19 @@ public class ConfigManager {
             return null;
         }
         return config;
+    }
+
+    /**
+     * Reloads the configuration from disk.
+     * <p>
+     * Useful when the file is manually modified while the server is running.
+     */
+    public void reloadConfig() {
+        if (configFile.exists()) {
+            config = YamlConfiguration.loadConfiguration(configFile);
+        } else {
+            Bukkit.getLogger().warning("Config file does not exist: " + fileName);
+        }
     }
 
     /**
