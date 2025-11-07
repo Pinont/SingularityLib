@@ -1,6 +1,8 @@
 package com.github.pinont.singularitylib.api.utils;
 
 import com.github.pinont.singularitylib.api.enums.PlayerInventorySlotType;
+import com.github.pinont.singularitylib.api.manager.ConfigManager;
+import com.github.pinont.singularitylib.plugin.CorePlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -26,6 +28,17 @@ public class Common {
      * Default constructor for Common utility class.
      */
     public Common() {
+    }
+
+    /**
+     * Gets the current API version.
+     *
+     * @return the API version string
+     */
+    public static String getAPIVersion() {
+        ConfigManager apiConfig = new ConfigManager(CorePlugin.getInstance(), "api-version.yml");
+        String version = apiConfig.getConfig().getString("api-version", "1.0.0");
+        return "V-" + version;
     }
 
     /**

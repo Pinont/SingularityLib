@@ -41,11 +41,13 @@
     <profiles>
         <profile>
             <id>with-shade</id>
+            <!-- Optional: still allow activation by property 'shade' if you prefer -Dshade=true -->
             <activation>
                 <property>
                     <name>shade</name>
                 </property>
             </activation>
+
             <build>
                 <plugins>
                     <plugin>
@@ -53,6 +55,10 @@
                         <artifactId>maven-shade-plugin</artifactId>
                         <version>3.5.3</version>
                         <configuration>
+                            <!-- Attach shaded artifact instead of replacing the main jar -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
                                 <filter>
                                     <artifact>org.reflections:reflections</artifact>
@@ -75,7 +81,6 @@
             </build>
         </profile>
     </profiles>
-
 
     <scm>
         <url>https://github.com/Pinont/SingularityLib</url>

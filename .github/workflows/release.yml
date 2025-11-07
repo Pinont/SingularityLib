@@ -105,42 +105,12 @@ jobs:
           fi
 
       - name: Build (package)
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml package
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Pwith-shade package
 
       - name: Deploy Release to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
-
-      - name: Build (package, with-shade)
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Pwith-shade package
-
-      - name: Verify built artifacts
-        run: |
-          set -e
-          echo "Contents of target/:"
-          ls -1 target || true
-
-          # Find a primary jar (excluding sources/javadoc)
-          MAIN_JAR=$(ls target/*.jar 2>/dev/null | grep -v '\-sources\.jar$' | grep -v '\-javadoc\.jar$' | head -n1 || true)
-          if [[ -z "$MAIN_JAR" ]]; then
-            echo "ERROR: No main artifact jar found."
-            exit 1
-          fi
-
-          BASENAME=$(basename "$MAIN_JAR")
-          STRIPPED=${BASENAME#original-}
-
-          if [[ "$BASENAME" != "$STRIPPED" ]]; then
-            # Found an 'original-' artifact -> produce *-api.jar
-            API_NAME="${STRIPPED%.jar}-api.jar"
-            cp "$MAIN_JAR" "$API_NAME"
-            echo "Found original artifact: $MAIN_JAR -> copied to $API_NAME"
-          else
-            # Likely the shaded artifact -> keep basename
-            cp "$MAIN_JAR" "$BASENAME"
-            echo "Found main artifact (shaded): $MAIN_JAR -> copied to $BASENAME"
-          fi
 
       - name: Create & Push Git Tag
         run: |
@@ -162,9 +132,7 @@ jobs:
           name: "SingularityLib ${{ steps.version.outputs.version }}"
           generate_release_notes: true
           files: |
-            target/*-sources.jar
-            target/*-javadoc.jar
-            singularitylib-*.jar
+            `target/*.jar`
 
       - name: Summary
         run: |
