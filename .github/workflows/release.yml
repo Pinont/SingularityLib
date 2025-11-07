@@ -112,25 +112,35 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
+      - name: Build (package, with-shade)
+        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Pwith-shade package
+
       - name: Verify built artifacts
         run: |
           set -e
           echo "Contents of target/:"
-          ls -1 target
-          # Capture a primary jar (non sources/javadoc) for convenience
-          MAIN_JAR=$(ls target/*.jar | grep -v '\-sources\.jar$' | grep -v '\-javadoc\.jar$' | head -n1 || true)
+          ls -1 target || true
+
+          # Find a primary jar (excluding sources/javadoc)
+          MAIN_JAR=$(ls target/*.jar 2>/dev/null | grep -v '\-sources\.jar$' | grep -v '\-javadoc\.jar$' | head -n1 || true)
           if [[ -z "$MAIN_JAR" ]]; then
-          echo "ERROR: No main artifact jar found."
-          exit 1
+            echo "ERROR: No main artifact jar found."
+            exit 1
           fi
-          
-          # Extract filename and remove 'original-' prefix if present
+
           BASENAME=$(basename "$MAIN_JAR")
-          BASENAME=${BASENAME#original-}
-          
-          cp "$MAIN_JAR" "$BASENAME"
-          echo "Selected main artifact: $MAIN_JAR"
-          echo "Copied to: $BASENAME"
+          STRIPPED=${BASENAME#original-}
+
+          if [[ "$BASENAME" != "$STRIPPED" ]]; then
+            # Found an 'original-' artifact -> produce *-api.jar
+            API_NAME="${STRIPPED%.jar}-api.jar"
+            cp "$MAIN_JAR" "$API_NAME"
+            echo "Found original artifact: $MAIN_JAR -> copied to $API_NAME"
+          else
+            # Likely the shaded artifact -> keep basename
+            cp "$MAIN_JAR" "$BASENAME"
+            echo "Found main artifact (shaded): $MAIN_JAR -> copied to $BASENAME"
+          fi
 
       - name: Create & Push Git Tag
         run: |
