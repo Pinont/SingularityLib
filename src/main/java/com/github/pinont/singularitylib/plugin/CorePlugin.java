@@ -1,5 +1,6 @@
 package com.github.pinont.singularitylib.plugin;
 
+import com.github.pinont.singularitylib.api.utils.Common;
 import com.github.pinont.singularitylib.plugin.listener.PlayerListener;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
@@ -93,16 +94,6 @@ public abstract class CorePlugin extends JavaPlugin {
 
     private final List<Listener> listeners = new ArrayList<>();
 
-    /**
-     * Gets the current API version.
-     *
-     * @return the API version string
-     */
-    public static String getAPIVersion() {
-        String version = "1.3.0";
-        return "V-" + version;
-    }
-
     private ConfigManager pluginConfig;
 
     /**
@@ -174,7 +165,7 @@ public abstract class CorePlugin extends JavaPlugin {
         }
 
         // Initialize API To Plugin.
-        sendConsoleMessage(ChatColor.WHITE + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI! " + getAPIVersion());
+        sendConsoleMessage(ChatColor.WHITE + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI! " + Common.getAPIVersion());
         onPluginStart();
         registerAPIListener(this, new PlayerListener());
 //        new CommandManager().register(this, this.simpleCommands);

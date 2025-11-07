@@ -6,7 +6,7 @@
 
     <groupId>com.github.pinont</groupId>
     <artifactId>singularitylib</artifactId>
-    <version>1.3.3-SNAPSHOT</version>
+    <version>1.3.3</version>
     <packaging>jar</packaging>
 
     <name>SingularityLib</name>
@@ -37,6 +37,50 @@
             </roles>
         </developer>
     </developers>
+
+    <profiles>
+        <profile>
+            <id>with-shade</id>
+            <!-- Optional: still allow activation by property 'shade' if you prefer -Dshade=true -->
+            <activation>
+                <property>
+                    <name>shade</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.5.3</version>
+                        <configuration>
+                            <!-- Attach shaded artifact instead of replacing the main jar -->
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>shaded</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>org.reflections:reflections</artifact>
+                                    <includes>
+                                        <include>org/reflections/**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <scm>
         <url>https://github.com/Pinont/SingularityLib</url>
@@ -127,31 +171,6 @@
                         <configuration>
                             <failOnError>false</failOnError>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Shade -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
-                <configuration>
-                    <filters>
-                        <filter>
-                            <artifact>org.reflections:reflections</artifact>
-                            <includes>
-                                <include>org/reflections/**</include>
-                            </includes>
-                        </filter>
-                    </filters>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
