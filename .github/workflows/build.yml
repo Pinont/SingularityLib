@@ -43,28 +43,3 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_ACTOR: ${{ github.actor }}
 
-  pages-repo:
-    # Public, token-free Maven repository served via GitHub Pages.
-    # Consumers add: https://pinont.github.io/SingularityLib/repo
-    if: github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-      - name: Stage maven repo layout
-        run: mvn -q deploy -DskipTests -DaltDeploymentRepository=pages::default::file:${{ github.workspace }}/staging
-      - name: Publish to gh-pages (accumulative — old versions kept)
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: staging
-          destination_dir: repo
-          keep_files: true
