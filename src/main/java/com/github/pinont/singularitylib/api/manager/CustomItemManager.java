@@ -1,6 +1,5 @@
 package com.github.pinont.singularitylib.api.manager;
 
-import com.github.pinont.devtool.api.CItemManager;
 import com.github.pinont.singularitylib.api.items.CustomItem;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -25,13 +24,6 @@ public class CustomItemManager {
     public List<CustomItem> customItems = new ArrayList<>();
 
     /**
-     * Integration manager for SingularityDevTool plugin.
-     * Used when the dev tool plugin is present to provide additional
-     * development and debugging features for custom items.
-     */
-    private CItemManager customItemManager;
-
-    /**
      * Default constructor for CustomItemManager.
      * Initializes the manager with empty collections ready for item registration.
      */
@@ -54,8 +46,7 @@ public class CustomItemManager {
      * <ul>
      *   <li>Validates the input list is not empty</li>
      *   <li>Logs the registration process to console</li>
-     *   <li>Checks for SingularityDevTool plugin integration</li>
-     *   <li>Registers items with dev tool if available</li>
+     *   <li>Registers all items</li>
      *   <li>Initializes item interactions and properties</li>
      * </ul>
      *
@@ -69,39 +60,21 @@ public class CustomItemManager {
     }
 
     /**
-     * Internal method to register all items without dev tool integration.
-     *
-     * @param items the list of items to register
-     */
-    private void registerAllItems(List<CustomItem> items) {
-        registerAllItems(items, false);
-    }
-
-    /**
-     * Internal method to register all items with optional dev tool integration.
+     * Internal method to register all items.
      *
      * <p>For each custom item, this method:</p>
      * <ul>
      *   <li>Adds the item to the internal registry</li>
-     *   <li>Registers with dev tool if requested and available</li>
      *   <li>Calls the item's register method for initialization</li>
      *   <li>Ensures the item stack is created and interactions are set up</li>
      *   <li>Logs interaction registration if present</li>
      * </ul>
      *
      * @param items the list of items to register
-     * @param forDevTool whether to register items with the development tool
      */
-    private void registerAllItems(List<CustomItem> items, boolean forDevTool) {
-        // WIP: DevTool integration
-//        if (forDevTool) {
-//            customItemManager = new CItemManager();
-//        }
+    private void registerAllItems(List<CustomItem> items) {
         for (CustomItem customItem : items) {
             customItems.add(customItem);
-            if (forDevTool) {
-                customItemManager.registerCustomItems(customItem);
-            }
             customItem.register(); // call register to ensure the item is properly initialized
             customItem.getItem(); // ensure the item is created and interaction is set up
             if (customItem.getInteraction() != null) {

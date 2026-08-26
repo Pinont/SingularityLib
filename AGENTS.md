@@ -9,21 +9,26 @@ SingularityLib (`com.github.pinont:singularitylib`) is the core framework of the
 | `SingularityPlugin` | Starter template plugin consuming SingularityLib |
 | `Singularity-DevTool` | In-game debugging/admin tool built on SingularityLib |
 
-Published via **JitPack** (`com.github.pinont:SingularityLib:<tag>`) and GitHub Packages.
+Published to **GitHub Packages** only (`https://maven.pkg.github.com/pinont/SingularityLib`). JitPack is no longer part of the build.
+
+## Branches
+- Modernization work lives on **`rework/v2`** (v2 platform/toolchain pass: Paper 26.2+, JDK 25, Folia flag, GitHub Packages). Never push directly to `main`; merge via PR when a pass is complete.
 
 ## Build & test
 ```bash
-mvn clean package          # build shaded jar into target/
-mvn test                   # run tests (JUnit; see src/test/java/...)
+export JAVA_HOME=$(echo ~/dev-tools/jdk-*)
+~/dev-tools/apache-maven-3.9.16/bin/mvn clean package   # jar + sources + javadoc into target/
+~/dev-tools/apache-maven-3.9.16/bin/mvn test            # JUnit + MockBukkit
 ```
-- Requires **JDK 23** (`<java.version>23</java.version>`).
-- Targets **Paper API 1.21.8-R0.1-SNAPSHOT** (`paperapi.version` property).
-- Shaded deps include `org.reflections` (used by the auto-register scanner).
+- Requires **JDK 25** (`<java.version>25</java.version>`).
+- Targets **Paper API 26.2+ latest-only**: `paperapi.version` is the range `[26.2.build,)`, which resolves to the newest build on repo.papermc.io at build time. The standalone `folia-api` dep stays pinned at its last line `26.2.build.7-beta` (from Paper 26.x the Folia schedulers ship inside paper-api).
+- Tests run against **MockBukkit `mockbukkit-v26.2`** (the old `mockbukkit-v1.21` artifact cannot load 26.x APIs).
+- Shaded deps include `org.reflections` (used by the auto-register scanner), behind the `-Dshade` profile.
 
 ## Code layout
 Root package: `com.github.pinont.singularitylib`
 
-- `api/Plugin.java` — Bukkit plugin entry point (declared in `src/main/resources/plugin.yml`, `load: STARTUP`)
+- `api/Plugin.java` — Bukkit plugin entry point (declared in `src/main/resources/paper-plugin.yml`, `load: STARTUP`)
 - `api/annotation/AutoRegister.java` — marks classes for automatic registration
 - `api/command/SimpleCommand.java` — simplified command abstraction
 - `api/entity/EntityCreator.java` — entity configuration/storage helpers
@@ -32,10 +37,10 @@ Root package: `com.github.pinont.singularitylib`
 - `api/hook/discordJDA/` — Discord bootstrap: `DiscordApp`, `SimpleSlashCommands`, `SlashCommandComponent`, `Ready`
 - `api/items/` — `CustomItem`, `ItemCreator`, `ItemHeadCreator`, `CrossbowCreator`, `ItemInteraction`
 - `api/manager/` — `CommandManager`, `ConfigManager`, `CustomItemManager`, `FileManager`, `WorldManager`
-- `api/runnable/` — `Runner`, `Scheduler` task wrappers
+- `api/runnable/` — `Runner`, `Scheduler` task wrappers. **Tick semantics:** delay/period are server ticks on both Paper and Folia paths (Folia `runAtFixedRate` and Bukkit `runTaskTimer` are tick-native); the only exception is `runRepeatingTaskAsync`, whose delay/period follow the supplied `TimeUnit`. Folia region-scheduler tasks have no bulk cancel API — cancel them via task handles/`cancelTask()`; `cancelAllTasks()` covers async + global-region (Folia) or everything (Paper).
 - `api/ui/` — GUI toolkit: `Menu`, `Button`, `Layout`
 - `api/utils/` — `Common`, `Console`, `MySQL`
-- `plugin/CorePlugin.java` — **the contract**: consumer main classes extend this instead of `JavaPlugin`; overrides are `onPluginStart()` / `onPluginStop()`. Owns static `instance`, prefix, Folia detection, registration wiring.
+- `plugin/CorePlugin.java` — **the contract**: consumer main classes extend this instead of `JavaPlugin`; overrides are `onPluginStart()` / `onPluginStop()`. Owns static `instance`, prefix, Folia detection, registration wiring. The lib itself is a bootstrap plugin declared in `src/main/resources/paper-plugin.yml` (`api-version: '26.2'`, `folia-supported: true`, `load: STARTUP`).
 - `plugin/listener/` — internal listeners (`EntityDamageListener`, `PlayerListener`) backing item interaction & PvP events
 - `plugin/register/Register.java` — scans packages with Reflections for `@AutoRegister`, instantiates and registers `SimpleCommand`, `CustomItem`, `Listener` impls
 
@@ -47,17 +52,17 @@ Tests live in `src/test/java` (`CorePluginTest`, `CommonTest`, `ItemCreatorMetaT
 - Version bumps happen through release tags; `-SNAPSHOT` between releases.
 
 ## Known issues / tech debt (observed)
-1. **Version confusion**: `pom.xml` says `1.3.4-SNAPSHOT`, tags go to `1.3.3`, but `RELEASE_NOTES.md` describes a "2.2.0" initial release. Align before any re-release.
+1. **Version history**: `pom.xml` is now `2.0.0-SNAPSHOT` (v2 line); tags stop at `1.3.3` while `RELEASE_NOTES.md` describes a "2.2.0" initial release. Reconcile release notes before tagging v2.
 2. **Legacy color API**: `org.bukkit.ChatColor` used across `Console`, `Register`, etc. — deprecated in modern Paper (use Adventure `Component`/`NamedTextColor`).
 3. **Typo'd enum** `PersisDataType` — public API surface, renaming is breaking.
 4. **Reflections scanner** (`Register`) is startup-slow and fragile under complex classpaths/relocation; a compile-time index or explicit registry would be more robust.
-5. **Ships as a plugin AND a library**: `plugin.yml` makes the lib itself a plugin (`main: ...api.Plugin`). Consumers instead depend on it as a Maven dep and extend `CorePlugin`. This dual role is a design smell worth revisiting during the rework.
-6. **JitPack coordinates mismatch**: consumers use `com.github.pinont:SingularityLib` (capital L) while this pom declares `com.github.pinont:singularitylib`.
+5. **Ships as a plugin AND a library**: `paper-plugin.yml` makes the lib itself a plugin (`main: ...api.Plugin`). Consumers instead depend on it as a Maven dep and extend `CorePlugin`. This dual role is a design smell worth revisiting during the rework.
+6. ~~JitPack coordinates mismatch~~ resolved on `rework/v2`: the JitPack repo and the last JitPack-hosted dependency (`com.github.Pinont:Singularity-DevTool`) were removed from the pom. README still shows a JitPack badge/install snippet — update docs when GitHub Packages publishing goes live.
 7. Minimal tests; no CI matrix across MC versions.
 
 ## Agent guidance
 - **Do not break `CorePlugin`'s public contract** (`onPluginStart`/`onPluginStop`, `getConfigManager`, static accessors) — both sibling repos and unknown external plugins depend on it.
-- Treat all classes under `api/` as public API; check JitPack consumers before renaming/moving anything.
+- Treat all classes under `api/` as public API; check downstream consumers (sibling repos, GitHub Packages) before renaming/moving anything.
 - New features go in the matching `api/` subpackage with Javadoc; wire global behavior through `CorePlugin`/`Register`, not static singletons where avoidable.
 - When touching items/events, remember the internal listeners in `plugin/listener` are the machinery behind the public events.
 - The owner plans a **major rework**: LTS/rolling MC version support, wiki + javadoc site. Favor changes that reduce coupling to a single Paper version (e.g., isolate NMS/version-specific code) over quick hacks.
