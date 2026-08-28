@@ -215,6 +215,10 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.49.1.0</version>
         </dependency>
+        <!-- SingularityNMS integration is DELIBERATELY reflection-only (NmsBridge):
+             no Maven dependency declared, so the lib and its tests stay hermetically
+             decoupled from net.minecraft.* server classes. Servers wanting deep-NBT
+             install the SingularityNMS plugin; the bridge probes it at runtime. -->
         <!-- MongoDB sync driver -->
         <dependency>
             <groupId>org.mongodb</groupId>
