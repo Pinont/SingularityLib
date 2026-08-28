@@ -39,6 +39,11 @@ public class Register {
      * @param packageName the package name to scan
      */
     public void scanAndCollect(String packageName) {
+        if (packageName == null || packageName.trim().isEmpty()) {
+            // Nothing to scan (e.g. under MockBukkit tests where the plugin's
+            // package may resolve empty). Explicitly supported no-op.
+            return;
+        }
         Reflections reflections = new Reflections(packageName);
         Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AutoRegister.class);
 
