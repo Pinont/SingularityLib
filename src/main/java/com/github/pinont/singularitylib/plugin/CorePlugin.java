@@ -32,7 +32,10 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     public @NotNull FileConfiguration getConfig() {
-        return new ConfigManager(this, "config.yml").getConfig();
+        // Return the cached config (created once in onEnable) rather than building
+        // a fresh ConfigManager per call — behavior fix from the v1 audit.
+        return pluginConfig == null ? new ConfigManager(this, "config.yml").getConfig()
+                : pluginConfig.getConfig();
     }
 
     /**
@@ -44,9 +47,9 @@ public abstract class CorePlugin extends JavaPlugin {
         return new ConfigManager(this, "config.yml");
     }
 
-    private static String prefix;
-    private static Long startTime;
-    private static boolean isFolia;
+    private static volatile String prefix;
+    private static volatile Long startTime;
+    private static volatile boolean isFolia;
 
     /**
      * Flag indicating if the plugin is running in test mode.
@@ -72,13 +75,17 @@ public abstract class CorePlugin extends JavaPlugin {
      * @return the formatted prefix string
      */
     public static String getPrefix() {
-        if (prefix == null) {
-            return "[" + getInstance().getName() + "]";
+        if (prefix != null) {
+            return prefix;
         }
-        if (!prefix.contains("[") || !prefix.contains("]")) {
-            prefix = "[" + prefix + "]";
-        }
-        return prefix;
+        // Safe publication: compute once and publish to the volatile — never mutate
+        // a shared reference lazily (avoids a benign-but-real read race on two threads).
+        final String raw = prefix;
+        final String formatted = raw == null
+                ? "[" + getInstance().getName() + "]"
+                : raw.contains("[") && raw.contains("]") ? raw : "[" + raw + "]";
+        prefix = formatted;
+        return formatted;
     }
 
     /**
