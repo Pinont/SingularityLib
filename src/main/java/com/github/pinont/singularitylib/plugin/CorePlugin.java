@@ -290,6 +290,33 @@ public abstract class CorePlugin extends JavaPlugin {
         exposeComponents(register);
     }
 
+    /**
+     * Registers a Reloadable component for this plugin. The DevTool live config
+     * editor calls {@link com.github.pinont.singularitylib.api.config.Reloadable#reload()}
+     * on every registered instance after saving config edits.
+     *
+     * @param reloadable the component to reload on config changes
+     */
+    public void registerReloadable(com.github.pinont.singularitylib.api.config.Reloadable reloadable) {
+        reloadables.add(reloadable);
+    }
+
+    /**
+     * Triggers reload on every registered Reloadable (e.g. after a live config edit).
+     */
+    public void reloadReloadables() {
+        for (com.github.pinont.singularitylib.api.config.Reloadable r : reloadables) {
+            try {
+                r.reload();
+            } catch (Exception e) {
+                sendConsoleMessage(Component.text("Failed to reload " + r.getClass().getSimpleName()
+                        + ": " + e.getMessage(), NamedTextColor.RED));
+            }
+        }
+    }
+
+    private final java.util.List<com.github.pinont.singularitylib.api.config.Reloadable> reloadables = new java.util.ArrayList<>();
+
     private boolean foliaCheck() {
         try {
             Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
