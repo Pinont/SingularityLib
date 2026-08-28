@@ -1,7 +1,7 @@
 # AGENTS.md — SingularityLib
 
 ## What this is
-SingularityLib (`com.github.pinont:singularitylib`) is the core framework of the **Singularity Project** — a Minecraft plugin development library for PaperMC. Sibling repos:
+SingularityLib (`io.github.pinont:singularitylib`) is the core framework of the **Singularity Project** — a Minecraft plugin development library for PaperMC. Sibling repos:
 
 | Repo | Role |
 |---|---|
@@ -26,7 +26,7 @@ export JAVA_HOME=$(echo ~/dev-tools/jdk-*)
 - Shaded deps include `org.reflections` (used by the auto-register scanner), behind the `-Dshade` profile.
 
 ## Code layout
-Root package: `com.github.pinont.singularitylib`
+Root package: `io.github.pinont.singularitylib`
 
 - `api/Plugin.java` — Bukkit plugin entry point (declared in `src/main/resources/paper-plugin.yml`, `load: STARTUP`)
 - `api/annotation/AutoRegister.java` — marks classes for automatic registration

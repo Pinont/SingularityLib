@@ -1,3 +1,9 @@
+### SingularityLib 2.0.0 (2026-08-28)
+
+First **Maven Central** release — `io.github.pinont:singularitylib:2.0.0`.
+Modernized stack: Paper 26.2+, JDK 25, Folia support, bootstrap plugin model,
+GitHub Packages + maven.pinont.me (snapshots). _(Older notes below retain history.)_
+
 ### SingularityLib 2.2.0
 
 #### Overview

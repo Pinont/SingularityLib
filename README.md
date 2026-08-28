@@ -1,6 +1,6 @@
 # SingularityLib
 
-[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://jitpack.io/v/Pinont/SingularityLib.svg)](https://jitpack.io/#Pinont/SingularityLib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml)
+[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://img.shields.io/maven-central/v/io.github.pinont/singularitylib)](https://central.sonatype.com/artifact/io.github.pinont/singularitylib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml)
 
 A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
@@ -33,27 +33,52 @@ A Minecraft plugin api that provides a lot of benefit to develop Minecraft plugi
 
 ## Installation (Maven)
 
-If the library is published to GitHub Packages, add the GitHub repository and dependency to your `pom.xml`:
+SingularityLib is published to **Maven Central** — no repository block needed for releases:
 
 ```xml
-<project>
-  ...
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
+<dependencies>
+  <dependency>
+    <groupId>io.github.pinont</groupId>
+    <artifactId>singularitylib</artifactId>
+    <version>2.0.0</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+```
 
-  <dependencies>
-    <dependency>
-	    <groupId>com.github.pinont</groupId>
-	    <artifactId>SingularityLib</artifactId>
-	    <version>Tag</version>
-	</dependency>
-  </dependencies>
-  ...
-</project>
+🚀 **Get the latest version:** [central.sonatype.com/artifact/io.github.pinont/singularitylib](https://central.sonatype.com/artifact/io.github.pinont/singularitylib)
+
+### Snapshots (dev/pre-release)
+
+```xml
+<repositories>
+  <repository>
+    <id>singularity</id>
+    <url>https://maven.pinont.me</url>
+  </repository>
+</repositories>
+<dependencies>
+  <dependency>
+    <groupId>io.github.pinont</groupId>
+    <artifactId>singularitylib</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <scope>provided</scope>
+  </dependency>
+</dependencies>
+```
+
+### Bootstrap plugin model ⚠️ important
+The lib runs as **its own server plugin**; consumer plugins compile against it with
+`provided` scope and declare it in `paper-plugin.yml`. Never shade the lib into your jar:
+
+```yaml
+# paper-plugin.yml (consumer)
+dependencies:
+  server:
+    SingularityLib:
+      load: BEFORE
+      required: true
+      join-classpath: true
 ```
 
 ## Usage
