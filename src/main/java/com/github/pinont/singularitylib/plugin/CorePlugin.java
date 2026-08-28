@@ -93,11 +93,19 @@ public abstract class CorePlugin extends JavaPlugin {
 
     /**
      * Sends a message to the console with the plugin prefix.
+     * Falls back to {@link System#out} when no Bukkit server is running (e.g.
+     * during unit tests or very early startup) so logging never NPEs.
      *
      * @param component the message component to send
      */
     public static void sendConsoleMessage(Component component) {
-        Bukkit.getConsoleSender().sendMessage(Component.text(getPrefix() + " ").append(component));
+        try {
+            Bukkit.getConsoleSender().sendMessage(Component.text(getPrefix() + " ").append(component));
+        } catch (Exception e) {
+            // Bukkit unavailable (unit tests / early startup): never re-enter getPrefix()
+            // (it can NPE without a server), just print a bare message.
+            System.out.println("[SingularityLib] " + component);
+        }
     }
 
     /**

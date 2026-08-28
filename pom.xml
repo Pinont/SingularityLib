@@ -135,6 +135,18 @@
                 <version>3.13.0</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
+                    <!-- Runs the singularitylib-processor annotation processor so the
+                         lib's OWN @AutoRegister classes (e.g. EntityDamageListener) land
+                         in a compile-time index inside the built jar. Consumers that
+                         depend on the lib should add the same entry to generate their
+                         own index (see README). -->
+                    <annotationProcessorPaths>
+                        <annotationProcessorPath>
+                            <groupId>io.github.pinont</groupId>
+                            <artifactId>singularitylib-processor</artifactId>
+                            <version>${project.version}</version>
+                        </annotationProcessorPath>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -224,6 +236,20 @@
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.10.2</version>
+            <!-- Only the deprecated scanAndCollect fallback needs Reflections; consumers
+                 compiled with the processor get a compile-time index instead. Optional so
+                 it never leaks transitively into consumer builds. -->
+            <optional>true</optional>
+        </dependency>
+        <!-- Compile-time @AutoRegister index generator. Provided: consumers do not need
+             it on their runtime classpath (the index resource is baked into their jar
+             at build time), and this also makes the lib's own build reference the
+             module from the reactor. -->
+        <dependency>
+            <groupId>io.github.pinont</groupId>
+            <artifactId>singularitylib-processor</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>

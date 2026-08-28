@@ -88,6 +88,8 @@ jobs:
         run: |
           set -e
           mvn -B -s $GITHUB_WORKSPACE/settings.xml versions:set -DnewVersion="${{ steps.version.outputs.version }}" -DgenerateBackupPoms=false
+          # Keep the standalone processor module version in lockstep.
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml versions:set -f singularitylib-processor/pom.xml -DnewVersion="${{ steps.version.outputs.version }}" -DgenerateBackupPoms=false
           echo "Effective pom version line:"
           grep -m1 '<version>' pom.xml
 
@@ -97,7 +99,7 @@ jobs:
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add pom.xml
+            git add pom.xml singularitylib-processor/pom.xml
             git commit -m "chore(release): set version ${{ steps.version.outputs.version }}"
             git push origin HEAD:main
           else
@@ -105,12 +107,16 @@ jobs:
           fi
 
       - name: Build (package)
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Pwith-shade package
+        run: |
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests install -f singularitylib-processor/pom.xml
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests -Pwith-shade package
 
       - name: Deploy Release to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
+        run: |
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy -f singularitylib-processor/pom.xml
+          mvn -B -s $GITHUB_WORKSPACE/settings.xml -DskipTests deploy
 
       - name: Create & Push Git Tag
         run: |
@@ -150,10 +156,11 @@ jobs:
           NEXT_PATCH=$((PA + 1))
           NEXT_VERSION="${MA}.${MI}.${NEXT_PATCH}-SNAPSHOT"
           mvn -B versions:set -DnewVersion="${NEXT_VERSION}" -DgenerateBackupPoms=false
+          mvn -B versions:set -f singularitylib-processor/pom.xml -DnewVersion="${NEXT_VERSION}" -DgenerateBackupPoms=false
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add pom.xml
+            git add pom.xml singularitylib-processor/pom.xml
             git commit -m "chore: prepare next development iteration ${NEXT_VERSION}"
             git push origin HEAD:main
           fi
@@ -211,10 +218,14 @@ KG
           echo "version=$VER" >> "$GITHUB_OUTPUT"
 
       - name: Set release version
-        run: mvn -B versions:set -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
+        run: |
+          mvn -B versions:set -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
+          mvn -B versions:set -f singularitylib-processor/pom.xml -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
 
       - name: Stage artifacts (file: deploy)
-        run: mvn -B clean deploy -DskipTests -DaltDeploymentRepository=central::default::file:$(pwd)/staging
+        run: |
+          mvn -B clean deploy -DskipTests -DaltDeploymentRepository=central::default::file:$(pwd)/staging
+          mvn -B deploy -f singularitylib-processor/pom.xml -DskipTests -DaltDeploymentRepository=central::default::file:$(pwd)/staging
 
       - name: GPG-sign all artifacts
         env:

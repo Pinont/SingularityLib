@@ -17,6 +17,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+      - name: Install annotation processor module
+        # singularitylib-processor is a standalone module (the root pom is a jar,
+        # not an aggregator), so install it into the local repo first — the lib
+        # compiles against it via annotationProcessorPaths.
+        run: mvn -q install -f singularitylib-processor/pom.xml
       - name: Build & test
         run: mvn -q clean package
 
@@ -37,8 +42,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-      - name: Publish snapshot
-        run: mvn -q deploy -DskipTests
+      - name: Install annotation processor module
+        run: mvn -q install -f singularitylib-processor/pom.xml
+      - name: Publish snapshot (processor + lib)
+        run: |
+          mvn -q deploy -f singularitylib-processor/pom.xml -DskipTests
+          mvn -q deploy -DskipTests
         env:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_ACTOR: ${{ github.actor }}

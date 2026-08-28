@@ -95,3 +95,55 @@ public class Main extends CorePlugin {
     }
 }
 ```
+
+### ⚡ Compile-time `@AutoRegister` index (recommended)
+Annotation-marked classes are collected **at compile time** by the
+`singularitylib-processor` annotation processor and shipped inside your jar as
+`META-INF/singularitylib/auto-register-index.properties`. At plugin startup
+`Register` reads that index instead of scanning the classpath with Reflections —
+no startup cost, no fragile classpath assumptions.
+
+Mark your components with `@AutoRegister`:
+
+```java
+@AutoRegister
+public class MyListener implements Listener { /* … */ }
+
+@AutoRegister
+public class MyCommand implements SimpleCommand { /* … */ }
+```
+
+Then tell your build to run the processor. Using Maven with
+`annotationProcessorPaths` (the processor is **not** on the runtime classpath —
+only the index resource matters at runtime):
+
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <configuration>
+        <annotationProcessorPaths>
+          <annotationProcessorPath>
+            <groupId>io.github.pinont</groupId>
+            <artifactId>singularitylib-processor</artifactId>
+            <version>2.0.0</version>
+          </annotationProcessorPath>
+        </annotationProcessorPaths>
+      </configuration>
+    </plugin>
+  </plugins>
+</build>
+```
+
+How it works: a class annotated with `@AutoRegister` is picked up by the
+processor during compilation, its fully-qualified name is appended to the index,
+and at runtime `CorePlugin.onEnable()` calls `Register.loadFromIndex()` which
+reads every index on the classpath, instantiates each listed class via its
+no-arg constructor, and registers it as a listener / command / custom item.
+
+> **Backward compatibility:** consumers compiled *without* the processor (no
+> index in their jar) fall back to the old (deprecated) Reflections
+> `scanAndCollect(package)` path, so nothing breaks on upgrade. The
+> `org.reflections` dependency is only needed for that fallback.
