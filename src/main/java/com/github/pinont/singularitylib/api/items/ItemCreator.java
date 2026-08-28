@@ -1,7 +1,7 @@
 package com.github.pinont.singularitylib.api.items;
 
 import com.github.pinont.singularitylib.api.enums.AttributeType;
-import com.github.pinont.singularitylib.api.enums.PersisDataType;
+import com.github.pinont.singularitylib.api.enums.PersistType;
 import com.github.pinont.singularitylib.api.utils.Common;
 import com.github.pinont.singularitylib.api.utils.Console;
 import com.google.common.collect.Sets;
@@ -218,7 +218,7 @@ public class ItemCreator {
      */
     public ItemCreator setCannotMove(boolean b) {
         if (b) {
-            this.setDataContainer("cannot_move", "true", PersisDataType.STRING);
+            this.setDataContainer("cannot_move", "true", PersistType.STRING);
         }
         return this;
     }
@@ -335,7 +335,7 @@ public class ItemCreator {
      * @return this ItemCreator for method chaining
      */
     public ItemCreator setUnstackable(boolean bool) {
-        setDataContainer("unstackable", (short) new Random().nextInt(), PersisDataType.SHORT);
+        setDataContainer("unstackable", (short) new Random().nextInt(), PersistType.SHORT);
         return this;
     }
 
@@ -491,7 +491,7 @@ public class ItemCreator {
      * @param type the type of the data
      * @return this ItemCreator for method chaining
      */
-    public ItemCreator setDataContainer(String key, Object value, PersisDataType type) {
+    public ItemCreator setDataContainer(String key, Object value, PersistType type) {
         switch (type) {
             case STRING:
                 data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, value.toString());
@@ -536,7 +536,7 @@ public class ItemCreator {
     public ItemCreator addInteraction(ItemInteraction itemInteraction) {
         if (itemInteraction == null) return this;
         ITEM_INTERACTIONS.add(itemInteraction);
-        this.setDataContainer("interaction", itemInteraction.getName(), PersisDataType.STRING);
+        this.setDataContainer("interaction", itemInteraction.getName(), PersistType.STRING);
         return this;
     }
 }

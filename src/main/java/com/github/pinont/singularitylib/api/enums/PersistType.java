@@ -4,7 +4,7 @@ package com.github.pinont.singularitylib.api.enums;
  * Enumeration of persistent data types for storing data in ItemStacks.
  * Each type corresponds to a Bukkit PersistentDataType for data storage.
  */
-public enum PersisDataType {
+public enum PersistType {
     /**
      * String data type.
      */
