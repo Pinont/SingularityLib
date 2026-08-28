@@ -41,4 +41,23 @@ public class PluginRegistryTest {
         Assertions.assertTrue(PluginRegistry.find("DoesNotExist").isEmpty());
         Assertions.assertNull(PluginRegistry.get("DoesNotExist"));
     }
+
+    @Test
+    @DisplayName("componentsOf returns registered commands for a plugin")
+    public void componentsRegistered() {
+        MockBukkit.load(TestPlugin.class);
+        var plugin = PluginRegistry.get("TestPlugin");
+        Assertions.assertNotNull(plugin);
+        var comps = PluginRegistry.componentsOf(plugin);
+        Assertions.assertNotNull(comps, "components record present");
+        Assertions.assertNotNull(comps.commands(), "commands list non-null");
+        Assertions.assertNotNull(comps.listeners(), "listeners list non-null");
+    }
+
+    @Test
+    @DisplayName("componentsOf returns EMPTY for unknown plugin")
+    public void componentsMissing() {
+        var comps = PluginRegistry.componentsOf(null);
+        Assertions.assertEquals(0, comps.commands().size());
+    }
 }

@@ -223,8 +223,20 @@ public abstract class CorePlugin extends JavaPlugin {
                     register.scanAndCollect(this.getClass().getPackageName());
                 }
                 register.registerAll(this);
+                exposeComponents(register);
             }
         }
+    }
+
+    /**
+     * Publishes this plugin's registered components into {@link PluginRegistry}
+     * so DevTool-style tooling can inspect them per-plugin.
+     */
+    private void exposeComponents(Register register) {
+        PluginRegistry.registerComponents(this,
+                register.getCommands(),
+                register.getListeners(),
+                register.getCustomItems());
     }
 
     /**
@@ -249,6 +261,7 @@ public abstract class CorePlugin extends JavaPlugin {
         Register register = new Register();
         register.register(components);
         register.registerAll(this);
+        exposeComponents(register);
     }
 
     /**
@@ -266,6 +279,7 @@ public abstract class CorePlugin extends JavaPlugin {
         Register register = new Register();
         register.register(classes);
         register.registerAll(this);
+        exposeComponents(register);
     }
 
     private boolean foliaCheck() {
