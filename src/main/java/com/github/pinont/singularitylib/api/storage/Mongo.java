@@ -3,8 +3,7 @@ package com.github.pinont.singularitylib.api.storage;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bson.Document;
@@ -81,8 +80,8 @@ public class Mongo implements AutoCloseable {
     public void upsert(String collection, Document filter, Document update) {
         coll(collection).findOneAndUpdate(
                 filter,
-                Updates.combine(Updates.set("$set", update)),
-                new com.mongodb.client.model.FindOneAndUpdateOptions().upsert(true)
+                new Document("$set", update),
+                new FindOneAndUpdateOptions().upsert(true)
         );
     }
 
