@@ -4,6 +4,7 @@ import com.github.pinont.singularitylib.api.utils.Common;
 import com.github.pinont.singularitylib.plugin.listener.PlayerListener;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
+import com.github.pinont.singularitylib.api.registry.PluginRegistry;
 import com.github.pinont.singularitylib.plugin.register.Register;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -173,6 +174,7 @@ public abstract class CorePlugin extends JavaPlugin {
 //        }
 
         // Plugin Stop Process
+        PluginRegistry.unregister(this);
         onPluginStop();
     }
 
@@ -181,6 +183,7 @@ public abstract class CorePlugin extends JavaPlugin {
         startTime = System.currentTimeMillis();
         // Initialize the plugin instance.
         instance = this;
+        PluginRegistry.register(this);
         prefix = getInstance().getPluginMeta().getLoggerPrefix();
         // Initialize Plugin Config.
         pluginConfig = new ConfigManager(this, "config.yml");
