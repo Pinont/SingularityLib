@@ -212,10 +212,54 @@ public abstract class CorePlugin extends JavaPlugin {
 
         // Register Command, CustomItem, and Listeners.
         if (!isTest) {
-            Register register = new Register();
-            register.scanAndCollect(this.getClass().getPackageName());
-            register.registerAll(this);
+            if (!explicitRegistration) {
+                // Legacy path: @AutoRegister classpath scan (deprecated but supported).
+                Register register = new Register();
+                register.scanAndCollect(this.getClass().getPackageName());
+                register.registerAll(this);
+            }
         }
+    }
+
+    /**
+     * Set when the consumer opts into explicit registration via
+     * {@link #registerComponents(Object...)} / {@link #registerComponentClasses(Class...)}.
+     * Suppresses the legacy {@code @AutoRegister} classpath scan to avoid double-registration.
+     */
+    private boolean explicitRegistration;
+
+    /**
+     * Registers component instances directly (listeners, commands, custom items) with
+     * this plugin — the fast, explicit path (no classpath scanning). Call from
+     * {@link #onPluginStart()}:
+     * <pre>{@code
+     * registerComponents(new MyListener(), new MyCommand(), new MyItem());
+     * }</pre>
+     *
+     * @param components the component instances to register
+     */
+    protected final void registerComponents(Object... components) {
+        explicitRegistration = true;
+        Register register = new Register();
+        register.register(components);
+        register.registerAll(this);
+    }
+
+    /**
+     * Registers component classes (instantiated reflectively via no-arg ctor) with this
+     * plugin. Preferred over old {@code @AutoRegister} scanning when you want class-level
+     * registration without classpath scanning:
+     * <pre>{@code
+     * registerComponentClasses(MyListener.class, MyCommand.class);
+     * }</pre>
+     *
+     * @param classes the component classes to register
+     */
+    protected final void registerComponentClasses(Class<?>... classes) {
+        explicitRegistration = true;
+        Register register = new Register();
+        register.register(classes);
+        register.registerAll(this);
     }
 
     private boolean foliaCheck() {

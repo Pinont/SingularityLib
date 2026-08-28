@@ -33,10 +33,66 @@ public class Register {
     }
 
     /**
+     * Explicitly registers annotated component CLASSES (no classpath scanning).
+     * Each class is instantiated via its no-arg constructor and classified into
+     * listeners / commands / custom items — the fast, reflection-free path.
+     *
+     * @param classes the component classes to register (must have a no-arg constructor)
+     */
+    public void register(Class<?>... classes) {
+        for (Class<?> clazz : classes) {
+            try {
+                Object instance = clazz.getDeclaredConstructor().newInstance();
+                collect(instance);
+            } catch (NoSuchMethodException e) {
+                Console.logError("No default constructor found for class: " + clazz.getName());
+            } catch (InstantiationException e) {
+                Console.logError("Failed to instantiate class: " + clazz.getName());
+            } catch (IllegalAccessException e) {
+                Console.logError("Illegal access while instantiating class: " + clazz.getName());
+            } catch (Exception e) {
+                Console.logError("Unexpected error while processing class: " + clazz.getName());
+                Console.logError(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Explicitly registers component INSTANCES (already constructed by the caller) —
+     * the fastest path, with no reflection at all.
+     *
+     * @param instances the component instances to register
+     */
+    public void register(Object... instances) {
+        for (Object instance : instances) {
+            collect(instance);
+        }
+    }
+
+    /**
+     * Classifies a single instance into the appropriate collection.
+     */
+    private void collect(Object instance) {
+        if (instance instanceof Listener) {
+            listeners.add((Listener) instance);
+        }
+        if (instance instanceof SimpleCommand) {
+            commands.add((SimpleCommand) instance);
+        }
+        if (instance instanceof CustomItem) {
+            customItems.add((CustomItem) instance);
+        }
+    }
+
+    /**
      * Scans the specified package for annotated classes and collects them for registration.
      *
      * @param packageName the package name to scan
+     * @deprecated prefer {@link #register(Class[])} / {@link #register(Object[])} —
+     *             the Reflections classpath scan is slow and fragile; explicit registration
+     *             is the supported path since v2.
      */
+    @Deprecated
     public void scanAndCollect(String packageName) {
         if (packageName == null || packageName.trim().isEmpty()) {
             // Nothing to scan (e.g. under MockBukkit tests where the plugin's
@@ -49,15 +105,7 @@ public class Register {
         for (Class<?> clazz : annotated) {
             try {
                 Object instance = clazz.getDeclaredConstructor().newInstance();
-                if (Listener.class.isAssignableFrom(clazz)) {
-                    listeners.add((Listener) instance);
-                }
-                if (SimpleCommand.class.isAssignableFrom(clazz)) {
-                    commands.add((SimpleCommand) instance);
-                }
-                if (CustomItem.class.isAssignableFrom(clazz)) {
-                    customItems.add((CustomItem) instance);
-                }
+                collect(instance);
             } catch (NoSuchMethodException e) {
                 Console.logError("No default constructor found for class: " + clazz.getName());
             } catch (InstantiationException e) {
