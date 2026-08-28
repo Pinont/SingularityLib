@@ -96,4 +96,34 @@ public final class NmsBridge {
     public static boolean hasVanillaNbt(ItemStack item) {
         return readItemNbt(item) != null;
     }
+
+    /**
+     * Returns a map of the item's vanilla NBT keys to their SNBT string values
+     * (best-effort via reflection on the NMS NbtCompound; empty when NMS is absent).
+     * Used by the DevTool inspector to display raw NBT without compile-time NMS deps.
+     */
+    public static java.util.Map<String, String> readItemNbtAsMap(ItemStack item) {
+        java.util.Map<String, String> out = new java.util.LinkedHashMap<>();
+        Object nbt = readItemNbt(item);
+        if (nbt == null) {
+            return out;
+        }
+        try {
+            // NbtCompound.keySet() -> Set<String>; getString(key, fallback) / toString of values
+            Object keys = nbt.getClass().getMethod("keySet").invoke(nbt);
+            for (Object k : (java.util.Set<?>) keys) {
+                String key = String.valueOf(k);
+                try {
+                    Object v = nbt.getClass().getMethod("getString", String.class, String.class)
+                            .invoke(nbt, key, "");
+                    out.put(key, String.valueOf(v));
+                } catch (NoSuchMethodException nsme) {
+                    out.put(key, "<raw>");
+                }
+            }
+        } catch (ReflectiveOperationException e) {
+            // ignore — best-effort inspection
+        }
+        return out;
+    }
 }
