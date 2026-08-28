@@ -25,9 +25,9 @@ import java.util.function.Function;
  */
 public class PaginatedMenu<T> extends Menu {
 
-    private final List<T> items;
-    private final Function<T, ItemStack> itemRenderer;
-    private final BiConsumer<Player, T> onClick;
+    private List<T> items;
+    private Function<T, ItemStack> itemRenderer;
+    private BiConsumer<Player, T> onClick;
     private final int pageSize;
     private final int[] contentSlots;
     private int page = 0;
@@ -61,6 +61,16 @@ public class PaginatedMenu<T> extends Menu {
             s.add(i);
         }
         return s.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    /**
+     * Re-points the data this menu pages over (used by subclasses that re-render, e.g.
+     * a config editor whose key set changes after edits).
+     */
+    protected void updateItems(List<T> items, Function<T, ItemStack> renderer, BiConsumer<Player, T> click) {
+        this.items = items == null ? new ArrayList<>() : items;
+        this.itemRenderer = renderer;
+        this.onClick = click;
     }
 
     /**
@@ -124,8 +134,18 @@ public class PaginatedMenu<T> extends Menu {
             buttons.add(pageIndicator());
         }
 
+        // Subclass hook for extra bottom-row buttons (e.g. save/cancel in tool menus)
+        addExtraBottomRowInto(buttons);
+
         buttons.forEach(this::addButton);
         super.show(player);
+    }
+
+    /**
+     * Hook: subclasses add bottom-row buttons here (they are merged before rendering).
+     * Default no-op.
+     */
+    protected void addExtraBottomRowInto(List<Button> buttons) {
     }
 
     private Button prevButton() {
