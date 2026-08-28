@@ -6,7 +6,7 @@ import com.github.pinont.singularitylib.api.utils.Common;
 import com.github.pinont.singularitylib.api.utils.Console;
 import com.google.common.collect.Sets;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.AttributeModifier;
@@ -422,7 +422,7 @@ public class ItemCreator {
             removeTag(oldKey);
             data.set(new NamespacedKey(plugin, newKey), PersistentDataType.STRING, value);
         } else {
-            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + oldKey);
+            sendConsoleMessage(Component.text("Item tag not found: " + oldKey, NamedTextColor.RED));
         }
         return this;
     }
@@ -451,7 +451,7 @@ public class ItemCreator {
             removeTag(key);
             data.set(new NamespacedKey(plugin, key), PersistentDataType.STRING, newValue);
         } else {
-            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + key);
+            sendConsoleMessage(Component.text("Item tag not found: " + key, NamedTextColor.RED));
         }
         return this;
     }
@@ -467,7 +467,7 @@ public class ItemCreator {
         if (hasTag(tag)) {
             data.remove(new NamespacedKey(plugin, tag));
         } else {
-            sendConsoleMessage(ChatColor.RED + "Item tag not found: " + tag);
+            sendConsoleMessage(Component.text("Item tag not found: " + tag, NamedTextColor.RED));
         }
         return this;
     }

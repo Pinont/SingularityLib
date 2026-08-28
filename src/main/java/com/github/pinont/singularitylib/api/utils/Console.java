@@ -1,6 +1,7 @@
 package com.github.pinont.singularitylib.api.utils;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendConsoleMessage;
 import static com.github.pinont.singularitylib.plugin.CorePlugin.sendDebugMessage;
@@ -23,7 +24,7 @@ public class Console {
      * @param message the message to log
      */
     public static void log(String message) {
-        sendConsoleMessage(message);
+        sendConsoleMessage(Component.text(message));
     }
 
     /**
@@ -32,7 +33,7 @@ public class Console {
      * @param message the error message to log
      */
     public static void logError(String message) {
-        sendConsoleMessage(ChatColor.RED + "[ERROR] " + message);
+        sendConsoleMessage(Component.text("[ERROR] " + message, NamedTextColor.RED));
     }
 
     /**
@@ -41,7 +42,7 @@ public class Console {
      * @param message the warning message to log
      */
     public static void logWarning(String message) {
-        sendConsoleMessage(ChatColor.YELLOW + "[WARNING] " + message);
+        sendConsoleMessage(Component.text("[WARNING] " + message, NamedTextColor.YELLOW));
     }
 
     /**

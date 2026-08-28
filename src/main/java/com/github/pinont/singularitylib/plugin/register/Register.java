@@ -7,7 +7,6 @@ import com.github.pinont.singularitylib.api.manager.CommandManager;
 import com.github.pinont.singularitylib.api.manager.CustomItemManager;
 import com.github.pinont.singularitylib.api.utils.Console;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.reflections.Reflections;
@@ -60,14 +59,14 @@ public class Register {
                     customItems.add((CustomItem) instance);
                 }
             } catch (NoSuchMethodException e) {
-                Console.logError(ChatColor.RED + "No default constructor found for class: " + clazz.getName());
+                Console.logError("No default constructor found for class: " + clazz.getName());
             } catch (InstantiationException e) {
-                Console.logError(ChatColor.RED + "Failed to instantiate class: " + clazz.getName());
+                Console.logError("Failed to instantiate class: " + clazz.getName());
             } catch (IllegalAccessException e) {
-                Console.logError(ChatColor.RED + "Illegal access while instantiating class: " + clazz.getName());
+                Console.logError("Illegal access while instantiating class: " + clazz.getName());
             } catch (Exception e) {
-                Console.logError(ChatColor.RED + "Unexpected error while processing class: " + clazz.getName());
-                Console.logError(ChatColor.RED + e.getMessage());
+                Console.logError("Unexpected error while processing class: " + clazz.getName());
+                Console.logError(e.getMessage());
             }
         }
     }

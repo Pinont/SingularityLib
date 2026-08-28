@@ -1,7 +1,7 @@
 package com.github.pinont.singularitylib.api.manager;
 
 import com.github.pinont.singularitylib.api.items.CustomItem;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -180,7 +180,7 @@ public class CustomItemManager {
     private void giveItemToPlayer(Player player, ItemStack item) {
         if (player != null) {
             player.getInventory().addItem(item);
-            player.sendMessage("Gave " + item.getAmount() + " " + item.getItemMeta().getItemName() + ChatColor.RESET + " to " + player.getName());
+            player.sendMessage(Component.text("Gave " + item.getAmount() + " " + item.getItemMeta().getItemName() + " to " + player.getName()));
         } else {
             player.sendMessage("Player not found");
         }

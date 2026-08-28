@@ -1,7 +1,8 @@
 package com.github.pinont.singularitylib.api.utils;
 
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -36,7 +37,7 @@ public class MySQL {
         configManager.set("database.timezone", "UTC");
         configManager.set("database.useSSL", "false");
         configManager.saveConfig();
-        sendConsoleMessage(ChatColor.YELLOW + "[DB] Please set the database configuration in database.yml");
+        sendConsoleMessage(Component.text("[DB] Please set the database configuration in database.yml", NamedTextColor.YELLOW));
     }
 
     /**
@@ -74,24 +75,24 @@ public class MySQL {
         String timeZone = config.getString("database.timezone", "UTC");
         String ssl = config.getString("database.useSSL", "false");
         String url = "jdbc:mysql://" + host + ":" + port + "/" + dbName + "?useSSL=" + ssl + "&serverTimezone=" + timeZone + "&autoReconnect=true&failOverReadOnly=false&maxReconnects=10";
-        sendDebugMessage(ChatColor.YELLOW + "[DB] Connecting to MySQL: host=" + host + ", port=" + port + ", dbName=" + dbName + ", user=" + username);
+        sendDebugMessage(Component.text("[DB] Connecting to MySQL: host=" + host + ", port=" + port + ", dbName=" + dbName + ", user=" + username, NamedTextColor.YELLOW));
         try {
             // Check if database exists, if not, create it
             String baseUrl = "jdbc:mysql://" + host + ":" + port + "/?useSSL=" + ssl + "&serverTimezone=" + timeZone;
             try (Connection baseConn = java.sql.DriverManager.getConnection(baseUrl, username, password)) {
-                sendConsoleMessage(ChatColor.YELLOW + "[DB] Connected to MySQL server for database check.");
+                sendConsoleMessage(Component.text("[DB] Connected to MySQL server for database check.", NamedTextColor.YELLOW));
                 try (java.sql.Statement stmt = baseConn.createStatement()) {
                     stmt.executeUpdate("CREATE DATABASE IF NOT EXISTS `" + dbName + "`");
-                    sendDebugMessage(ChatColor.YELLOW + "[DB] Ensured database '" + dbName + "' exists.");
+                    sendDebugMessage(Component.text("[DB] Ensured database '" + dbName + "' exists.", NamedTextColor.YELLOW));
                 }
             }
             // Now connect to the actual database
             if (connection == null || connection.isClosed()) {
                 connection = java.sql.DriverManager.getConnection(url, username, password);
-                sendDebugMessage(ChatColor.GREEN + "[DB] Connected to database '" + dbName + "'.");
+                sendDebugMessage(Component.text("[DB] Connected to database '" + dbName + "'.", NamedTextColor.GREEN));
             }
         } catch (Exception e) {
-            sendConsoleMessage(ChatColor.RED + "[DB] MySQL connection error:\n" + e.getMessage());
+            sendConsoleMessage(Component.text("[DB] MySQL connection error:\n" + e.getMessage(), NamedTextColor.RED));
             return null;
         }
         return connection;
@@ -105,9 +106,9 @@ public class MySQL {
     public void init(String configPath) {
         connection = getConnection(configPath);
         if (connection == null) {
-            sendConsoleMessage(ChatColor.RED + "[DB] Failed to connect to the database. Please check your configuration in database.yml");
+            sendConsoleMessage(Component.text("[DB] Failed to connect to the database. Please check your configuration in database.yml", NamedTextColor.RED));
         } else {
-            sendConsoleMessage(ChatColor.GREEN + "[DB] Successfully connected to the database.");
+            sendConsoleMessage(Component.text("[DB] Successfully connected to the database.", NamedTextColor.GREEN));
         }
     }
 

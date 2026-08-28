@@ -4,7 +4,8 @@ import com.github.pinont.singularitylib.api.manager.ConfigManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public abstract class DiscordApp {
                 }, "JDA-Thread");
                 jdaThread.start();
             } catch (Exception e) {
-                sendConsoleMessage(ChatColor.RED + "Make sure you have correct bot token in " + configPath + "!");
+                sendConsoleMessage(Component.text("Make sure you have correct bot token in " + configPath + "!", NamedTextColor.RED));
                 throw e;
             }
         } else {
@@ -82,7 +83,7 @@ public abstract class DiscordApp {
         if (configManager.getConfig().getString("bot_token") == null) {
             configManager.set("bot_token", "BOT_TOKEN_HERE");
             configManager.saveConfig();
-            sendConsoleMessage(ChatColor.RED + "Please set the bot_token in " + configPath + ".");
+            sendConsoleMessage(Component.text("Please set the bot_token in " + configPath + ".", NamedTextColor.RED));
             return "BOT_TOKEN_HERE";
         }
         return configManager.getConfig().getString("bot_token");

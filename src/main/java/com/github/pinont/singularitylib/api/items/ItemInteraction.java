@@ -1,6 +1,7 @@
 package com.github.pinont.singularitylib.api.items;
 
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
@@ -122,14 +123,14 @@ public abstract class ItemInteraction {
     public static ItemInteraction getInteraction(Plugin plugin, ItemStack item) {
         String id = getItemInteractionName(plugin, item);
         if (id == null) {
-            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
+            sendConsoleMessage(Component.text("Item interaction not found for item: " + item.getType(), NamedTextColor.RED));
             return null;
         }
         ItemInteraction interaction = ItemCreator.getInteractions().stream().filter(itemInteraction -> itemInteraction.getName().equals(id)).findFirst().orElse(null);
         if (interaction != null) {
             return interaction;
         } else {
-            sendConsoleMessage(ChatColor.RED + "Item interaction not found for item: " + item.getType());
+            sendConsoleMessage(Component.text("Item interaction not found for item: " + item.getType(), NamedTextColor.RED));
         }
         return null;
     }

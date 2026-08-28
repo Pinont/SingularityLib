@@ -1,8 +1,9 @@
 package com.github.pinont.singularitylib.api.ui;
 
 import com.github.pinont.singularitylib.api.items.ItemCreator;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -162,7 +163,7 @@ public class Menu {
 
                         @Override
                         public ItemStack getItem() {
-                            return new ItemCreator(plugin, new ItemStack(Material.BARRIER)).setName(ChatColor.RED + "This feature are not implemented yet.").create();
+                            return new ItemCreator(plugin, new ItemStack(Material.BARRIER)).setName(Component.text("This feature are not implemented yet.", NamedTextColor.RED)).create();
                         }
 
                         @Override

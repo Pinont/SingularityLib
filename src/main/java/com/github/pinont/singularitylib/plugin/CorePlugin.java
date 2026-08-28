@@ -5,8 +5,10 @@ import com.github.pinont.singularitylib.plugin.listener.PlayerListener;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import com.github.pinont.singularitylib.api.manager.ConfigManager;
 import com.github.pinont.singularitylib.plugin.register.Register;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -91,10 +93,19 @@ public abstract class CorePlugin extends JavaPlugin {
     /**
      * Sends a message to the console with the plugin prefix.
      *
+     * @param component the message component to send
+     */
+    public static void sendConsoleMessage(Component component) {
+        Bukkit.getConsoleSender().sendMessage(Component.text(getPrefix() + " ").append(component));
+    }
+
+    /**
+     * Sends a message to the console with the plugin prefix.
+     *
      * @param message the message to send
      */
     public static void sendConsoleMessage(String message) {
-        Bukkit.getConsoleSender().sendMessage(getPrefix() + " " + message);
+        sendConsoleMessage(Component.text(message));
     }
 
     private final List<SimpleCommand> simpleCommands = new ArrayList<>();
@@ -130,8 +141,24 @@ public abstract class CorePlugin extends JavaPlugin {
      * @param message the debug message to send
      */
     public static void sendDebugMessage(String message) {
+        sendDebugMessage(Component.text(message, NamedTextColor.WHITE, TextDecoration.ITALIC));
+    }
+
+    /**
+     * Sends a debug message to the console if debug mode is enabled.
+     * The prefix, DEV tag, and the message are rendered italic (matching the
+     * legacy colour-code behaviour where the trailing ITALIC code never reset);
+     * the message colour is whatever the supplied component carries.
+     *
+     * @param component the debug message component to send
+     */
+    public static void sendDebugMessage(Component component) {
         if (getInstance().getConfig().getBoolean("debug")) {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.ITALIC + "" + ChatColor.LIGHT_PURPLE + getPrefix() + ChatColor.YELLOW + " [DEV] " + ChatColor.WHITE + message);
+            Bukkit.getConsoleSender().sendMessage(
+                    Component.text(getPrefix(), NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC)
+                            .append(Component.text(" [DEV] ", NamedTextColor.YELLOW, TextDecoration.ITALIC))
+                            .append(component.decorate(TextDecoration.ITALIC))
+            );
         }
     }
 
@@ -168,11 +195,17 @@ public abstract class CorePlugin extends JavaPlugin {
 
         isFolia = foliaCheck();
         if (isFolia) {
-            sendConsoleMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "Folia environment detected, enabling Folia compatibility mode...");
+            sendConsoleMessage(Component.text("Folia environment detected, enabling Folia compatibility mode...", NamedTextColor.GREEN, TextDecoration.ITALIC));
         }
 
         // Initialize API To Plugin.
-        sendConsoleMessage(ChatColor.WHITE + "" + ChatColor.ITALIC + "Hooked " + ChatColor.YELLOW + ChatColor.ITALIC + this.getName() + ChatColor.WHITE + ChatColor.ITALIC + " into " + ChatColor.LIGHT_PURPLE + ChatColor.ITALIC + "SingularityAPI! " + Common.getAPIVersion());
+        sendConsoleMessage(
+                Component.text("Hooked ", NamedTextColor.WHITE, TextDecoration.ITALIC)
+                        .append(Component.text(this.getName(), NamedTextColor.YELLOW, TextDecoration.ITALIC))
+                        .append(Component.text(" into ", NamedTextColor.WHITE, TextDecoration.ITALIC))
+                        .append(Component.text("SingularityAPI! ", NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
+                        .append(Component.text(Common.getAPIVersion(), NamedTextColor.LIGHT_PURPLE, TextDecoration.ITALIC))
+        );
         onPluginStart();
         registerAPIListener(this, new PlayerListener());
 //        new CommandManager().register(this, this.simpleCommands);
@@ -195,7 +228,7 @@ public abstract class CorePlugin extends JavaPlugin {
     }
 
     private void registerAPIListener(Plugin plugin, Listener... listener) {
-        sendConsoleMessage(ChatColor.GREEN + "" + ChatColor.ITALIC + "Initializing API listeners for " + plugin.getName() + "...");
+        sendConsoleMessage(Component.text("Initializing API listeners for " + plugin.getName() + "...", NamedTextColor.GREEN, TextDecoration.ITALIC));
         for (Listener l : listener) {
             Bukkit.getPluginManager().registerEvents(l, plugin);
         }

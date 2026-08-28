@@ -3,7 +3,8 @@ package com.github.pinont.singularitylib.api.manager;
 import com.github.pinont.singularitylib.api.command.SimpleCommand;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,40 +41,40 @@ public class CommandManager {
      */
     public void register(Plugin plugin, List<SimpleCommand> simpleCommands) {
         final LifecycleEventManager<@NotNull Plugin> lifecycleManager = plugin.getLifecycleManager();
-        sendConsoleMessage(ChatColor.WHITE + "Registering Commands: " + Arrays.toString(simpleCommands.stream().map(SimpleCommand::getName).toArray()));
+        sendConsoleMessage(Component.text("Registering Commands: " + Arrays.toString(simpleCommands.stream().map(SimpleCommand::getName).toArray()), NamedTextColor.WHITE));
         lifecycleManager.registerEventHandler(LifecycleEvents.COMMANDS, (event) -> {
             for (SimpleCommand simpleCommand : simpleCommands) {
                 String[] aliases = simpleCommand.getName().toLowerCase().split(":");
-                sendConsoleMessage(ChatColor.WHITE + "Founded " + ChatColor.YELLOW + (aliases.length - 1) + ChatColor.WHITE + " aliases in " + ChatColor.YELLOW + aliases[0]);
+                sendConsoleMessage(Component.text("Founded ", NamedTextColor.WHITE).append(Component.text(aliases.length - 1, NamedTextColor.YELLOW)).append(Component.text(" aliases in ", NamedTextColor.WHITE)).append(Component.text(aliases[0], NamedTextColor.YELLOW)));
                 target_amount++;
                 try {
                     event.registrar().register(aliases[0], simpleCommand);
-                    sendConsoleMessage(ChatColor.WHITE + "Registered command: " + aliases[0]);
+                    sendConsoleMessage(Component.text("Registered command: " + aliases[0], NamedTextColor.WHITE));
                     success++;
                 } catch (Exception e) {
                     failure++;
-                    sendConsoleMessage(ChatColor.YELLOW + "Failed to register command: " + aliases[0] + "\n\nERROR TRACE: \n" + e.getMessage());
+                    sendConsoleMessage(Component.text("Failed to register command: " + aliases[0] + "\n\nERROR TRACE: \n" + e.getMessage(), NamedTextColor.YELLOW));
                 }
                 if (aliases.length > 1) {
                     for (int i = 1; i < aliases.length; i++) {
                         target_amount++;
                         try {
                             event.registrar().register(aliases[i], simpleCommand);
-                            sendConsoleMessage(ChatColor.WHITE + "Registered alias: " + aliases[i]);
+                            sendConsoleMessage(Component.text("Registered alias: " + aliases[i], NamedTextColor.WHITE));
                             success++;
                         } catch (Exception e) {
                             failure++;
-                            sendConsoleMessage(ChatColor.YELLOW + "Failed to register alias: " + aliases[i] + "\n\nERROR TRACE: \n" + e.getMessage());
+                            sendConsoleMessage(Component.text("Failed to register alias: " + aliases[i] + "\n\nERROR TRACE: \n" + e.getMessage(), NamedTextColor.YELLOW));
                         }
                     }
                 }
             }
             if (failure > 0) {
-                sendConsoleMessage(ChatColor.GREEN + "Command Register: successfully registered " + success + "/" + target_amount + " commands, " + ChatColor.RED + failure + " command failures");
+                sendConsoleMessage(Component.text("Command Register: successfully registered " + success + "/" + target_amount + " commands, ", NamedTextColor.GREEN).append(Component.text(failure + " command failures", NamedTextColor.RED)));
             }
-            sendConsoleMessage(ChatColor.GREEN + "Command Register: successfully registered " + success + "/" + target_amount + " commands.");
+            sendConsoleMessage(Component.text("Command Register: successfully registered " + success + "/" + target_amount + " commands.", NamedTextColor.GREEN));
             Long startTime = System.currentTimeMillis() - getStartTime();
-            sendConsoleMessage(ChatColor.WHITE + "Plugin is Enabled (took " + ChatColor.YELLOW + startTime + ChatColor.WHITE + " ms)");
+            sendConsoleMessage(Component.text("Plugin is Enabled (took ", NamedTextColor.WHITE).append(Component.text(startTime, NamedTextColor.YELLOW)).append(Component.text(" ms)", NamedTextColor.WHITE)));
         });
     }
 }
