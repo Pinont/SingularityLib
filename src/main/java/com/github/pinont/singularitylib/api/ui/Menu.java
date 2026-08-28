@@ -40,6 +40,22 @@ public class Menu {
     }
 
     /**
+     * Clears all buttons (used by subclasses that re-render per page).
+     */
+    protected void clearButtons() {
+        buttons.clear();
+    }
+
+    /**
+     * Gets the owning plugin.
+     *
+     * @return the plugin that owns this menu
+     */
+    protected Plugin getPlugin() {
+        return plugin;
+    }
+
+    /**
      * Creates a new Menu with the specified title and automatic size.
      *
      * @param title the title of the menu
