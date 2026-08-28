@@ -216,9 +216,12 @@ public abstract class CorePlugin extends JavaPlugin {
         // Register Command, CustomItem, and Listeners.
         if (!isTest) {
             if (!explicitRegistration) {
-                // Legacy path: @AutoRegister classpath scan (deprecated but supported).
                 Register register = new Register();
-                register.scanAndCollect(this.getClass().getPackageName());
+                // Primary: compile-time @AutoRegister index (fast, no classpath scan).
+                // Fallback: legacy Reflections scan when no index resource exists.
+                if (!register.loadFromIndex()) {
+                    register.scanAndCollect(this.getClass().getPackageName());
+                }
                 register.registerAll(this);
             }
         }

@@ -54,7 +54,11 @@ public final class Attributes {
             return 0.0;
         }
         double total = 0.0;
-        for (AttributeModifier modifier : meta.getAttributeModifiers(type.getAttribute())) {
+        var modifiers = meta.getAttributeModifiers(type.getAttribute());
+        if (modifiers == null) {
+            return 0.0;
+        }
+        for (AttributeModifier modifier : modifiers) {
             total += modifier.getAmount();
         }
         return total;

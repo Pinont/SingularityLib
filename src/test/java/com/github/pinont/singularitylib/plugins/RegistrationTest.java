@@ -32,6 +32,9 @@ public class RegistrationTest {
 
     @BeforeEach
     public void setUp() {
+        // Clear the cross-test dedupe set so each test can register its own classes
+        // fresh (in production the dedupe prevents cross-plugin double-registration).
+        Register.resetDedupe();
         register = new Register();
     }
 
