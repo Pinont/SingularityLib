@@ -19,6 +19,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # This job never pushes back to SingularityLib. Leaving the default
+          # persist-credentials extraheader (GITHUB_TOKEN) in place makes
+          # later git clone/push to Pinont/singularity-maven use the wrong
+          # token: clone of a public repo still succeeds, then `git push`
+          # fails with "Invalid username or token" (run 33554760652).
+          persist-credentials: false
       - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
@@ -41,24 +48,33 @@ jobs:
       - name: Clone target repo (gh-pages branch)
         # Clone into runner.temp — Maven's `target/` already exists after deploy,
         # so `git clone … target` would fail (non-empty destination).
+        env:
+          MAVEN_REPO_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
         run: |
           DEST="${{ runner.temp }}/singularity-maven"
-          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" "$DEST" || {
-            git clone "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" "$DEST"
+          AUTH_URL="https://x-access-token:${MAVEN_REPO_TOKEN}@github.com/Pinont/singularity-maven.git"
+          git -c "http.https://github.com/.extraheader=" clone --depth 1 --branch gh-pages "$AUTH_URL" "$DEST" || {
+            git -c "http.https://github.com/.extraheader=" clone "$AUTH_URL" "$DEST"
             git -C "$DEST" checkout -b gh-pages || true
           }
+          git -C "$DEST" remote set-url origin "$AUTH_URL"
       - name: Sync artifacts in (accumulative)
+        env:
+          MAVEN_REPO_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
         run: |
           DEST="${{ runner.temp }}/singularity-maven"
+          AUTH_URL="https://x-access-token:${MAVEN_REPO_TOKEN}@github.com/Pinont/singularity-maven.git"
           # Overlay onto gh-pages root (io/, com/, …). Do not nest under repo/,
           # and do not delete javadoc/, CNAME, or .nojekyll.
           cp -R staging/. "$DEST/"
           cd "$DEST"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "$AUTH_URL"
           git add -A
           git diff --cached --quiet && echo "No changes" || git commit -m "publish ${{ github.sha }}"
-          git push origin gh-pages
+          # Blank extraheader so a leftover GITHUB_TOKEN cannot override the PAT.
+          git -c "http.https://github.com/.extraheader=" push origin gh-pages
       - name: Trigger Pages rebuild
         run: |
           curl -s -X POST \
