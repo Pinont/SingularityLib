@@ -170,18 +170,20 @@
                 </executions>
             </plugin>
 
-            <!-- Javadoc JAR (failOnError=false to avoid build breaks) -->
+            <!-- Javadoc JAR (attached for Central) + HTML via javadoc:javadoc for the docs site.
+                 failOnError stays false so missing comments / JDK 25 lint do not fail the build. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.7.0</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <failOnWarnings>false</failOnWarnings>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
                         <goals><goal>jar</goal></goals>
-                        <configuration>
-                            <failOnError>false</failOnError>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

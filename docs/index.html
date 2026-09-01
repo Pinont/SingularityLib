@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SingularityLib — Docs</title>
+  <meta name="description" content="SingularityLib JavaDoc and install coordinates. A PaperMC plugin development library.">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #171e27;
+      --ink: #e8eef4;
+      --muted: #9aa8b5;
+      --line: #2a3542;
+      --accent: #e0a54b;
+      --accent-ink: #1a1408;
+      --link: #7ec8e8;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    main {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 3.5rem 1.25rem 4rem;
+    }
+    .eyebrow {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin: 0 0 0.75rem;
+    }
+    h1 {
+      font-size: 2.15rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.75rem;
+    }
+    .lead { color: var(--muted); margin: 0 0 1.75rem; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 0 0 2.25rem;
+    }
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.55rem 0.95rem;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: var(--panel);
+    }
+    a.btn.primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+    }
+    a.btn:hover { filter: brightness(1.08); }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.15rem 1.2rem 1.05rem;
+      margin: 0 0 1rem;
+    }
+    h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0 0 0.65rem;
+    }
+    p { margin: 0 0 0.7rem; }
+    p:last-child { margin-bottom: 0; }
+    code, pre {
+      font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+    }
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      background: #0c1015;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.85rem 1rem;
+      color: var(--ink);
+    }
+    a { color: var(--link); }
+    ul { margin: 0.25rem 0 0; padding-left: 1.2rem; color: var(--muted); }
+    li { margin: 0.2rem 0; }
+    footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">PaperMC · JDK 25 · Maven Central</p>
+    <h1>SingularityLib</h1>
+    <p class="lead">
+      Core API library for Paper plugins: commands, config, GUI, items, entities,
+      compile-time auto-registration, database helpers, and Discord JDA bootstrap.
+    </p>
+
+    <div class="actions">
+      <a class="btn primary" href="./latest/index.html">Browse JavaDoc</a>
+      <a class="btn" href="https://github.com/Pinont/SingularityLib#installation-maven">Install (README)</a>
+      <a class="btn" href="https://central.sonatype.com/artifact/io.github.pinont/singularitylib">Maven Central</a>
+    </div>
+
+    <section>
+      <h2>Maven Central coordinates</h2>
+      <p>Releases are on Central — no extra repository block. Scope <code>provided</code>; the lib loads as its own server plugin.</p>
+      <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.github.pinont&lt;/groupId&gt;
+  &lt;artifactId&gt;singularitylib&lt;/artifactId&gt;
+  &lt;version&gt;2.0.0&lt;/version&gt;
+  &lt;scope&gt;provided&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+    </section>
+
+    <section>
+      <h2>JavaDoc</h2>
+      <p>
+        HTML is generated from <code>src/main/java</code> and published on
+        <code>maven.pinont.me</code> next to the snapshot Maven repository.
+      </p>
+      <ul>
+        <li><a href="./latest/index.html">Latest from <code>main</code></a> — <code>/javadoc/singularitylib/latest/</code></li>
+        <li>Per-version copies live under <code>/javadoc/singularitylib/&lt;version&gt;/</code></li>
+        <li>Fallback:
+          <a href="https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0">javadoc.io (2.0.0)</a>
+          (Central sync may lag)
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Snapshots</h2>
+      <p>
+        Dev builds: <code>io.github.pinont:singularitylib:2.0.0-SNAPSHOT</code> from
+        <a href="https://maven.pinont.me">https://maven.pinont.me</a>.
+        Full install notes, including the bootstrap <code>paper-plugin.yml</code> snippet, are in the
+        <a href="https://github.com/Pinont/SingularityLib#installation-maven">README</a>.
+      </p>
+    </section>
+
+    <footer>
+      <a href="https://github.com/Pinont/SingularityLib">GitHub</a>
+      ·
+      <a href="https://github.com/Pinont/SingularityLib/blob/main/LICENSE">MIT</a>
+    </footer>
+  </main>
+</body>
+</html>

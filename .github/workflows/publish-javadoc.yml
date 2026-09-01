@@ -1,0 +1,111 @@
+name: publish-javadoc
+
+# Generates JavaDoc HTML and copies it into Pinont/singularity-maven (gh-pages),
+# which is served at https://maven.pinont.me. Paths are under /javadoc/ so they
+# never collide with the Maven layout (io/, com/) written by pages-repo.yml.
+#
+# Do not enable GitHub Pages on Pinont/SingularityLib — that URL is the
+# portfolio (pinont.me), not this library.
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: singularity-maven-gh-pages
+  cancel-in-progress: false
+
+jobs:
+  javadoc:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Install annotation processor module
+        run: mvn -q install -DskipTests -f singularitylib-processor/pom.xml
+
+      - name: Resolve project version
+        id: ver
+        run: |
+          VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate JavaDoc HTML
+        run: mvn -q javadoc:javadoc -DskipTests
+
+      - name: Locate JavaDoc output
+        id: javadoc
+        run: |
+          if [ -d target/site/apidocs ]; then
+            echo "dir=target/site/apidocs" >> "$GITHUB_OUTPUT"
+          elif [ -d target/reports/apidocs ]; then
+            echo "dir=target/reports/apidocs" >> "$GITHUB_OUTPUT"
+          else
+            echo "JavaDoc output not found under target/site or target/reports" >&2
+            find target -type d -name apidocs || true
+            exit 1
+          fi
+
+      - name: Clone singularity-maven (gh-pages)
+        run: |
+          git clone --depth 1 --branch gh-pages \
+            "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" \
+            singularity-maven-pages
+
+      - name: Stage JavaDoc (Maven group paths untouched)
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          JAVADOC_DIR: ${{ steps.javadoc.outputs.dir }}
+        run: |
+          set -euo pipefail
+          ROOT="singularity-maven-pages"
+          DEST="${ROOT}/javadoc/singularitylib"
+          mkdir -p "${DEST}"
+          cp docs/javadoc-root.html "${ROOT}/javadoc/index.html"
+          cp docs/index.html "${DEST}/index.html"
+          rm -rf "${DEST}/${VERSION}"
+          mkdir -p "${DEST}/${VERSION}"
+          cp -R "${JAVADOC_DIR}/." "${DEST}/${VERSION}/"
+          # Copy, not symlink — GitHub Pages does not follow git symlinks.
+          rm -rf "${DEST}/latest"
+          mkdir -p "${DEST}/latest"
+          cp -R "${JAVADOC_DIR}/." "${DEST}/latest/"
+          touch "${ROOT}/.nojekyll"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          cd singularity-maven-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add javadoc .nojekyll
+          if git diff --cached --quiet; then
+            echo "No javadoc changes"
+            exit 0
+          fi
+          git commit -m "docs: javadoc singularitylib ${{ steps.ver.outputs.version }} (${{ github.sha }})"
+          for i in 1 2 3 4; do
+            git pull --rebase origin gh-pages
+            if git push origin gh-pages; then
+              exit 0
+            fi
+            sleep $((i * 4))
+          done
+          echo "Failed to push gh-pages after retries" >&2
+          exit 1
+
+      - name: Trigger Pages rebuild
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Bearer ${{ secrets.MAVEN_REPO_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/Pinont/singularity-maven/pages/builds -o /dev/null -w "%{http_code}\n"
