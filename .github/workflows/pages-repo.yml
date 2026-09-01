@@ -5,10 +5,18 @@ on:
     branches: [ main, "rework/v2" ]
   workflow_dispatch:
 
+# Shared with publish-javadoc.yml so Maven-layout and JavaDoc pushes to
+# Pinont/singularity-maven gh-pages do not race.
+concurrency:
+  group: singularity-maven-gh-pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     # Pushes the maven repo layout to Pinont/singularity-maven (Pages-served,
     # anonymous reads). Accumulative: previously published versions are kept.
+    # JavaDoc HTML is published separately under /javadoc/ by publish-javadoc.yml
+    # — do not delete that tree.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

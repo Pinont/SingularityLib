@@ -1,6 +1,8 @@
 # SingularityLib
 
-[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://img.shields.io/maven-central/v/io.github.pinont/singularitylib)](https://central.sonatype.com/artifact/io.github.pinont/singularitylib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml)
+[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://img.shields.io/maven-central/v/io.github.pinont/singularitylib)](https://central.sonatype.com/artifact/io.github.pinont/singularitylib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml) [![JavaDoc](https://img.shields.io/badge/docs-JavaDoc-e0a54b)](https://maven.pinont.me/javadoc/singularitylib/)
+
+**Docs / JavaDoc:** [maven.pinont.me/javadoc/singularitylib](https://maven.pinont.me/javadoc/singularitylib/) · [latest API](https://maven.pinont.me/javadoc/singularitylib/latest/) · [javadoc.io fallback](https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0)
 
 A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
