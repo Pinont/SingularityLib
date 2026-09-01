@@ -5,10 +5,17 @@ on:
     branches: [ main, "rework/v2" ]
   workflow_dispatch:
 
+# Shared with JavaDoc publishing so Maven-layout and docs pushes to
+# Pinont/singularity-maven gh-pages do not race.
+concurrency:
+  group: singularity-maven-gh-pages
+  cancel-in-progress: false
+
 jobs:
   deploy:
     # Pushes the maven repo layout to Pinont/singularity-maven (Pages-served,
     # anonymous reads). Accumulative: previously published versions are kept.
+    # JavaDoc HTML lives under /javadoc/ — overlay only; do not delete that tree.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,19 +24,36 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+      - name: Install annotation processor module
+        # singularitylib-processor is a standalone module (the root pom is a jar,
+        # not an aggregator), so install it into the local repo first — the lib
+        # compiles against it via annotationProcessorPaths. Same step as build.yml.
+        run: mvn -q install -f singularitylib-processor/pom.xml
       - name: Stage maven repo layout
-        run: mvn -q clean deploy -DskipTests -DaltDeploymentRepository=pages::default::file:${{ github.workspace }}/staging
-      - name: Clone target repo (gh-pages branch)
+        # File-repo deploy. maven.pinont.me serves group paths at the Pages root
+        # (https://maven.pinont.me/io/github/pinont/...), not under /repo/.
         run: |
-          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" target || {
-            cd target 2>/dev/null || git clone "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" target
-            cd target && git checkout -b gh-pages || true
+          STAGING="${{ github.workspace }}/staging"
+          mvn -q deploy -f singularitylib-processor/pom.xml -DskipTests \
+            -DaltDeploymentRepository=pages::default::file:${STAGING}
+          mvn -q clean deploy -DskipTests \
+            -DaltDeploymentRepository=pages::default::file:${STAGING}
+      - name: Clone target repo (gh-pages branch)
+        # Clone into runner.temp — Maven's `target/` already exists after deploy,
+        # so `git clone … target` would fail (non-empty destination).
+        run: |
+          DEST="${{ runner.temp }}/singularity-maven"
+          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" "$DEST" || {
+            git clone "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" "$DEST"
+            git -C "$DEST" checkout -b gh-pages || true
           }
       - name: Sync artifacts in (accumulative)
         run: |
-          mkdir -p target/repo
-          cp -R staging/. target/repo/
-          cd target
+          DEST="${{ runner.temp }}/singularity-maven"
+          # Overlay onto gh-pages root (io/, com/, …). Do not nest under repo/,
+          # and do not delete javadoc/, CNAME, or .nojekyll.
+          cp -R staging/. "$DEST/"
+          cd "$DEST"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
