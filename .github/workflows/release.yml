@@ -12,7 +12,9 @@ concurrency:
 jobs:
   release:
     name: Create & Publish Release
-    if: github.event.pull_request.merged == true
+    # Only tagged product releases. Merging a CI/docs PR to main without the
+    # `release` label must not derive a hotfix tag or publish.
+    if: github.event.pull_request.merged == true && contains(join(github.event.pull_request.labels.*.name, ','), 'release')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -170,7 +172,9 @@ jobs:
     #   stage via deploy file: -> gpg sign -> checksums for EVERY file (incl .asc)
     #   -> zip via python zipfile (NEVER jar tool: it injects META-INF manifest
     #   that Central rejects) -> POST bundle?publishingType=AUTOMATIC
-    if: github.event.pull_request.merged == true
+    # Same `release` label gate as the release job — Central upload must not
+    # run for unlabeled merges.
+    if: github.event.pull_request.merged == true && contains(join(github.event.pull_request.labels.*.name, ','), 'release')
     needs: release
     runs-on: ubuntu-latest
     steps:
