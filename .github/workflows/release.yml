@@ -256,8 +256,8 @@ PY
 
       - name: Upload to Maven Central
         env:
-          CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
-          CENTRAL_PASS: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          CENTRAL_USER: ${{ secrets.SONATYPE_USERNAME }}
+          CENTRAL_PASS: ${{ secrets.SONATYPE_PASSWORD }}
         run: |
           curl -s -X POST \
             -u "${CENTRAL_USER}:${CENTRAL_PASS}" \
