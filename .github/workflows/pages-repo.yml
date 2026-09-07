@@ -1,83 +1,25 @@
 name: publish-public-repo
 
+# Retired. This workflow used to git-push snapshots to Pinont/singularity-maven
+# (maven.pinont.me). That path is closed:
+#   - Snapshots live on GitHub Packages (build.yml, GITHUB_TOKEN).
+#   - maven.pinont.me is a frozen Pages archive — do not git-push it from CI.
+#   - Releases go to Maven Central via release.yml
+#     (SONATYPE_USERNAME / SONATYPE_PASSWORD).
+#   - Central Portal does not accept SNAPSHOT uploads.
+# workflow_dispatch is kept so the old Actions name still resolves; the job
+# only prints the policy and never pushes.
+
 on:
-  push:
-    branches: [ main, "rework/v2" ]
   workflow_dispatch:
 
-# Shared with JavaDoc publishing so Maven-layout and docs pushes to
-# Pinont/singularity-maven gh-pages do not race.
-concurrency:
-  group: singularity-maven-gh-pages
-  cancel-in-progress: false
-
 jobs:
-  deploy:
-    # Pushes the maven repo layout to Pinont/singularity-maven (Pages-served,
-    # anonymous reads). Accumulative: previously published versions are kept.
-    # JavaDoc HTML lives under /javadoc/ — overlay only; do not delete that tree.
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          # This job never pushes back to SingularityLib. Leaving the default
-          # persist-credentials extraheader (GITHUB_TOKEN) in place makes
-          # later git clone/push to Pinont/singularity-maven use the wrong
-          # token: clone of a public repo still succeeds, then `git push`
-          # fails with "Invalid username or token" (run 33554760652).
-          persist-credentials: false
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-      - name: Install annotation processor module
-        # singularitylib-processor is a standalone module (the root pom is a jar,
-        # not an aggregator), so install it into the local repo first — the lib
-        # compiles against it via annotationProcessorPaths. Same step as build.yml.
-        run: mvn -q install -f singularitylib-processor/pom.xml
-      - name: Stage maven repo layout
-        # File-repo deploy. maven.pinont.me serves group paths at the Pages root
-        # (https://maven.pinont.me/io/github/pinont/...), not under /repo/.
+      - name: Public repo publish is retired
         run: |
-          STAGING="${{ github.workspace }}/staging"
-          mvn -q deploy -f singularitylib-processor/pom.xml -DskipTests \
-            -DaltDeploymentRepository=pages::default::file:${STAGING}
-          mvn -q clean deploy -DskipTests \
-            -DaltDeploymentRepository=pages::default::file:${STAGING}
-      - name: Clone target repo (gh-pages branch)
-        # Clone into runner.temp — Maven's `target/` already exists after deploy,
-        # so `git clone … target` would fail (non-empty destination).
-        env:
-          MAVEN_REPO_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
-        run: |
-          DEST="${{ runner.temp }}/singularity-maven"
-          AUTH_URL="https://x-access-token:${MAVEN_REPO_TOKEN}@github.com/Pinont/singularity-maven.git"
-          git -c "http.https://github.com/.extraheader=" clone --depth 1 --branch gh-pages "$AUTH_URL" "$DEST" || {
-            git -c "http.https://github.com/.extraheader=" clone "$AUTH_URL" "$DEST"
-            git -C "$DEST" checkout -b gh-pages || true
-          }
-          git -C "$DEST" remote set-url origin "$AUTH_URL"
-      - name: Sync artifacts in (accumulative)
-        env:
-          MAVEN_REPO_TOKEN: ${{ secrets.MAVEN_REPO_TOKEN }}
-        run: |
-          DEST="${{ runner.temp }}/singularity-maven"
-          AUTH_URL="https://x-access-token:${MAVEN_REPO_TOKEN}@github.com/Pinont/singularity-maven.git"
-          # Overlay onto gh-pages root (io/, com/, …). Do not nest under repo/,
-          # and do not delete javadoc/, CNAME, or .nojekyll.
-          cp -R staging/. "$DEST/"
-          cd "$DEST"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin "$AUTH_URL"
-          git add -A
-          git diff --cached --quiet && echo "No changes" || git commit -m "publish ${{ github.sha }}"
-          # Blank extraheader so a leftover GITHUB_TOKEN cannot override the PAT.
-          git -c "http.https://github.com/.extraheader=" push origin gh-pages
-      - name: Trigger Pages rebuild
-        run: |
-          curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.MAVEN_REPO_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/Pinont/singularity-maven/pages/builds -o /dev/null -w "%{http_code}\n"
+          echo "publish-public-repo is retired."
+          echo "Snapshots: GitHub Packages (build.yml)."
+          echo "maven.pinont.me is a frozen Pages archive."
+          echo "Releases: Maven Central via release.yml."
