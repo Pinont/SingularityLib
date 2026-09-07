@@ -83,6 +83,10 @@ dependencies:
 
 ## Usage
 To use SingularityLib, your main class must extend `CorePlugin` instead of `JavaPlugin`.
+
+Copy-paste examples (CommandGroup, Paper conversations, Item Studio export) live in
+[`docs/examples/`](docs/examples/README.md). The GitHub wiki is not published; those
+markdown pages are the docs home.
 ```java
 public class Main extends CorePlugin {
     @Override
