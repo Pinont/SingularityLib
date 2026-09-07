@@ -151,12 +151,12 @@ final class ListSub extends SubCommand {
 
 | Input | Result |
 | --- | --- |
-| `/arena` | Auto help: `—— arena help ——` then one yellow line per subcommand |
+| `/arena` | Auto help: `—— arena:ar help ——` then one yellow line per subcommand (`getName()` is printed as-is, including aliases) |
 | `/arena create spawn` | `CreateSub.execute` with `args = ["spawn"]` (subcommand name stripped) |
 | `/arena c spawn` | Same — `create:c` registers both `create` and `c` |
-| `/arena nope` | Red `Unknown subcommand: nope. Use /arena help` |
+| `/arena nope` | Red `Unknown subcommand: nope. Use /arena:ar help` |
 | Console `/arena create spawn` | Red `This subcommand is players-only.` (`isPlayerOnly()`) |
-| No permission | Red `You do not have permission to use: /arena create:c` |
+| No permission | Red `You do not have permission to use: /arena:ar create:c` |
 
 Empty `getPermission()` / `null` means no permission check. Empty
 `getDescription()` omits the ` — …` suffix on the help line.
