@@ -96,8 +96,10 @@
 
     <properties>
         <java.version>25</java.version>
-        <!-- Latest-only Paper 26.2+: resolves to the newest build on repo.papermc.io -->
-        <paperapi.version>[26.2.build,)</paperapi.version>
+        <!-- Pin to the Paper bundle MockBukkit 4.116.1 was built against.
+             The previous range [26.2.build,) also matched 26.3-pre-* alphas and
+             broke tests (RegistryAccessMock / decorated_pot_pattern mismatch). -->
+        <paperapi.version>26.2.build.111-stable</paperapi.version>
         <!-- Last standalone Folia API line; from Paper 26.x Folia schedulers ship inside paper-api -->
         <foliaapi.version>26.2.build.7-beta</foliaapi.version>
         <!-- MockBukkit artifact matching Paper 26.2 -->
