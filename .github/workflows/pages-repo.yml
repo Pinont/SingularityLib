@@ -1,51 +1,25 @@
 name: publish-public-repo
 
+# Retired. This workflow used to git-push snapshots to Pinont/singularity-maven
+# (maven.pinont.me). That path is closed:
+#   - Snapshots live on GitHub Packages (build.yml, GITHUB_TOKEN).
+#   - maven.pinont.me is a frozen Pages archive — do not git-push it from CI.
+#   - Releases go to Maven Central via release.yml
+#     (SONATYPE_USERNAME / SONATYPE_PASSWORD).
+#   - Central Portal does not accept SNAPSHOT uploads.
+# workflow_dispatch is kept so the old Actions name still resolves; the job
+# only prints the policy and never pushes.
+
 on:
-  push:
-    branches: [ main, "rework/v2" ]
   workflow_dispatch:
 
-# Shared with publish-javadoc.yml so Maven-layout and JavaDoc pushes to
-# Pinont/singularity-maven gh-pages do not race.
-concurrency:
-  group: singularity-maven-gh-pages
-  cancel-in-progress: false
-
 jobs:
-  deploy:
-    # Pushes the maven repo layout to Pinont/singularity-maven (Pages-served,
-    # anonymous reads). Accumulative: previously published versions are kept.
-    # JavaDoc HTML is published separately under /javadoc/ by publish-javadoc.yml
-    # — do not delete that tree.
+  retired:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup JDK 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '25'
-      - name: Stage maven repo layout
-        run: mvn -q clean deploy -DskipTests -DaltDeploymentRepository=pages::default::file:${{ github.workspace }}/staging
-      - name: Clone target repo (gh-pages branch)
+      - name: Public repo publish is retired
         run: |
-          git clone --depth 1 --branch gh-pages "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" target || {
-            cd target 2>/dev/null || git clone "https://x-access-token:${{ secrets.MAVEN_REPO_TOKEN }}@github.com/Pinont/singularity-maven.git" target
-            cd target && git checkout -b gh-pages || true
-          }
-      - name: Sync artifacts in (accumulative)
-        run: |
-          mkdir -p target/repo
-          cp -R staging/. target/repo/
-          cd target
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && echo "No changes" || git commit -m "publish ${{ github.sha }}"
-          git push origin gh-pages
-      - name: Trigger Pages rebuild
-        run: |
-          curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.MAVEN_REPO_TOKEN }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/Pinont/singularity-maven/pages/builds -o /dev/null -w "%{http_code}\n"
+          echo "publish-public-repo is retired."
+          echo "Snapshots: GitHub Packages (build.yml)."
+          echo "maven.pinont.me is a frozen Pages archive."
+          echo "Releases: Maven Central via release.yml."
