@@ -1,8 +1,8 @@
 # SingularityLib
 
-[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://img.shields.io/maven-central/v/io.github.pinont/singularitylib)](https://central.sonatype.com/artifact/io.github.pinont/singularitylib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml) [![JavaDoc](https://img.shields.io/badge/docs-JavaDoc-e0a54b)](https://maven.pinont.me/javadoc/singularitylib/)
+[![](https://img.shields.io/github/license/pinont/singularitylib)](https://github.com/Pinont/SingularityLib/blob/main/LICENSE) [![](https://img.shields.io/maven-central/v/io.github.pinont/singularitylib)](https://central.sonatype.com/artifact/io.github.pinont/singularitylib) [![](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml/badge.svg)](https://github.com/Pinont/SingularityLib/actions/workflows/build.yml) [![JavaDoc](https://img.shields.io/badge/docs-JavaDoc-e0a54b)](https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0)
 
-**Docs / JavaDoc:** [maven.pinont.me/javadoc/singularitylib](https://maven.pinont.me/javadoc/singularitylib/) · [latest API](https://maven.pinont.me/javadoc/singularitylib/latest/) · [javadoc.io fallback](https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0)
+**Docs / JavaDoc:** [javadoc.io (2.0.0)](https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0) · [latest from `main`](https://cdn.jsdelivr.net/gh/Pinont/SingularityLib@javadoc/latest/) · [`javadoc` branch](https://github.com/Pinont/SingularityLib/tree/javadoc)
 
 A fork of [ExperienceLib](https://github.com/pinont/ExperienceLib)
 
@@ -51,6 +51,8 @@ SingularityLib is published to **Maven Central** — no repository block needed 
 🚀 **Get the latest version:** [central.sonatype.com/artifact/io.github.pinont/singularitylib](https://central.sonatype.com/artifact/io.github.pinont/singularitylib)
 
 ### Snapshots (dev/pre-release)
+
+Live SNAPSHOT jars are published to [GitHub Packages](https://github.com/Pinont/SingularityLib/packages) (`build.yml`, `GITHUB_TOKEN`). `https://maven.pinont.me` is a frozen Pages archive and is not updated from CI.
 
 ```xml
 <repositories>

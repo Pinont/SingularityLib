@@ -3,7 +3,9 @@ name: publish-public-repo
 # Retired. This workflow used to git-push snapshots to Pinont/singularity-maven
 # (maven.pinont.me). That path is closed:
 #   - Snapshots live on GitHub Packages (build.yml, GITHUB_TOKEN).
-#   - maven.pinont.me is a frozen Pages archive — do not git-push it from CI.
+#   - maven.pinont.me is a frozen Pages archive — do not git-push it from CI
+#     (no Maven layout, no JavaDoc). Public JavaDoc HTML is published by
+#     publish-javadoc.yml to the `javadoc` branch of this repo.
 #   - Releases go to Maven Central via release.yml
 #     (SONATYPE_USERNAME / SONATYPE_PASSWORD).
 #   - Central Portal does not accept SNAPSHOT uploads.
@@ -22,4 +24,5 @@ jobs:
           echo "publish-public-repo is retired."
           echo "Snapshots: GitHub Packages (build.yml)."
           echo "maven.pinont.me is a frozen Pages archive."
+          echo "JavaDoc HTML: publish-javadoc.yml -> javadoc branch."
           echo "Releases: Maven Central via release.yml."

@@ -135,15 +135,15 @@
     <section>
       <h2>JavaDoc</h2>
       <p>
-        HTML is generated from <code>src/main/java</code> and published on
-        <code>maven.pinont.me</code> next to the snapshot Maven repository.
+        HTML is generated from <code>src/main/java</code> and published to the
+        <code>javadoc</code> branch of this repository (no extra CI secret).
+        Release docs also live on javadoc.io once Central has the version.
       </p>
       <ul>
-        <li><a href="./latest/index.html">Latest from <code>main</code></a> — <code>/javadoc/singularitylib/latest/</code></li>
-        <li>Per-version copies live under <code>/javadoc/singularitylib/&lt;version&gt;/</code></li>
-        <li>Fallback:
+        <li><a href="./latest/index.html">Latest from <code>main</code></a></li>
+        <li>Per-version copies live alongside this page (folder named after the pom version)</li>
+        <li>Release:
           <a href="https://javadoc.io/doc/io.github.pinont/singularitylib/2.0.0">javadoc.io (2.0.0)</a>
-          (Central sync may lag)
         </li>
       </ul>
     </section>
@@ -152,7 +152,8 @@
       <h2>Snapshots</h2>
       <p>
         Dev builds: <code>io.github.pinont:singularitylib:2.0.0-SNAPSHOT</code> from
-        <a href="https://maven.pinont.me">https://maven.pinont.me</a>.
+        <a href="https://github.com/Pinont/SingularityLib/packages">GitHub Packages</a>.
+        <code>maven.pinont.me</code> is a frozen Pages archive.
         Full install notes, including the bootstrap <code>paper-plugin.yml</code> snippet, are in the
         <a href="https://github.com/Pinont/SingularityLib#installation-maven">README</a>.
       </p>
