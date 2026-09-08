@@ -99,6 +99,8 @@ jobs:
           name: javadoc-html
           path: javadoc-site
           if-no-files-found: error
+          # v4.4+ drops dotfiles by default; keep .nojekyll in the artifact.
+          include-hidden-files: true
 
   publish:
     # Never publish from pull requests. workflow_dispatch may run off main.
@@ -135,7 +137,10 @@ jobs:
           fi
           mkdir -p "${VERSION}" latest
           cp "${SITE}/index.html" index.html
-          cp "${SITE}/.nojekyll" .nojekyll
+          # Do not copy .nojekyll from the artifact: upload-artifact@v4 omits
+          # hidden files unless include-hidden-files is set. Recreate it here
+          # so publish still succeeds if a future upload drops it again.
+          touch .nojekyll
           rm -rf "${VERSION}" latest
           mkdir -p "${VERSION}" latest
           cp -R "${SITE}/${VERSION}/." "${VERSION}/"
