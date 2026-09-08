@@ -1,0 +1,1 @@
+tagSearchIndex = [{"l":"Constant Field Values","h":"","k":"18","u":"constant-values.html"},{"l":"Tick semantics","h":"class com.github.pinont.singularitylib.api.runnable.Scheduler","k":"16","u":"com/github/pinont/singularitylib/api/runnable/Scheduler.html#tick-semantics-heading"}];updateSearchResults();
