@@ -228,6 +228,7 @@ KG
 
       - name: Stage artifacts (file: deploy)
         run: |
+          mvn -B install -f singularitylib-processor/pom.xml -DskipTests
           mvn -B clean deploy -DskipTests -DaltDeploymentRepository=central::default::file:$(pwd)/staging
           mvn -B deploy -f singularitylib-processor/pom.xml -DskipTests -DaltDeploymentRepository=central::default::file:$(pwd)/staging
 
